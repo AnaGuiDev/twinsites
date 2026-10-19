@@ -1,6 +1,8 @@
 import path from "node:path";
-import { defineConfig } from "vite";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
+import { zoneSentence, type ZoneRecord } from "./src/lib/zones";
 
 const headers = {
   "Cross-Origin-Opener-Policy": "same-origin",
@@ -21,7 +23,7 @@ function dropBundledOrtWasm() {
 }
 
 export default defineConfig({
-  plugins: [react(), dropBundledOrtWasm()],
+  plugins: [react(), dropBundledOrtWasm(), zoneStubs()],
   optimizeDeps: {
     exclude: ["@huggingface/transformers"],
   },
@@ -42,3 +44,51 @@ export default defineConfig({
   server: { headers },
   preview: { headers },
 });
+
+function zoneStubs(): Plugin {
+  return {
+    name: "zone-stubs",
+    apply: "build",
+    closeBundle() {
+      const distIndex = path.resolve("dist/index.html");
+      const explorePath = path.resolve("public/data/explore.json");
+      const html = readFileSync(distIndex, "utf8");
+      const explore = JSON.parse(readFileSync(explorePath, "utf8")) as { zones: ZoneRecord[] };
+      for (const zone of explore.zones) {
+        const sentence = zoneSentence(zone, "en");
+        const url = `https://twinsites.com/zone/${zone.slug}`;
+        writeStub(html, path.resolve("dist/zone", zone.slug), `${zone.labelEn} — Twinsites`, sentence, url, zone.labelEn);
+      }
+      writeStub(
+        html,
+        path.resolve("dist/zones"),
+        "Zones — Twinsites",
+        `${explore.zones.length} zones of AI-built homepages.`,
+        "https://twinsites.com/zones",
+        "Zones",
+      );
+    },
+  };
+}
+
+function writeStub(html: string, dir: string, title: string, description: string, url: string, heading: string): void {
+  let page = html;
+  page = page.replace(/<title>[^<]*<\/title>/, `<title>${esc(title)}</title>`);
+  page = page.replace(/(<meta\s+name="description"\s+content=")[^"]*(")/, `$1${esc(description)}$2`);
+  page = page.replace(/(<link rel="canonical" href=")[^"]*(")/, `$1${url}$2`);
+  page = page.replace(/(<meta property="og:url" content=")[^"]*(")/, `$1${url}$2`);
+  page = page.replace(/(<meta property="og:title" content=")[^"]*(")/, `$1${esc(title)}$2`);
+  page = page.replace(/(<meta property="og:description" content=")[^"]*(")/, `$1${esc(description)}$2`);
+  page = page.replace(/(<meta name="twitter:title" content=")[^"]*(")/, `$1${esc(title)}$2`);
+  page = page.replace(/(<meta name="twitter:description" content=")[^"]*(")/, `$1${esc(description)}$2`);
+  page = page.replace(
+    /<div id="root">[\s\S]*?<\/div>/,
+    `<div id="root"><h1>${esc(heading)}</h1><p>${esc(description)}</p></div>`,
+  );
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(path.join(dir, "index.html"), page);
+}
+
+function esc(value: string): string {
+  return value.replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char] ?? char);
+}

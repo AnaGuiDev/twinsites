@@ -70,8 +70,18 @@ async function main() {
 
   const mobile = await session(browser, true);
   const mobileInteractive = await timeToInteractive(mobile.page);
+  await mobile.page.waitForTimeout(1500);
   const beforeIntent = await mobile.page.evaluate(heavyBefore);
+  const firstLoad = await mobile.page.evaluate(`(() => {
+    const nav = performance.getEntriesByType("navigation")[0];
+    const resources = performance.getEntriesByType("resource");
+    const transfer = (nav ? nav.transferSize : 0) + resources.reduce((sum, entry) => sum + (entry.transferSize || 0), 0);
+    const encoded = (nav ? nav.encodedBodySize : 0) + resources.reduce((sum, entry) => sum + (entry.encodedBodySize || 0), 0);
+    const names = [document.location.pathname].concat(resources.map((entry) => entry.name.replace(location.origin, "")));
+    return { transfer, encoded, names };
+  })()`);
   console.log("mobile resources before intent", beforeIntent);
+  console.log("mobile first load", JSON.stringify(firstLoad));
   const resultStarted = Date.now();
   await mobile.page.locator("input[type=file]").setInputFiles(FILE);
   await mobile.page.locator(".bar").waitFor({ timeout: 20000 });
@@ -84,7 +94,7 @@ async function main() {
 
   const warmed = await session(browser, true);
   const warmedInteractive = await timeToInteractive(warmed.page);
-  await warmed.page.locator("button.ticket").first().focus();
+  await warmed.page.getByRole("button", { name: "Choose a file" }).focus();
   const preloadMs = await warmed.page.evaluate(`(async () => {
     const started = performance.now();
     const ready = () => {
@@ -110,7 +120,7 @@ async function main() {
       mobile: "375×812, 4× CPU, fast 4G: 40 ms latency, 9 Mbit/s down, 1.5 Mbit/s up, cache disabled",
     },
     desktop: { interactiveMs: desktopInteractive, firstResultMs: desktopResult },
-    mobileImmediate: { interactiveMs: mobileInteractive, firstResultMs: mobileResult },
+    mobileImmediate: { interactiveMs: mobileInteractive, firstResultMs: mobileResult, firstLoad },
     mobileAfterPreload: {
       interactiveMs: warmedInteractive,
       preloadMs,

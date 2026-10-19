@@ -1,0 +1,17 @@
+name = "twinsites-shot"
+main = "src/index.ts"
+compatibility_date = "2026-04-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Browser Rendering (Cloudflare Browser Run). Not used when SHOT_PROVIDER=api.
+[browser]
+binding = "BROWSER"
+
+[[kv_namespaces]]
+binding = "SHOTS"
+id = "replace-with-kv-namespace-id"
+
+[vars]
+SHOT_KILL = "0"
+SHOT_DAILY_CAP = "40"
+SHOT_PROVIDER = "browser"

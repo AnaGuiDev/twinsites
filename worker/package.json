@@ -1,0 +1,13 @@
+{
+  "name": "twinsites-shot",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "test": "tsx --test test/*.test.ts"
+  },
+  "devDependencies": {
+    "@cloudflare/puppeteer": "1.1.0",
+    "wrangler": "4.40.0"
+  }
+}

@@ -7,8 +7,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build",
+    "build": "tsx scripts/precompute-explore.ts && tsc --noEmit && vite build",
     "preview": "vite preview --host 127.0.0.1 --port 4173",
+    "test:worker": "tsx --test worker/test/*.test.ts",
     "dataset": "tsx scripts/build-dataset.ts",
     "dataset:capture": "tsx scripts/capture.ts",
     "dataset:embed": "tsx scripts/embed.ts",
