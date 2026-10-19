@@ -24,11 +24,18 @@ jobs:
       - name: Prepare SSH
         env:
           VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+          VPS_KNOWN_HOSTS: ${{ secrets.VPS_KNOWN_HOSTS }}
         run: |
           mkdir -p ~/.ssh
           printf '%s\n' "$VPS_SSH_KEY" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan 169.58.213.168 >> ~/.ssh/known_hosts
+          if [ -n "$VPS_KNOWN_HOSTS" ]; then
+            printf '%s\n' "$VPS_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          else
+            echo "::warning::VPS_KNOWN_HOSTS is empty. Falling back to ssh-keyscan for 169.58.213.168. Pin that secret before treating this host key as trusted."
+            ssh-keyscan -T 10 169.58.213.168 >> ~/.ssh/known_hosts
+          fi
+          chmod 644 ~/.ssh/known_hosts
 
       - name: Upload site
         run: rsync -avz --delete dist/ deploy@169.58.213.168:/var/www/twinsites/

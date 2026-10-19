@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { ColorName, Lang } from "./types";
 import type { Suggestion } from "./lib/suggest";
-import { formatRank, type KinVerdict } from "./lib/calibrate";
+import { formatPercentile, type KinVerdict } from "./lib/calibrate";
 import { COLOR_EN, COLOR_ES } from "./lib/labels";
 
 const REMOVAL_URL =
@@ -79,13 +79,15 @@ const copy = {
     centeredNo: "Off-center",
     errorImage: "That file could not be read as an image.",
     errorLarge: "Use an image under 20 MB.",
-    errorModel: "The on-device model did not start. Reload, and serve the site with COOP and COEP headers.",
+    errorModel: "Your browser couldn't start the model. Try desktop Chrome or Firefox.",
+    cropNote: "Only the top of the image is compared, the same first screen the catalog keeps.",
+    portraitNote: "This looks like a phone screenshot. The catalog is desktop homepages, so the match is a rough one.",
     errorCatalog: "The catalog is missing from this build.",
     loadingIdle: "Waiting for a screenshot",
     zone: "Zone",
     colorName: (name: ColorName) => COLOR_EN[name],
     suggestion: (item: Suggestion) => suggestionEn(item),
-    cardLine: (verdict: KinVerdict, zone: string) => kinPost("en", verdict, zone),
+    cardLine: (verdict: KinVerdict, zone: string, total: number) => kinPost("en", verdict, zone, total),
     categories: {
       games_play: "Games",
       productivity: "Productivity",
@@ -106,7 +108,7 @@ const copy = {
     langName: "English",
     kicker: "Nota de campo 01",
     title: "Encuentra las webs que ya llevan tu cara.",
-    lede: "Suelta una captura de una landing. Twinsites la pone junto a un cajón de webs hechas con IA y te dice cuáles tienen los mismos huesos.",
+    lede: "Suelta una captura de una página de inicio. Twinsites la pone junto a un cajón de webs hechas con IA y te dice cuáles tienen los mismos huesos.",
     privacy:
       "Tu captura no sale de este navegador. El modelo, el catálogo y la comparación ocurren en este dispositivo.",
     dropTitle: "Suelta una captura",
@@ -130,7 +132,7 @@ const copy = {
     progressLabel: "Progreso de carga",
     mapTitle: "El campo",
     mapDek: "Cada punto es una web hecha con IA. La cercanía es parentesco visual. La tuya aterriza en su barrio.",
-    mapHint: "Arrastra para moverte. La rueda hace zoom. Un clic abre la web.",
+    mapHint: "Arrastra para moverte. La rueda acerca la vista. Un clic abre la web.",
     fit: "Reencuadrar",
     you: "Tu captura",
     traitsTitle: "Marcas compartidas",
@@ -144,7 +146,7 @@ const copy = {
     shareNote:
       "En el móvil, el botón de compartir puede adjuntar la tarjeta. Si no, la publicación se abre con la frase y el enlace, y la imagen se queda aquí hasta que la adjuntes.",
     footerPrivacy: "Las capturas se quedan en la pestaña que las abrió.",
-    footerCatalog: "Homepages del catálogo CC0 awesome-vibe-coded-apps.",
+    footerCatalog: "Portadas del catálogo CC0 awesome-vibe-coded-apps.",
     footerLicense: "Twinsites es MIT.",
     dominant: "Color dominante",
     mode: "Fondo",
@@ -160,19 +162,21 @@ const copy = {
     packed: "Denso",
     gradientYes: "Degradado",
     gradientNo: "Color plano",
-    bentoYes: "Retícula bento",
-    bentoNo: "Sin retícula bento",
+    bentoYes: "Retícula de cajas",
+    bentoNo: "Sin retícula de cajas",
     centeredYes: "Centrado",
     centeredNo: "Descentrado",
     errorImage: "Ese archivo no se pudo leer como imagen.",
     errorLarge: "Usa una imagen de menos de 20 MB.",
-    errorModel: "El modelo local no arrancó. Recarga y sirve el sitio con las cabeceras COOP y COEP.",
-    errorCatalog: "A este build le falta el catálogo.",
+    errorModel: "Tu navegador no pudo arrancar el modelo. Prueba con Chrome o Firefox en el escritorio.",
+    cropNote: "Se compara solo la parte de arriba, la misma primera pantalla que guarda el catálogo.",
+    portraitNote: "Parece una captura de teléfono. El catálogo son portadas de escritorio, así que el parecido es orientativo.",
+    errorCatalog: "A esta versión le falta el catálogo.",
     loadingIdle: "Esperando una captura",
     zone: "Zona",
     colorName: (name: ColorName) => COLOR_ES[name],
     suggestion: (item: Suggestion) => suggestionEs(item),
-    cardLine: (verdict: KinVerdict, zone: string) => kinPost("es", verdict, zone),
+    cardLine: (verdict: KinVerdict, zone: string, total: number) => kinPost("es", verdict, zone, total),
     categories: {
       games_play: "Juegos",
       productivity: "Productividad",
@@ -194,11 +198,12 @@ function grouped(n: number, lang: Lang): string {
   return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, separator);
 }
 
-function kinLine(lang: Lang, verdict: KinVerdict, zone: string, rank: number): string {
+function kinLine(lang: Lang, verdict: KinVerdict, zone: string, percentile: number): string {
+  const shown = formatPercentile(percentile, lang);
   if (verdict.mode === "none") {
     return lang === "es"
-      ? `Ninguna gemela en el ${verdict.top} % superior. La más cercana está en el percentil ${rank}.`
-      : `No twin in the top ${verdict.top}%. Nearest is in the ${formatRank(rank, "en")} percentile.`;
+      ? `Ninguna gemela en el ${verdict.top} % superior. La más cercana está en el percentil ${shown}.`
+      : `No twin in the top ${verdict.top}%. Nearest is percentile ${shown}.`;
   }
   if (verdict.mode === "neighborhood") {
     if (lang === "es") {
@@ -218,20 +223,19 @@ function kinLine(lang: Lang, verdict: KinVerdict, zone: string, rank: number): s
     : `${verdict.count} twins in the top ${verdict.top}%.`;
 }
 
-function kinPost(lang: Lang, verdict: KinVerdict, zone: string): string {
+function kinPost(lang: Lang, verdict: KinVerdict, zone: string, total: number): string {
+  const among = lang === "es" ? `entre ${grouped(total, "es")} webs hechas con IA` : `among ${grouped(total, "en")} AI-built sites`;
   if (verdict.mode === "none") {
-    return lang === "es"
-      ? `Mi web no tiene ninguna gemela en el ${verdict.top} % superior de parejas hechas con IA`
-      : `My site has no twin in the top ${verdict.top}% of vibe-coded pairs`;
+    return lang === "es" ? `Mi web no tiene ninguna gemela ${among}` : `My site has no twin ${among}`;
   }
   if (verdict.mode === "neighborhood") {
+    const noun = lang === "es" ? (verdict.count === 1 ? "vecina" : "vecinas") : verdict.count === 1 ? "neighbor" : "neighbors";
     return lang === "es"
-      ? `Mi web vive en ${zone} con ${verdict.count} vecinas en el ${verdict.top} % superior de parejas hechas con IA`
-      : `My site lives in ${zone} with ${verdict.count} neighbors in the top ${verdict.top}% of vibe-coded pairs`;
+      ? `Mi web vive en ${zone} con ${verdict.count} ${noun} ${among}`
+      : `My site lives in ${zone} with ${verdict.count} ${noun} ${among}`;
   }
-  return lang === "es"
-    ? `Mi web tiene ${verdict.count} gemela${verdict.count === 1 ? "" : "s"} en el ${verdict.top} % superior de parejas hechas con IA`
-    : `My site has ${verdict.count} twin${verdict.count === 1 ? "" : "s"} in the top ${verdict.top}% of vibe-coded pairs`;
+  const noun = lang === "es" ? (verdict.count === 1 ? "gemela" : "gemelas") : verdict.count === 1 ? "twin" : "twins";
+  return lang === "es" ? `Mi web tiene ${verdict.count} ${noun} ${among}` : `My site has ${verdict.count} ${noun} ${among}`;
 }
 
 function suggestionEn(item: Suggestion): string {
@@ -276,7 +280,7 @@ function suggestionEs(item: Suggestion): string {
     case "drop-gradient":
       return "El degradado suave es el uniforme. Tinta plana, o una foto con un borde duro, se sale de él.";
     case "leave-bento":
-      return "Las retículas bento son el traje local. Una columna asimétrica, o una historia a sangre, lo deja atrás.";
+      return "Las retículas de cajas son el traje local. Una columna asimétrica, o una historia a sangre, lo deja atrás.";
     case "break-center":
       return "Titular al centro, botón al centro. Empuja el título a un margen y deja la navegación en silencio.";
     case "add-grain":
@@ -292,13 +296,34 @@ const I18nContext = createContext<{
   t: Copy;
 } | null>(null);
 
-export function I18nProvider({ children }: { children: ReactNode }) {
-  const [lang, setLangState] = useState<Lang>(() => {
+function readStoredLang(): Lang | null {
+  try {
     const stored = localStorage.getItem("twinsites.lang");
-    return stored === "es" ? "es" : "en";
-  });
-  const setLang = (next: Lang) => {
+    return stored === "es" || stored === "en" ? stored : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeStoredLang(next: Lang): void {
+  try {
     localStorage.setItem("twinsites.lang", next);
+  } catch {
+    /* Private mode and blocked storage still switch the language in memory. */
+  }
+}
+
+function initialLang(): Lang {
+  const stored = readStoredLang();
+  if (stored) return stored;
+  const language = typeof navigator === "undefined" ? "" : navigator.language || "";
+  return language.toLowerCase().startsWith("es") ? "es" : "en";
+}
+
+export function I18nProvider({ children }: { children: ReactNode }) {
+  const [lang, setLangState] = useState<Lang>(initialLang);
+  const setLang = (next: Lang) => {
+    writeStoredLang(next);
     setLangState(next);
   };
   useEffect(() => {

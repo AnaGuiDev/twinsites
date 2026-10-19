@@ -3,12 +3,14 @@ import { useI18n } from "../i18n";
 
 export function DropZone({
   onFile,
+  onIntent,
   compact = false,
   progress = null,
   progressLabel,
   stageLabel,
 }: {
   onFile: (file: File) => void;
+  onIntent?: () => void;
   compact?: boolean;
   progress?: number | null;
   progressLabel?: string;
@@ -25,14 +27,17 @@ export function DropZone({
       for (const item of items) {
         if (item.type.startsWith("image/")) {
           const file = item.getAsFile();
-          if (file) onFile(file);
+          if (file) {
+            onIntent?.();
+            onFile(file);
+          }
           break;
         }
       }
     };
     window.addEventListener("paste", onPaste);
     return () => window.removeEventListener("paste", onPaste);
-  }, [onFile]);
+  }, [onFile, onIntent]);
 
   const take = (file: File | undefined) => {
     if (file) onFile(file);
@@ -51,8 +56,10 @@ export function DropZone({
         event.preventDefault();
         setHot(true);
       }}
+      onDragEnter={() => onIntent?.()}
       onDragLeave={() => setHot(false)}
       onDrop={onDrop}
+      onPointerEnter={() => onIntent?.()}
     >
       {!compact && (
         <span className="stamp-mark" aria-hidden="true">
@@ -89,7 +96,15 @@ export function DropZone({
           {stageLabel}
         </p>
       )}
-      <button type="button" className="ticket" onClick={() => inputRef.current?.click()}>
+      <button
+        type="button"
+        className="ticket"
+        onFocus={() => onIntent?.()}
+        onClick={() => {
+          onIntent?.();
+          inputRef.current?.click();
+        }}
+      >
         {t.browse}
       </button>
       <input

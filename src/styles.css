@@ -77,8 +77,8 @@ button, input, a { font: inherit; color: inherit; }
   font-size: 12px;
   text-decoration: underline;
   text-underline-offset: 3px;
-  max-width: 280px;
 }
+footer .removal { max-width: 36rem; }
 .lang {
   border: 1px solid var(--ink);
   background: transparent;
