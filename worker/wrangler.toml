@@ -9,7 +9,7 @@ binding = "BROWSER"
 
 [[kv_namespaces]]
 binding = "SHOTS"
-id = "replace-with-kv-namespace-id"
+id = "c849f0f6f5ca4813967cefa8b19c5600"
 
 [vars]
 SHOT_KILL = "0"
