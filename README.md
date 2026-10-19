@@ -1,15 +1,18 @@
 # Twinsites
 
-Every AI landing page has a twin. Twinsites shows you which ones.
+Your AI-built landing page has twins. Meet them.
 
-Drop a screenshot of a homepage. In the browser, a small vision model lines it up against a field guide of vibe-coded websites and answers four things:
+Slop detectors give you a score. Twinsites names the relatives, and runs entirely in your browser.
 
-1. The dozen sites that look most like yours, as a percentile to one decimal, with a link to the original.
-2. Where your page lands on a map of the whole catalog.
+Drop a screenshot, try a catalog example, or search any of the 2,003 sites by name or URL. A small vision model runs only for a screenshot you supply. A catalog site already has a vector, so its twins load without the model.
+
+1. The zone your page belongs to, then the dozen nearest sites, as a percentile to one decimal.
+2. Where that zone sits on a map of the whole catalog.
 3. The marks you share with those twins, and three plain ways to step aside.
-4. A PNG card you can post on X, with the sentence and `https://twinsites.com`.
+4. A PNG card for X. The zone name is the headline. Your own screenshot is included only if you opt in.
 
-Slop detectors hand out a score. Twinsites names the relatives.
+[![License: MIT](https://img.shields.io/badge/license-MIT-1b1612?style=flat-square)](LICENSE)
+[![Comparison on device](https://img.shields.io/badge/comparison-on%20device-b82c1a?style=flat-square)](#privacy)
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-1b1612?style=flat-square)](LICENSE)
 [![Comparison on device](https://img.shields.io/badge/comparison-on%20device-b82c1a?style=flat-square)](#privacy)
@@ -20,7 +23,11 @@ Slop detectors hand out a score. Twinsites names the relatives.
 
 ## Privacy
 
-Your screenshot never leaves the browser. There is no account, no upload, and no API key. The model, the thumbnails, and the embeddings are files on this site. Comparison is a cosine similarity on your device.
+Your screenshot never leaves the browser. There is no account and no API key in the site itself. The model, the thumbnails, and the embeddings are files on this site. Comparison is a cosine similarity on your device.
+
+If you paste a URL, that path is off unless the build was given `VITE_SHOT_ENDPOINT`. When it is on, a separate Cloudflare Worker (not this VPS) visits the public page, returns a PNG, and does not store it. Setup is in [worker/README.md](worker/README.md). The VPS still serves only static files.
+
+No cookies. Analytics is off unless both `VITE_ANALYTICS_SRC` and `VITE_ANALYTICS_DOMAIN` are set at build time. The page then loads that script and can send five aggregate events: `visit`, `example`, `upload`, `result`, `share` (plus `explore` when a catalog search is opened). `VITE_ANALYTICS_DOMAIN` is written to both `data-domain` (Plausible) and `data-website-id` (Umami), so you put whichever value that provider expects. Because the site uses `Cross-Origin-Embedder-Policy: require-corp`, the analytics host must send `Cross-Origin-Resource-Policy: cross-origin` on the script. Without that header the browser blocks it. No third-party account is created by this repo.
 
 The page is served with `Cross-Origin-Opener-Policy: same-origin` and `Cross-Origin-Embedder-Policy: require-corp`. The quantized vision graph is not stable with a threaded runtime, so comparison always uses one thread. That also keeps it working when the document is not cross-origin isolated.
 
@@ -35,7 +42,9 @@ The offline pipeline in `scripts/` reads the public URL list, screenshots the vi
 - `calibration.json` — the percentile curve of catalog pairs
 - `thumbs/` — small WebP miniatures
 
-Vectors come from the quantized MobileCLIP-S0 vision encoder (`Xenova/mobileclip_s0`, 8-bit), the same file the page loads from `/models`. They are computed in headless Chrome against a local build, because the Node ONNX runtime does not match the browser vectors. A shown percentile is how many random pairs in the catalog that cosine beats, not a pixel match. The map is a UMAP of those vectors after a PCA reduction. A new screenshot is not run through UMAP; it is placed among its nearest neighbors, which is what “landing in the neighborhood” means. Zone names are the traits that lift above the catalog average, phrased as places.
+Vectors come from the quantized MobileCLIP-S0 vision encoder (`Xenova/mobileclip_s0`, 8-bit), the same file the page loads from `/models`. They are computed in headless Chrome against a local build, because the Node ONNX runtime does not match the browser vectors. A shown percentile is how many random pairs in the catalog that cosine beats, not a pixel match. The map is a UMAP of those vectors after a PCA reduction. A new screenshot is not run through UMAP; it is placed among its nearest neighbors, which is what landing in a zone means. Zone names are the traits that lift above the catalog average, phrased as places. `/zones` lists them. `/zone/<slug>` is one zone, and `/site/<slug>` is one catalog site, both served by the SPA fallback. The build also writes a static `index.html` per zone, with its own title and description, under `dist/zone/<slug>/`, and one for `/zones`. A server that tries `$uri/index.html` before the SPA fallback shows that title to a crawler. The SPA still renders the page if it does not. This release does not change nginx.
+
+`public/data/explore.json` is the precomputed twin list (top 12 and the band counts, excluding the site itself) plus a slim directory. `public/data/example.json` is one Lovable-style page used by “Try an example”, small enough to paint before the rest of the directory arrives. `npm run build` regenerates both from the embeddings already in the repo. No Chrome step.
 
 The first screen does not wait on the model. On a desktop without data saver, the vision runtime and the catalog start downloading in the background while a screenshot is chosen. On a phone, when `navigator.connection.saveData` is set, or on a 2G/3G link, that download starts only on intent: pointer over the drop zone, focus, drag, paste, or opening the file picker. The progress bar is the share of those bytes that has arrived.
 
@@ -103,9 +112,9 @@ Keep thumbnails small. The projection step re-encodes them to 420px WebP. Prefer
 
 ## Deploy
 
-`.github/workflows/deploy.yml` runs only on a push to `main`: `npm ci && npm run build`, then `rsync` of `dist/` to the web root. Pull requests do not deploy. The workflow expects an ed25519 key in the `VPS_SSH_KEY` secret and a pinned `known_hosts` line in `VPS_KNOWN_HOSTS`. If that second secret is empty, the job warns and falls back to `ssh-keyscan`, so a push to `main` still deploys. The server already speaks HTTP with SPA fallback, long-lived caching for `/assets/`, and the COOP/COEP/CORP headers.
+`.github/workflows/deploy.yml` runs only on a push to `main`: `npm ci && npm run build`, then `rsync` of `dist/` to the web root. It does not start a process on the VPS, and it does not deploy the Worker in `/worker`. Pull requests do not deploy. Optional Actions variables (`VITE_SHOT_ENDPOINT`, `VITE_TURNSTILE_SITEKEY`, `VITE_ANALYTICS_SRC`, `VITE_ANALYTICS_DOMAIN`) are passed into the build and stay empty when unset. The workflow expects an ed25519 key in the `VPS_SSH_KEY` secret and a pinned `known_hosts` line in `VPS_KNOWN_HOSTS`. If that second secret is empty, the job warns and falls back to `ssh-keyscan`, so a push to `main` still deploys. The server already speaks HTTP with SPA fallback, long-lived caching for `/assets/`, and the COOP/COEP/CORP headers.
 
-On a local preview, the drop zone is usable in about 0.1 s on desktop and 0.3 s on an emulated phone. Desktop, with no throttle and the cache off, returns the first twins in about 2.3 s. A cold fast-4G phone (375 px, 40 ms latency, 9 Mbit/s down, 1.5 Mbit/s up, 4× CPU, cache off) does not download the eye or the drawer until there is intent. Before that, none of those files are requested. Focusing the file button starts the download, about 31 s, and the first twins then come back in about 3.6 s. Choosing a file the instant the page appears, which is itself the intent, takes about 35 s.
+On a local preview, the drop zone is usable in about 0.1 s on desktop and 0.4 s on an emulated phone. That phone's first load, before any intent, transfers about 149 KB: the document, the script, the stylesheet, the two used font files, a tiny catalog count, and the favicon. The vision runtime, the embeddings, and the catalog index are not in that load. Desktop, with no throttle and the cache off, returns the first twins in about 2.2 s. A cold fast-4G phone (375 px, 40 ms latency, 9 Mbit/s down, 1.5 Mbit/s up, 4× CPU, cache off) does not download the runtime or the embeddings until there is intent. Focusing the file button starts that download, about 31 s, and the first twins then come back in about 3.4 s. Choosing a file the instant the page appears, which is itself the intent, takes about 34 s.
 
 ## Next
 

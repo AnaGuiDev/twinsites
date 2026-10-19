@@ -61,11 +61,6 @@ export function DropZone({
       onDrop={onDrop}
       onPointerEnter={() => onIntent?.()}
     >
-      {!compact && (
-        <span className="stamp-mark" aria-hidden="true">
-          {t.noUpload}
-        </span>
-      )}
       <span className="crop tl" />
       <span className="crop tr" />
       <span className="crop bl" />

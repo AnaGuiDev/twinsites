@@ -14,14 +14,14 @@ export { REMOVAL_URL };
 
 const copy = {
   en: {
-    registry: "Visual kin registry",
     removal: "Is your site here and you want it removed?",
     langName: "Español",
-    kicker: "Field note 01",
-    title: "Find the sites that already wear your face.",
-    lede: "Drop a screenshot of a landing page. Twinsites lines it up against a drawer of vibe-coded websites and names the ones with the same bones.",
+    title: "Your AI-built landing page has twins. Meet them.",
+    lede: "Slop detectors give you a score. Twinsites names the relatives, and runs entirely in your browser.",
     privacy:
-      "Your screenshot never leaves this browser. The model, the catalog, and the comparison all run on this device.",
+      "If you upload a screenshot, it never leaves your browser. If you paste a URL, a Cloudflare worker visits that public page to take the screenshot and doesn't store it.",
+    analyticsNote:
+      "No cookies. If a counter is on, it records only aggregate events: a visit, an example, an upload, a result, a share.",
     dropTitle: "Drop a screenshot",
     dropHint: "Paste, or browse. PNG, JPG, WebP. Nothing is uploaded.",
     noUpload: "No upload",
@@ -29,20 +29,31 @@ const copy = {
     factModel: "Quantized MobileCLIP, on device",
     factCatalog: (n: number) => `${grouped(n, "en")} public homepages`,
     factNoUpload: "No upload. No account.",
+    tryExample: "Try an example",
+    browseZones: "Browse zones",
+    navZones: "Zones",
+    searchLabel: "Search the catalog",
+    searchPlaceholder: "Search 2,003 sites by name or URL",
+    searchEmpty: "No site with that name.",
+    phoneInvite: "Uploading is meant for a desktop capture. On a phone, try the example or search the catalog.",
+    shotLabel: "Or paste a public page",
+    shotButton: "Use this URL",
+    shotHint: "https://…",
     stageRead: "Reading the screenshot",
-    stageModel: "Waking the on-device eye",
-    stageData: "Opening the drawer",
-    stageMatch: "Measuring kin",
+    stageModel: "Starting the on-device model",
+    stageData: "Loading the catalog",
+    stageMatch: "Comparing",
     another: "Try another screenshot",
-    twinsTitle: "Closest kin",
-    twinsDek: "Twelve websites whose first screen sits nearest to yours.",
+    twinsTitle: "Twelve twins",
+    twinsDek: "The twelve sites whose first screen sits nearest to yours.",
+    itsTwins: "See its twins",
     openSite: "Open site",
     simLabel: "percentile",
     scoreNote: "Percentile, not a copy score: 90 means closer than 90% of pairs in this catalog.",
-    resultLine: (verdict: KinVerdict, zone: string, rank: number) => kinLine("en", verdict, zone, rank),
+    resultLine: (verdict: KinVerdict, percentile: number) => resultSentence("en", verdict, percentile),
     progressLabel: "Loading progress",
-    mapTitle: "The field",
-    mapDek: "Every dot is a vibe-coded site. Closeness is visual kinship. Yours lands in its neighborhood.",
+    mapTitle: "The map",
+    mapDek: "Every dot is an AI-built site. Closer dots look more alike. Yours lands in a zone.",
     mapHint: "Drag to pan. Scroll to zoom. Click a dot to open the site.",
     fit: "Reset view",
     you: "Your screenshot",
@@ -51,8 +62,9 @@ const copy = {
     suggestTitle: "Three ways to step aside",
     suggestDek: "Plain moves, read off the marks above. A direction, not a redesign.",
     shareTitle: "A card for X",
-    shareDek: "Drawn in this tab. The post includes the sentence and twinsites.com.",
+    shareDek: "Drawn in this tab. The post includes the sentence and the zone link.",
     download: "Download PNG",
+    includeMine: "Include my screenshot on the card",
     post: "Post the line on X",
     shareNote:
       "On a phone, the share button can attach the card. Otherwise the post opens with the sentence and the link, and the image stays here until you attach it.",
@@ -62,7 +74,7 @@ const copy = {
     dominant: "Dominant color",
     mode: "Ground",
     density: "Density",
-    gradient: "Color field",
+    gradient: "Gradient",
     bento: "Grid",
     centered: "Composition",
     shared: (k: number) => `shared with ${k} of 12`,
@@ -82,12 +94,18 @@ const copy = {
     errorModel: "Your browser couldn't start the model. Try desktop Chrome or Firefox.",
     cropNote: "Only the top of the image is compared, the same first screen the catalog keeps.",
     portraitNote: "This looks like a phone screenshot. The catalog is desktop homepages, so the match is a rough one.",
+    errorShot: "That page didn't yield a screenshot. Try the example, or upload a desktop capture.",
     errorCatalog: "The catalog is missing from this build.",
+    missingSite: "That site is not in this catalog.",
+    loadingCatalog: "Opening the catalog…",
+    atlasTitle: "Zones",
+    atlasLede: "Each zone is a group of AI-built homepages that share a look. Open one to see the pages inside.",
+    zoneCount: (n: number) => `${grouped(n, "en")} sites`,
     loadingIdle: "Waiting for a screenshot",
     zone: "Zone",
     colorName: (name: ColorName) => COLOR_EN[name],
     suggestion: (item: Suggestion) => suggestionEn(item),
-    cardLine: (verdict: KinVerdict, zone: string, total: number) => kinPost("en", verdict, zone, total),
+    cardLine: (verdict: KinVerdict, zone: string, total: number) => cardSentence("en", verdict, zone, total),
     categories: {
       games_play: "Games",
       productivity: "Productivity",
@@ -103,35 +121,46 @@ const copy = {
     } as Record<string, string>,
   },
   es: {
-    registry: "Registro de parentesco visual",
     removal: "¿Tu web aparece y quieres retirarla?",
     langName: "English",
-    kicker: "Nota de campo 01",
-    title: "Encuentra las webs que ya llevan tu cara.",
-    lede: "Suelta una captura de una página de inicio. Twinsites la pone junto a un cajón de webs hechas con IA y te dice cuáles tienen los mismos huesos.",
+    title: "Tu página de inicio hecha con IA tiene gemelas. Conócelas.",
+    lede: "Los detectores de páginas genéricas te dan una nota. Twinsites nombra a las parientes, y funciona entero en tu navegador.",
     privacy:
-      "Tu captura no sale de este navegador. El modelo, el catálogo y la comparación ocurren en este dispositivo.",
+      "Si subes una captura, no sale de tu navegador. Si pegas una URL, un worker de Cloudflare visita esa página pública para hacer la captura y no la guarda.",
+    analyticsNote:
+      "Sin cookies. Si hay un contador, solo anota eventos agregados: visita, ejemplo, subida, resultado y compartir.",
     dropTitle: "Suelta una captura",
     dropHint: "Pega, o elige un archivo. PNG, JPG, WebP. No se sube nada.",
     noUpload: "Sin subida",
     browse: "Elegir archivo",
+    tryExample: "Prueba con un ejemplo",
+    browseZones: "Ver zonas",
+    navZones: "Zonas",
+    searchLabel: "Buscar en el catálogo",
+    searchPlaceholder: "Busca entre 2.003 webs por nombre o URL",
+    searchEmpty: "Ninguna web con ese nombre.",
+    phoneInvite: "Subir una captura está pensado para el escritorio. En el teléfono, prueba el ejemplo o busca en el catálogo.",
+    shotLabel: "O pega una página pública",
+    shotButton: "Usar esta URL",
+    shotHint: "https://…",
     factModel: "MobileCLIP cuantizado, en el dispositivo",
     factCatalog: (n: number) => `${grouped(n, "es")} portadas públicas`,
     factNoUpload: "Sin subida. Sin cuenta.",
     stageRead: "Leyendo la captura",
-    stageModel: "Despertando el ojo local",
-    stageData: "Abriendo el cajón",
-    stageMatch: "Midiendo el parentesco",
+    stageModel: "Arrancando el modelo en el dispositivo",
+    stageData: "Cargando el catálogo",
+    stageMatch: "Comparando",
     another: "Probar otra captura",
-    twinsTitle: "Parientes más cercanos",
-    twinsDek: "Doce webs cuya primera pantalla queda más cerca de la tuya.",
+    twinsTitle: "Doce gemelas",
+    twinsDek: "Las doce webs cuya primera pantalla queda más cerca de la tuya.",
+    itsTwins: "Ver sus gemelas",
     openSite: "Abrir web",
     simLabel: "percentil",
     scoreNote: "Percentil, no un porcentaje de copia: 90 significa más cerca que el 90 % de las parejas del catálogo.",
-    resultLine: (verdict: KinVerdict, zone: string, rank: number) => kinLine("es", verdict, zone, rank),
+    resultLine: (verdict: KinVerdict, percentile: number) => resultSentence("es", verdict, percentile),
     progressLabel: "Progreso de carga",
-    mapTitle: "El campo",
-    mapDek: "Cada punto es una web hecha con IA. La cercanía es parentesco visual. La tuya aterriza en su barrio.",
+    mapTitle: "El mapa",
+    mapDek: "Cada punto es una web hecha con IA. Los puntos cercanos se parecen más. La tuya cae en una zona.",
     mapHint: "Arrastra para moverte. La rueda acerca la vista. Un clic abre la web.",
     fit: "Reencuadrar",
     you: "Tu captura",
@@ -140,8 +169,9 @@ const copy = {
     suggestTitle: "Tres modos de apartarte",
     suggestDek: "Gestos sencillos, leídos de las marcas de arriba. Una dirección, no un rediseño.",
     shareTitle: "Una tarjeta para X",
-    shareDek: "Dibujada en esta pestaña. La publicación incluye la frase y twinsites.com.",
+    shareDek: "Dibujada en esta pestaña. La publicación incluye la frase y el enlace de la zona.",
     download: "Descargar PNG",
+    includeMine: "Incluir mi captura en la tarjeta",
     post: "Publicar la frase en X",
     shareNote:
       "En el móvil, el botón de compartir puede adjuntar la tarjeta. Si no, la publicación se abre con la frase y el enlace, y la imagen se queda aquí hasta que la adjuntes.",
@@ -151,7 +181,7 @@ const copy = {
     dominant: "Color dominante",
     mode: "Fondo",
     density: "Densidad",
-    gradient: "Campo de color",
+    gradient: "Degradado",
     bento: "Retícula",
     centered: "Composición",
     shared: (k: number) => `compartido con ${k} de 12`,
@@ -169,14 +199,20 @@ const copy = {
     errorImage: "Ese archivo no se pudo leer como imagen.",
     errorLarge: "Usa una imagen de menos de 20 MB.",
     errorModel: "Tu navegador no pudo arrancar el modelo. Prueba con Chrome o Firefox en el escritorio.",
+    errorShot: "Esa página no dejó una captura. Prueba el ejemplo, o sube una captura de escritorio.",
     cropNote: "Se compara solo la parte de arriba, la misma primera pantalla que guarda el catálogo.",
     portraitNote: "Parece una captura de teléfono. El catálogo son portadas de escritorio, así que el parecido es orientativo.",
     errorCatalog: "A esta versión le falta el catálogo.",
+    missingSite: "Esa web no está en este catálogo.",
+    loadingCatalog: "Abriendo el catálogo…",
+    atlasTitle: "Zonas",
+    atlasLede: "Cada zona agrupa páginas de inicio hechas con IA que comparten un aspecto. Ábrela para ver las webs de dentro.",
+    zoneCount: (n: number) => `${grouped(n, "es")} webs`,
     loadingIdle: "Esperando una captura",
     zone: "Zona",
     colorName: (name: ColorName) => COLOR_ES[name],
     suggestion: (item: Suggestion) => suggestionEs(item),
-    cardLine: (verdict: KinVerdict, zone: string, total: number) => kinPost("es", verdict, zone, total),
+    cardLine: (verdict: KinVerdict, zone: string, total: number) => cardSentence("es", verdict, zone, total),
     categories: {
       games_play: "Juegos",
       productivity: "Productividad",
@@ -198,7 +234,7 @@ function grouped(n: number, lang: Lang): string {
   return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, separator);
 }
 
-function kinLine(lang: Lang, verdict: KinVerdict, zone: string, percentile: number): string {
+function resultSentence(lang: Lang, verdict: KinVerdict, percentile: number): string {
   const shown = formatPercentile(percentile, lang);
   if (verdict.mode === "none") {
     return lang === "es"
@@ -206,85 +242,79 @@ function kinLine(lang: Lang, verdict: KinVerdict, zone: string, percentile: numb
       : `No twin in the top ${verdict.top}%. Nearest is percentile ${shown}.`;
   }
   if (verdict.mode === "neighborhood") {
-    if (lang === "es") {
-      const noun = verdict.count === 1 ? "vecina" : "vecinas";
-      return `Tu web vive en ${zone} con ${verdict.count} ${noun} en el ${verdict.top} % superior.`;
-    }
-    const noun = verdict.count === 1 ? "neighbor" : "neighbors";
-    return `Your site lives in ${zone} with ${verdict.count} ${noun} in the top ${verdict.top}%.`;
+    return lang === "es"
+      ? `${verdict.count} webs en el ${verdict.top} % superior.`
+      : `${verdict.count} sites in the top ${verdict.top}%.`;
   }
   if (lang === "es") {
     return verdict.count === 1
       ? `1 gemela en el ${verdict.top} % superior.`
       : `${verdict.count} gemelas en el ${verdict.top} % superior.`;
   }
-  return verdict.count === 1
-    ? `1 twin in the top ${verdict.top}%.`
-    : `${verdict.count} twins in the top ${verdict.top}%.`;
+  return verdict.count === 1 ? `1 twin in the top ${verdict.top}%.` : `${verdict.count} twins in the top ${verdict.top}%.`;
 }
 
-function kinPost(lang: Lang, verdict: KinVerdict, zone: string, total: number): string {
+function cardSentence(lang: Lang, verdict: KinVerdict, zone: string, total: number): string {
   const among = lang === "es" ? `entre ${grouped(total, "es")} webs hechas con IA` : `among ${grouped(total, "en")} AI-built sites`;
   if (verdict.mode === "none") {
-    return lang === "es" ? `Mi web no tiene ninguna gemela ${among}` : `My site has no twin ${among}`;
+    return lang === "es" ? `${zone}. Ninguna gemela ${among}` : `${zone}. No twin ${among}`;
   }
   if (verdict.mode === "neighborhood") {
-    const noun = lang === "es" ? (verdict.count === 1 ? "vecina" : "vecinas") : verdict.count === 1 ? "neighbor" : "neighbors";
     return lang === "es"
-      ? `Mi web vive en ${zone} con ${verdict.count} ${noun} ${among}`
-      : `My site lives in ${zone} with ${verdict.count} ${noun} ${among}`;
+      ? `${zone}. ${verdict.count} webs en el ${verdict.top} % superior ${among}`
+      : `${zone}. ${verdict.count} sites in the top ${verdict.top}% ${among}`;
   }
   const noun = lang === "es" ? (verdict.count === 1 ? "gemela" : "gemelas") : verdict.count === 1 ? "twin" : "twins";
-  return lang === "es" ? `Mi web tiene ${verdict.count} ${noun} ${among}` : `My site has ${verdict.count} ${noun} ${among}`;
+  return `${zone}. ${verdict.count} ${noun} ${among}`;
 }
 
 function suggestionEn(item: Suggestion): string {
   switch (item.id) {
     case "shift-hue":
-      return `Move the accent off ${COLOR_EN[item.from]}. That hue is the local uniform; ${COLOR_EN[item.to]}, used once, splits you from the pile.`;
+      return `Move the accent off ${COLOR_EN[item.from]}. That hue shows up a lot here; ${COLOR_EN[item.to]}, used once, sets the page apart.`;
     case "add-accent":
-      return `The page is as neutral as its twins. One stubborn ${COLOR_EN[item.to]} accent, used a single time, is enough to break the match.`;
+      return `The page is as neutral as its twins. One strong ${COLOR_EN[item.to]} accent, used a single time, is enough to break the match.`;
     case "flip-mode":
       return item.mode === "light"
         ? "Most twins are dark. A light ground changes the silhouette before the layout does."
-        : "Most twins are light. Invert the page and the kinship drops before you touch the type.";
+        : "Most twins are light. Invert the page and the resemblance drops before you touch the type.";
     case "open-space":
-      return "This neighborhood is packed. Give the first screen one idea and a wide, quiet margin.";
+      return "These pages are packed. Give the first screen one idea and a wide, quiet margin.";
     case "add-density":
-      return "The twins are airy hero-and-button pages. A denser editorial stack reads as a different species.";
+      return "The twins are airy pages with a headline and a button. A denser editorial stack reads differently.";
     case "drop-gradient":
-      return "A soft gradient is the uniform here. Flat ink, or a photograph with a hard edge, steps out of it.";
+      return "A soft gradient is common here. Flat ink, or a photograph with a hard edge, steps away from it.";
     case "leave-bento":
-      return "Bento grids are the local costume. One asymmetric column, or a full-bleed story, leaves it behind.";
+      return "Box grids are common here. One asymmetric column, or a full-bleed story, leaves that pattern.";
     case "break-center":
       return "Centered headline, centered button. Push the title into a margin and let the navigation go quiet.";
     case "add-grain":
-      return "The field is flat digital color. A grain, a print scan, or a single sharp rule reads as made by a hand.";
+      return "Most of these pages are flat digital color. A grain, a print scan, or a single sharp rule reads as made by hand.";
   }
 }
 
 function suggestionEs(item: Suggestion): string {
   switch (item.id) {
     case "shift-hue":
-      return `Saca el acento del ${COLOR_ES[item.from]}. Ese tono es el uniforme del barrio; un ${COLOR_ES[item.to]} usado una sola vez te separa del montón.`;
+      return `Saca el acento del ${COLOR_ES[item.from]}. Ese tono aparece mucho aquí; un ${COLOR_ES[item.to]} usado una sola vez distingue la página.`;
     case "add-accent":
-      return `La página es tan neutra como sus gemelas. Un acento terco de ${COLOR_ES[item.to]}, una sola vez, basta para romper el parecido.`;
+      return `La página es tan neutra como sus gemelas. Un acento firme de ${COLOR_ES[item.to]}, una sola vez, basta para romper el parecido.`;
     case "flip-mode":
       return item.mode === "light"
         ? "Casi todas las gemelas son oscuras. Un fondo claro cambia la silueta antes que la maquetación."
-        : "Casi todas las gemelas son claras. Invierte la página y el parentesco baja antes de tocar la tipografía.";
+        : "Casi todas las gemelas son claras. Invierte la página y el parecido baja antes de tocar la tipografía.";
     case "open-space":
-      return "Este barrio está apretado. Deja la primera pantalla en una sola idea y un margen amplio y quieto.";
+      return "Estas páginas están apretadas. Deja la primera pantalla en una sola idea y un margen amplio y quieto.";
     case "add-density":
-      return "Las gemelas son páginas aireadas de titular y botón. Una pila editorial más densa se lee como otra especie.";
+      return "Las gemelas son páginas aireadas de titular y botón. Una pila editorial más densa se lee distinto.";
     case "drop-gradient":
-      return "El degradado suave es el uniforme. Tinta plana, o una foto con un borde duro, se sale de él.";
+      return "El degradado suave es habitual aquí. Tinta plana, o una foto con un borde duro, se aparta de eso.";
     case "leave-bento":
-      return "Las retículas de cajas son el traje local. Una columna asimétrica, o una historia a sangre, lo deja atrás.";
+      return "Las retículas de cajas son habituales aquí. Una columna asimétrica, o una historia a sangre, deja ese patrón.";
     case "break-center":
       return "Titular al centro, botón al centro. Empuja el título a un margen y deja la navegación en silencio.";
     case "add-grain":
-      return "El campo es color digital plano. Un grano, un escaneo de imprenta o una regla nítida se leen como hechos a mano.";
+      return "Casi todas estas páginas son color digital plano. Un grano, un escaneo de imprenta o una regla nítida se leen como hechos a mano.";
   }
 }
 

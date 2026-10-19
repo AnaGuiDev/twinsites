@@ -19,6 +19,11 @@ jobs:
           cache: npm
 
       - name: Install and build
+        env:
+          VITE_SHOT_ENDPOINT: ${{ vars.VITE_SHOT_ENDPOINT }}
+          VITE_TURNSTILE_SITEKEY: ${{ vars.VITE_TURNSTILE_SITEKEY }}
+          VITE_ANALYTICS_SRC: ${{ vars.VITE_ANALYTICS_SRC }}
+          VITE_ANALYTICS_DOMAIN: ${{ vars.VITE_ANALYTICS_DOMAIN }}
         run: npm ci && npm run build
 
       - name: Prepare SSH
