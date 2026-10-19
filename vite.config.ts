@@ -1,8 +1,18 @@
+import { createHash } from "node:crypto";
 import path from "node:path";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import { zoneSentence, type ZoneRecord } from "./src/lib/zones";
+
+/** Changes when the shipped ONNX runtime bytes change, so /ort/?v= is a new cache key. */
+function ortBuildHash(): string {
+  const hash = createHash("sha256");
+  for (const file of ["public/ort/ort-wasm-simd-threaded.jsep.wasm", "public/ort/ort-wasm-simd-threaded.jsep.mjs"]) {
+    hash.update(readFileSync(file));
+  }
+  return hash.digest("hex").slice(0, 12);
+}
 
 const headers = {
   "Cross-Origin-Opener-Policy": "same-origin",
@@ -23,6 +33,9 @@ function dropBundledOrtWasm() {
 }
 
 export default defineConfig({
+  define: {
+    __ORT_BUILD__: JSON.stringify(ortBuildHash()),
+  },
   plugins: [react(), dropBundledOrtWasm(), zoneStubs()],
   optimizeDeps: {
     exclude: ["@huggingface/transformers"],

@@ -2,10 +2,24 @@ import { useEffect, useRef, useState } from "react";
 import { useI18n } from "../i18n";
 
 interface TurnstileApi {
-  render: (el: HTMLElement, options: { sitekey: string; theme: "light" }) => string;
-  getResponse: (id?: string) => string;
+  render: (
+    el: HTMLElement,
+    options: {
+      sitekey: string;
+      theme: "light";
+      callback: (token: string) => void;
+      "expired-callback": () => void;
+      "error-callback": () => void;
+    },
+  ) => string;
   reset: (id?: string) => void;
   remove: (id: string) => void;
+}
+
+type ShotNotice = "generic" | "verify" | "busy";
+
+function turnstileApi(): TurnstileApi | undefined {
+  return (window as Window & { turnstile?: TurnstileApi }).turnstile;
 }
 
 export function UrlShot({ onFile }: { onFile: (file: File) => void }) {
@@ -15,18 +29,30 @@ export function UrlShot({ onFile }: { onFile: (file: File) => void }) {
   const box = useRef<HTMLDivElement>(null);
   const widget = useRef<string | undefined>(undefined);
   const [url, setUrl] = useState("");
+  const [token, setToken] = useState("");
   const [busy, setBusy] = useState(false);
-  const [failed, setFailed] = useState(false);
+  const [notice, setNotice] = useState<ShotNotice | null>(null);
+
+  const clearToken = () => setToken("");
 
   useEffect(() => {
     if (!endpoint || !siteKey || !box.current) return;
     let dead = false;
     const mount = () => {
-      const turnstile = (window as Window & { turnstile?: TurnstileApi }).turnstile;
+      const turnstile = turnstileApi();
       if (dead || !turnstile || !box.current || widget.current) return;
-      widget.current = turnstile.render(box.current, { sitekey: siteKey, theme: "light" });
+      widget.current = turnstile.render(box.current, {
+        sitekey: siteKey,
+        theme: "light",
+        callback: (next) => {
+          setToken(next);
+          setNotice(null);
+        },
+        "expired-callback": () => clearToken(),
+        "error-callback": () => clearToken(),
+      });
     };
-    if ((window as Window & { turnstile?: TurnstileApi }).turnstile) {
+    if (turnstileApi()) {
       mount();
     } else {
       const script = document.createElement("script");
@@ -34,7 +60,7 @@ export function UrlShot({ onFile }: { onFile: (file: File) => void }) {
       script.async = true;
       script.dataset.turnstile = "1";
       script.onload = mount;
-      script.onerror = () => setFailed(true);
+      script.onerror = () => setNotice("generic");
       document.head.appendChild(script);
     }
     return () => {
@@ -44,13 +70,15 @@ export function UrlShot({ onFile }: { onFile: (file: File) => void }) {
 
   if (!endpoint) return null;
 
+  const resetWidget = () => {
+    clearToken();
+    if (widget.current) turnstileApi()?.reset(widget.current);
+  };
+
   const submit = async () => {
-    setFailed(false);
+    setNotice(null);
     setBusy(true);
     try {
-      const token = widget.current
-        ? (window as Window & { turnstile?: TurnstileApi }).turnstile?.getResponse(widget.current) ?? ""
-        : "";
       const response = await fetch(endpoint, {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -63,13 +91,19 @@ export function UrlShot({ onFile }: { onFile: (file: File) => void }) {
       const name = type.includes("png") ? "page.png" : "page.jpg";
       onFile(new File([blob], name, { type }));
     } catch (err) {
-      console.error("shot", err instanceof Error ? err.message : "shot");
-      setFailed(true);
+      const message = err instanceof Error ? err.message : "shot";
+      console.error("shot", message);
+      if (message === "403") setNotice("verify");
+      else if (message === "429" || message === "503") setNotice("busy");
+      else setNotice("generic");
     } finally {
       setBusy(false);
-      if (widget.current) (window as Window & { turnstile?: TurnstileApi }).turnstile?.reset(widget.current);
+      resetWidget();
     }
   };
+
+  const needsToken = Boolean(siteKey);
+  const waiting = needsToken && !token;
 
   return (
     <form
@@ -90,12 +124,15 @@ export function UrlShot({ onFile }: { onFile: (file: File) => void }) {
           onChange={(event) => setUrl(event.target.value)}
           required
         />
-        <button className="ticket" type="submit" disabled={busy || url.trim().length < 8}>
+        <button className="ticket" type="submit" disabled={busy || waiting || url.trim().length < 8}>
           {t.shotButton}
         </button>
       </div>
       {siteKey && <div ref={box} className="turnstile" />}
-      {failed && <p className="score-note">{t.errorShot}</p>}
+      {waiting && !notice && <p className="shot-wait">{t.shotVerifying}</p>}
+      {notice === "verify" && <p className="score-note">{t.errorVerify}</p>}
+      {notice === "busy" && <p className="score-note">{t.errorBusy}</p>}
+      {notice === "generic" && <p className="score-note">{t.errorShot}</p>}
     </form>
   );
 }

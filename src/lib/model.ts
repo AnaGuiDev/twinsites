@@ -43,6 +43,12 @@ export function subscribeEngine(listener: (fraction: number) => void): () => voi
   return () => listeners.delete(listener);
 }
 
+/** Absolute same-origin URL for one runtime file, with a build query so a stale immutable response is not reused. */
+export function ortRuntimeUrl(file: string): string {
+  const base = import.meta.env.BASE_URL;
+  return `${base}ort/${file}?v=${__ORT_BUILD__}`;
+}
+
 export function configureRuntime(): void {
   env.allowRemoteModels = false;
   env.allowLocalModels = true;
@@ -51,7 +57,11 @@ export function configureRuntime(): void {
   const wasm = env.backends.onnx.wasm;
   if (wasm) {
     // Same-origin factory. The library's default is a CDN, which COEP would block.
-    wasm.wasmPaths = `${base}ort/`;
+    // Explicit file URLs: a string prefix drops ?v= when ONNX joins the filename.
+    wasm.wasmPaths = {
+      mjs: ortRuntimeUrl("ort-wasm-simd-threaded.jsep.mjs"),
+      wasm: ortRuntimeUrl("ort-wasm-simd-threaded.jsep.wasm"),
+    };
     // The q8 vision graph is not stable with the threaded WASM runtime: the same
     // screenshot alternates between two embeddings. The catalog was encoded with
     // one thread, so the browser must do the same or twins will not match.
@@ -62,8 +72,7 @@ export function configureRuntime(): void {
 async function fetchWasm(): Promise<ArrayBuffer> {
   if (wasmPromise) return wasmPromise;
   wasmPromise = (async () => {
-    const base = import.meta.env.BASE_URL;
-    const response = await fetch(`${base}ort/ort-wasm-simd-threaded.jsep.wasm`);
+    const response = await fetch(ortRuntimeUrl("ort-wasm-simd-threaded.jsep.wasm"));
     if (!response.ok) throw new Error("wasm");
     const total = Number(response.headers.get("content-length")) || WASM_BYTES;
     const reader = response.body?.getReader();
