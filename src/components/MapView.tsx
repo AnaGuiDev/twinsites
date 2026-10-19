@@ -141,7 +141,7 @@ export function MapView({
       if (pulse > 0.5) {
         ctx.beginPath();
         ctx.arc(you.x, you.y, 14 + pulse, 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(197,54,27,${0.55 * (1 - drop)})`;
+        ctx.strokeStyle = `rgba(184,44,26,${0.55 * (1 - drop)})`;
         ctx.lineWidth = 2;
         ctx.stroke();
       }
@@ -151,7 +151,7 @@ export function MapView({
       ctx.fill();
       ctx.beginPath();
       ctx.arc(you.x, you.y, 6, 0, Math.PI * 2);
-      ctx.fillStyle = "#c5361b";
+      ctx.fillStyle = "#b82c1a";
       ctx.fill();
       ctx.font = '600 11px "IBM Plex Mono", monospace';
       ctx.fillStyle = "#f3ecdf";
@@ -268,7 +268,7 @@ export function MapView({
 
   return (
     <div className="map-frame" ref={wrapRef}>
-      <canvas ref={canvasRef} aria-label={t.mapTitle} />
+      <canvas ref={canvasRef} role="img" aria-label={t.mapTitle} />
       <button type="button" className="ticket ghost map-fit" data-fit>
         {t.fit}
       </button>

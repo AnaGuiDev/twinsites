@@ -1,4 +1,4 @@
-import { rankOf } from "./calibrate";
+import { KIN_BANDS, rankOf } from "./calibrate";
 import type { Dataset, Twin } from "../types";
 
 export function dotAt(vector: Float32Array, embeddings: Float32Array, index: number, dim: number): number {
@@ -27,15 +27,16 @@ export function nearest(vector: Float32Array, dataset: Dataset, k: number): Twin
   return best;
 }
 
-/** Sites whose calibrated rank is at least the catalog's twin bar. */
-export function countTwins(vector: Float32Array, dataset: Dataset): number {
-  const bar = dataset.calibration.twinPercentile;
-  let count = 0;
+/** How many sites clear each kin band. Counts are cumulative: p80 includes p99. */
+export function countBands(vector: Float32Array, dataset: Dataset): Map<number, number> {
+  const counts = new Map<number, number>(KIN_BANDS.map((band) => [band, 0]));
   for (let i = 0; i < dataset.catalog.sites.length; i++) {
-    const similarity = dotAt(vector, dataset.embeddings, i, dataset.dim);
-    if (rankOf(similarity, dataset.calibration) >= bar) count++;
+    const rank = rankOf(dotAt(vector, dataset.embeddings, i, dataset.dim), dataset.calibration);
+    for (const band of KIN_BANDS) {
+      if (rank >= band) counts.set(band, (counts.get(band) ?? 0) + 1);
+    }
   }
-  return count;
+  return counts;
 }
 
 export function countAtLeast(vector: Float32Array, dataset: Dataset, threshold: number): number {

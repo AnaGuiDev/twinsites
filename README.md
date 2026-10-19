@@ -7,17 +7,24 @@ Drop a screenshot of a homepage. In the browser, a small vision model lines it u
 1. The dozen sites that look most like yours, as a percentile of catalog pairs, with a link to the original.
 2. Where your page lands on a map of the whole catalog.
 3. The marks you share with those twins, and three plain ways to step aside.
-4. A PNG card: “My site has N twins in the top 20% of vibe-coded pairs.”
+4. A PNG card you can post on X, with the sentence and `https://twinsites.com`.
 
 Slop detectors hand out a score. Twinsites names the relatives.
 
+[![License: MIT](https://img.shields.io/badge/license-MIT-1b1612?style=flat-square)](LICENSE)
+[![Comparison on device](https://img.shields.io/badge/comparison-on%20device-b82c1a?style=flat-square)](#privacy)
+
 ![Twinsites after a screenshot](docs/preview.png)
+
+[Watch the 20 second launch demo](docs/launch.mp4)
 
 ## Privacy
 
 Your screenshot never leaves the browser. There is no account, no upload, and no API key. The model, the thumbnails, and the embeddings are files on this site. Comparison is a cosine similarity on your device.
 
 The page is served with `Cross-Origin-Opener-Policy: same-origin` and `Cross-Origin-Embedder-Policy: require-corp`. The quantized vision graph is not stable with a threaded runtime, so comparison always uses one thread. That also keeps it working when the document is not cross-origin isolated.
+
+Sharing uses the sentence plus `https://twinsites.com`. On a phone that can share files, the button attaches the PNG. Otherwise it opens the X composer with that text. `public/og.png` is the preview for Open Graph and the large Twitter card. The tab icon is `favicon.svg`, and `apple-touch-icon.png` is the home-screen icon.
 
 ## How it works
 
@@ -28,7 +35,26 @@ The offline pipeline in `scripts/` reads the public URL list, screenshots the vi
 - `calibration.json` — the percentile curve of catalog pairs
 - `thumbs/` — small WebP miniatures
 
-Vectors come from the quantized MobileCLIP-S0 vision encoder (`Xenova/mobileclip_s0`, 8-bit), the same file the page loads from `/models`. They are computed in headless Chrome against a local build, because the Node ONNX runtime does not match the browser vectors. A shown percentile is how many random pairs in the catalog that cosine beats, not a pixel match. A twin is a page in the top 20% of those pairs. The map is a UMAP of those vectors after a PCA reduction. A new screenshot is not run through UMAP; it is placed among its nearest neighbors, which is what “landing in the neighborhood” means. Zone names are the traits that lift above the catalog average, phrased as places.
+Vectors come from the quantized MobileCLIP-S0 vision encoder (`Xenova/mobileclip_s0`, 8-bit), the same file the page loads from `/models`. They are computed in headless Chrome against a local build, because the Node ONNX runtime does not match the browser vectors. A shown percentile is how many random pairs in the catalog that cosine beats, not a pixel match. The map is a UMAP of those vectors after a PCA reduction. A new screenshot is not run through UMAP; it is placed among its nearest neighbors, which is what “landing in the neighborhood” means. Zone names are the traits that lift above the catalog average, phrased as places.
+
+The first screen does not wait on the model. The vision runtime and the catalog start downloading in the background while a screenshot is chosen, and the progress bar is the share of those bytes that has arrived.
+
+### What counts as a twin
+
+A single global cut does not work. On the 2,003-site pair curve (400,000 seeded pairs), the median cosine is about 0.32 and the 80th percentile is about 0.62. Measured against that curve in Chrome:
+
+| Screenshot | Nearest | Top 20% | Top 5% | Top 3% | Top 1% |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| MenuThere, already in the catalog | 100th | 3 | 1 | 1 | 1 |
+| Capabase, a typical SaaS landing | 88th | 15 | 0 | 0 | 0 |
+| Lofi Cities, a dark scene | 99th | 697 | 80 | 31 | 4 |
+| A handmade newspaper page | 73rd | 0 | 0 | 0 | 0 |
+
+The top 5% leaves the SaaS page with no twins. The top 20% calls 697 pages a twin of the dark scene, which is the dense part of the catalog, not a likeness.
+
+The page walks the bands 99, 97, 95, 90, 85, 80 and keeps the tightest band whose count is between 8 and 40. A thinner match still uses the tightest band it actually clears. If every non-empty band is above 40, the sentence names the zone and the neighbors instead of calling them twins. Nothing in the top 20% is “no twin in the top 20%”.
+
+That rule, on the same four screenshots: “1 twin in the top 1%”, “15 twins in the top 20%”, “31 twins in the top 3%”, and “No twin in the top 20%”. A dark mobile landing of Linear, which sits in a packed part of the field, reads “Your site lives in Ink Dashboard Ridge with 176 neighbors in the top 1%.” The number is the real count. The wording is the part that stays shareable.
 
 
 ## Catalog
@@ -71,7 +97,9 @@ Keep thumbnails small. The projection step re-encodes them to 420px WebP. Prefer
 
 ## Deploy
 
-`.github/workflows/deploy.yml` runs on every push to `main`: `npm ci && npm run build`, then `rsync` of `dist/` to the web root. The workflow expects an ed25519 key in the `VPS_SSH_KEY` secret. The server already speaks HTTP with SPA fallback, long-lived caching for `/assets/`, and the COOP/COEP/CORP headers.
+`.github/workflows/deploy.yml` runs only on a push to `main`: `npm ci && npm run build`, then `rsync` of `dist/` to the web root. Pull requests do not deploy. The workflow expects an ed25519 key in the `VPS_SSH_KEY` secret. The server already speaks HTTP with SPA fallback, long-lived caching for `/assets/`, and the COOP/COEP/CORP headers.
+
+On a local preview, the drop zone is usable in about 0.1 s on desktop and 0.4 s on an emulated phone. A cold fast-4G phone (40 ms latency, 9 Mbit/s down, 1.5 Mbit/s up, 4× CPU, cache off) spends about 31 s preloading the eye and the drawer in the background, then returns the first twins in about 4 s. Choosing a file the instant the page appears, before that preload, takes about 35 s. Desktop, with no throttle, returns the first twins in about 2.3 s.
 
 ## Next
 

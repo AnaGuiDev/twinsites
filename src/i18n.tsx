@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { ColorName, Lang } from "./types";
 import type { Suggestion } from "./lib/suggest";
-import { formatRank } from "./lib/calibrate";
+import { formatRank, type KinVerdict } from "./lib/calibrate";
 import { COLOR_EN, COLOR_ES } from "./lib/labels";
 
 const REMOVAL_URL =
@@ -24,9 +24,10 @@ const copy = {
       "Your screenshot never leaves this browser. The model, the catalog, and the comparison all run on this device.",
     dropTitle: "Drop a screenshot",
     dropHint: "Paste, or browse. PNG, JPG, WebP. Nothing is uploaded.",
+    noUpload: "No upload",
     browse: "Choose a file",
     factModel: "Quantized MobileCLIP, on device",
-    factCatalog: (n: number) => `${n.toLocaleString("en")} public homepages`,
+    factCatalog: (n: number) => `${grouped(n, "en")} public homepages`,
     factNoUpload: "No upload. No account.",
     stageRead: "Reading the screenshot",
     stageModel: "Waking the on-device eye",
@@ -38,10 +39,8 @@ const copy = {
     openSite: "Open site",
     simLabel: "percentile",
     scoreNote: "Percentile, not a copy score: 90 means closer than 90% of pairs in this catalog.",
-    highBar: (n: number, top: number) =>
-      n === 1 ? `1 twin in the top ${top}%.` : `${n} twins in the top ${top}%.`,
-    noneHigh: (rank: number, top: number) =>
-      `No twin in the top ${top}%. Nearest is in the ${formatRank(rank, "en")} percentile.`,
+    resultLine: (verdict: KinVerdict, zone: string, rank: number) => kinLine("en", verdict, zone, rank),
+    progressLabel: "Loading progress",
     mapTitle: "The field",
     mapDek: "Every dot is a vibe-coded site. Closeness is visual kinship. Yours lands in its neighborhood.",
     mapHint: "Drag to pan. Scroll to zoom. Click a dot to open the site.",
@@ -52,10 +51,11 @@ const copy = {
     suggestTitle: "Three ways to step aside",
     suggestDek: "Plain moves, read off the marks above. A direction, not a redesign.",
     shareTitle: "A card for X",
-    shareDek: "Drawn in this tab. Download it, then attach it to a post.",
+    shareDek: "Drawn in this tab. The post includes the sentence and twinsites.com.",
     download: "Download PNG",
     post: "Post the line on X",
-    shareNote: "The post opens with the sentence only. The image stays on your machine until you attach it.",
+    shareNote:
+      "On a phone, the share button can attach the card. Otherwise the post opens with the sentence and the link, and the image stays here until you attach it.",
     footerPrivacy: "Screenshots stay in the tab that opened them.",
     footerCatalog: "Homepages from the CC0 catalog awesome-vibe-coded-apps.",
     footerLicense: "Twinsites is MIT.",
@@ -85,8 +85,7 @@ const copy = {
     zone: "Zone",
     colorName: (name: ColorName) => COLOR_EN[name],
     suggestion: (item: Suggestion) => suggestionEn(item),
-    cardLine: (n: number, top: number) =>
-      `My site has ${n} twin${n === 1 ? "" : "s"} in the top ${top}% of vibe-coded pairs`,
+    cardLine: (verdict: KinVerdict, zone: string) => kinPost("en", verdict, zone),
     categories: {
       games_play: "Games",
       productivity: "Productivity",
@@ -112,9 +111,10 @@ const copy = {
       "Tu captura no sale de este navegador. El modelo, el catálogo y la comparación ocurren en este dispositivo.",
     dropTitle: "Suelta una captura",
     dropHint: "Pega, o elige un archivo. PNG, JPG, WebP. No se sube nada.",
+    noUpload: "Sin subida",
     browse: "Elegir archivo",
     factModel: "MobileCLIP cuantizado, en el dispositivo",
-    factCatalog: (n: number) => `${n.toLocaleString("es")} homepages públicas`,
+    factCatalog: (n: number) => `${grouped(n, "es")} portadas públicas`,
     factNoUpload: "Sin subida. Sin cuenta.",
     stageRead: "Leyendo la captura",
     stageModel: "Despertando el ojo local",
@@ -126,10 +126,8 @@ const copy = {
     openSite: "Abrir web",
     simLabel: "percentil",
     scoreNote: "Percentil, no un porcentaje de copia: 90 significa más cerca que el 90 % de las parejas del catálogo.",
-    highBar: (n: number, top: number) =>
-      n === 1 ? `1 gemela en el ${top} % superior.` : `${n} gemelas en el ${top} % superior.`,
-    noneHigh: (rank: number, top: number) =>
-      `Ninguna gemela en el ${top} % superior. La más cercana está en el percentil ${rank}.`,
+    resultLine: (verdict: KinVerdict, zone: string, rank: number) => kinLine("es", verdict, zone, rank),
+    progressLabel: "Progreso de carga",
     mapTitle: "El campo",
     mapDek: "Cada punto es una web hecha con IA. La cercanía es parentesco visual. La tuya aterriza en su barrio.",
     mapHint: "Arrastra para moverte. La rueda hace zoom. Un clic abre la web.",
@@ -140,10 +138,11 @@ const copy = {
     suggestTitle: "Tres modos de apartarte",
     suggestDek: "Gestos sencillos, leídos de las marcas de arriba. Una dirección, no un rediseño.",
     shareTitle: "Una tarjeta para X",
-    shareDek: "Dibujada en esta pestaña. Descárgala y adjúntala a una publicación.",
+    shareDek: "Dibujada en esta pestaña. La publicación incluye la frase y twinsites.com.",
     download: "Descargar PNG",
     post: "Publicar la frase en X",
-    shareNote: "La publicación se abre solo con la frase. La imagen se queda en tu equipo hasta que la adjuntes.",
+    shareNote:
+      "En el móvil, el botón de compartir puede adjuntar la tarjeta. Si no, la publicación se abre con la frase y el enlace, y la imagen se queda aquí hasta que la adjuntes.",
     footerPrivacy: "Las capturas se quedan en la pestaña que las abrió.",
     footerCatalog: "Homepages del catálogo CC0 awesome-vibe-coded-apps.",
     footerLicense: "Twinsites es MIT.",
@@ -161,8 +160,8 @@ const copy = {
     packed: "Denso",
     gradientYes: "Degradado",
     gradientNo: "Color plano",
-    bentoYes: "Bento grid",
-    bentoNo: "Sin bento",
+    bentoYes: "Retícula bento",
+    bentoNo: "Sin retícula bento",
     centeredYes: "Centrado",
     centeredNo: "Descentrado",
     errorImage: "Ese archivo no se pudo leer como imagen.",
@@ -173,8 +172,7 @@ const copy = {
     zone: "Zona",
     colorName: (name: ColorName) => COLOR_ES[name],
     suggestion: (item: Suggestion) => suggestionEs(item),
-    cardLine: (n: number, top: number) =>
-      `Mi web tiene ${n} gemela${n === 1 ? "" : "s"} en el ${top} % superior de parejas hechas con IA`,
+    cardLine: (verdict: KinVerdict, zone: string) => kinPost("es", verdict, zone),
     categories: {
       games_play: "Juegos",
       productivity: "Productividad",
@@ -190,6 +188,51 @@ const copy = {
     } as Record<string, string>,
   },
 };
+
+function grouped(n: number, lang: Lang): string {
+  const separator = lang === "es" ? "." : ",";
+  return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, separator);
+}
+
+function kinLine(lang: Lang, verdict: KinVerdict, zone: string, rank: number): string {
+  if (verdict.mode === "none") {
+    return lang === "es"
+      ? `Ninguna gemela en el ${verdict.top} % superior. La más cercana está en el percentil ${rank}.`
+      : `No twin in the top ${verdict.top}%. Nearest is in the ${formatRank(rank, "en")} percentile.`;
+  }
+  if (verdict.mode === "neighborhood") {
+    if (lang === "es") {
+      const noun = verdict.count === 1 ? "vecina" : "vecinas";
+      return `Tu web vive en ${zone} con ${verdict.count} ${noun} en el ${verdict.top} % superior.`;
+    }
+    const noun = verdict.count === 1 ? "neighbor" : "neighbors";
+    return `Your site lives in ${zone} with ${verdict.count} ${noun} in the top ${verdict.top}%.`;
+  }
+  if (lang === "es") {
+    return verdict.count === 1
+      ? `1 gemela en el ${verdict.top} % superior.`
+      : `${verdict.count} gemelas en el ${verdict.top} % superior.`;
+  }
+  return verdict.count === 1
+    ? `1 twin in the top ${verdict.top}%.`
+    : `${verdict.count} twins in the top ${verdict.top}%.`;
+}
+
+function kinPost(lang: Lang, verdict: KinVerdict, zone: string): string {
+  if (verdict.mode === "none") {
+    return lang === "es"
+      ? `Mi web no tiene ninguna gemela en el ${verdict.top} % superior de parejas hechas con IA`
+      : `My site has no twin in the top ${verdict.top}% of vibe-coded pairs`;
+  }
+  if (verdict.mode === "neighborhood") {
+    return lang === "es"
+      ? `Mi web vive en ${zone} con ${verdict.count} vecinas en el ${verdict.top} % superior de parejas hechas con IA`
+      : `My site lives in ${zone} with ${verdict.count} neighbors in the top ${verdict.top}% of vibe-coded pairs`;
+  }
+  return lang === "es"
+    ? `Mi web tiene ${verdict.count} gemela${verdict.count === 1 ? "" : "s"} en el ${verdict.top} % superior de parejas hechas con IA`
+    : `My site has ${verdict.count} twin${verdict.count === 1 ? "" : "s"} in the top ${verdict.top}% of vibe-coded pairs`;
+}
 
 function suggestionEn(item: Suggestion): string {
   switch (item.id) {

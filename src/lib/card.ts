@@ -1,11 +1,11 @@
-import { formatRank } from "./calibrate";
+import { formatRank, type KinVerdict } from "./calibrate";
 import type { Lang } from "../types";
 
 export interface CardInput {
   lang: Lang;
-  count: number;
+  verdict: KinVerdict;
   nearestRank: number;
-  top: number;
+  zone: string;
   thumbs: string[];
 }
 
@@ -95,40 +95,94 @@ export async function renderShareCard(input: CardInput): Promise<HTMLCanvasEleme
   ctx.fillStyle = "#1b1612";
   ctx.font = '500 22px "IBM Plex Mono", monospace';
   ctx.fillText("TWINSITES", 64, 78);
-  ctx.fillStyle = "#c5361b";
+  ctx.fillStyle = "#b82c1a";
   ctx.fillText(input.lang === "es" ? "REGISTRO VISUAL" : "VISUAL KIN REGISTRY", 250, 78);
 
-  const headline = input.lang === "es" ? "Mi web tiene" : "My site has";
+  const es = input.lang === "es";
+  const { verdict } = input;
+  const noun =
+    verdict.mode === "neighborhood"
+      ? es
+        ? verdict.count === 1
+          ? "vecina"
+          : "vecinas"
+        : verdict.count === 1
+          ? "neighbor"
+          : "neighbors"
+      : es
+        ? verdict.count === 1
+          ? "gemela"
+          : "gemelas"
+        : verdict.count === 1
+          ? "twin"
+          : "twins";
+  const headline =
+    verdict.mode === "neighborhood"
+      ? es
+        ? "Tu web vive en"
+        : "Your site lives in"
+      : verdict.mode === "none"
+        ? es
+          ? "Ninguna gemela"
+          : "No twin"
+        : es
+          ? "Mi web tiene"
+          : "My site has";
+  const figure = verdict.mode === "neighborhood" ? input.zone : String(verdict.count);
   const tail =
-    input.lang === "es"
-      ? `gemela${input.count === 1 ? "" : "s"} en el ${input.top} % superior`
-      : `twin${input.count === 1 ? "" : "s"} in the top ${input.top}%`;
+    verdict.mode === "neighborhood"
+      ? es
+        ? `con ${verdict.count} ${noun} en el ${verdict.top} % superior`
+        : `with ${verdict.count} ${noun} in the top ${verdict.top}%`
+      : verdict.mode === "none"
+        ? es
+          ? `en el ${verdict.top} % superior`
+          : `in the top ${verdict.top}%`
+        : es
+          ? `${noun} en el ${verdict.top} % superior`
+          : `${noun} in the top ${verdict.top}%`;
   const nearestLine =
-    input.count > 0
-      ? input.lang === "es"
-        ? `La más cercana, percentil ${input.nearestRank}. Cada gemela está en ese ${input.top} %.`
-        : `Nearest, ${formatRank(input.nearestRank, "en")} percentile. Each twin is in that top ${input.top}%.`
-      : input.lang === "es"
-        ? `Ninguna entra en ese ${input.top} %. La más cercana, percentil ${input.nearestRank}.`
-        : `None clear that top ${input.top}%. Nearest is the ${formatRank(input.nearestRank, "en")} percentile.`;
+    verdict.mode === "none"
+      ? es
+        ? `La más cercana queda en el percentil ${input.nearestRank}.`
+        : `Nearest is the ${formatRank(input.nearestRank, "en")} percentile.`
+      : verdict.mode === "neighborhood"
+        ? es
+          ? `Esas vecinas están en ese ${verdict.top} %. La más cercana, percentil ${input.nearestRank}.`
+          : `Those neighbors clear that top ${verdict.top}%. Nearest, ${formatRank(input.nearestRank, "en")} percentile.`
+        : es
+          ? `La más cercana, percentil ${input.nearestRank}. Cada gemela está en ese ${verdict.top} %.`
+          : `Nearest, ${formatRank(input.nearestRank, "en")} percentile. Each twin is in that top ${verdict.top}%.`;
 
   ctx.fillStyle = "#1b1612";
-  ctx.font = '520 54px "Fraunces Variable", serif';
-  ctx.fillText(headline, 64, 170);
-  const countSize = fitText(ctx, String(input.count), 560, 150, '620 SIZEpx "Fraunces Variable", serif');
-  ctx.font = `620 ${countSize}px "Fraunces Variable", serif`;
-  ctx.fillText(String(input.count), 64, 330);
-  const tailSize = fitText(ctx, tail, 600, 42, '560 SIZEpx "Fraunces Variable", serif');
+  ctx.font = '520 42px "Fraunces Variable", serif';
+  ctx.fillText(headline, 64, 168);
+  const figureSize = fitText(
+    ctx,
+    figure,
+    600,
+    verdict.mode === "neighborhood" ? 64 : 150,
+    '620 SIZEpx "Fraunces Variable", serif',
+  );
+  ctx.font = `620 ${figureSize}px "Fraunces Variable", serif`;
+  if (verdict.mode === "neighborhood") {
+    wrapFill(ctx, figure, 64, 250, 600, figureSize + 4);
+  } else {
+    ctx.fillText(figure, 64, 330);
+  }
+  const tailSize = fitText(ctx, tail, 600, verdict.mode === "neighborhood" ? 32 : 40, '560 SIZEpx "Fraunces Variable", serif');
   ctx.font = `560 ${tailSize}px "Fraunces Variable", serif`;
-  ctx.fillText(tail, 64, 400);
+  const tailY = verdict.mode === "neighborhood" ? 250 + figureSize + 36 : 400;
+  ctx.fillText(tail, 64, tailY);
 
   ctx.font = '400 20px "IBM Plex Mono", monospace';
   ctx.fillStyle = "#4a4036";
   const noteSize = fitText(ctx, nearestLine, 600, 20, '400 SIZEpx "IBM Plex Mono", monospace');
   ctx.font = `400 ${noteSize}px "IBM Plex Mono", monospace`;
-  wrapFill(ctx, nearestLine, 64, 455, 600, noteSize + 6);
+  wrapFill(ctx, nearestLine, 64, Math.max(tailY + 48, 470), 600, noteSize + 6);
   ctx.font = '400 20px "IBM Plex Mono", monospace';
-  ctx.fillText("twinsites.com", 64, 560);
+  ctx.fillStyle = "#1b1612";
+  ctx.fillText("twinsites.com", 64, 572);
 
   const images = (await Promise.all(input.thumbs.slice(0, 4).map(loadImage))).filter(
     (image): image is HTMLImageElement => image !== null,
@@ -146,14 +200,14 @@ export async function renderShareCard(input: CardInput): Promise<HTMLCanvasEleme
   ctx.rotate(-0.12);
   ctx.beginPath();
   ctx.arc(0, 0, 54, 0, Math.PI * 2);
-  ctx.strokeStyle = "#c5361b";
+  ctx.strokeStyle = "#b82c1a";
   ctx.lineWidth = 3;
   ctx.stroke();
   ctx.font = '600 16px "IBM Plex Mono", monospace';
-  ctx.fillStyle = "#c5361b";
+  ctx.fillStyle = "#b82c1a";
   ctx.textAlign = "center";
-  ctx.fillText("ON", 0, -4);
-  ctx.fillText("DEVICE", 0, 16);
+  ctx.fillText(input.lang === "es" ? "EN EL" : "ON", 0, -4);
+  ctx.fillText(input.lang === "es" ? "EQUIPO" : "DEVICE", 0, 16);
   ctx.restore();
 
   return canvas;

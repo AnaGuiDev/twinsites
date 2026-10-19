@@ -4,9 +4,15 @@ import { useI18n } from "../i18n";
 export function DropZone({
   onFile,
   compact = false,
+  progress = null,
+  progressLabel,
+  stageLabel,
 }: {
   onFile: (file: File) => void;
   compact?: boolean;
+  progress?: number | null;
+  progressLabel?: string;
+  stageLabel?: string | null;
 }) {
   const { t } = useI18n();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -48,12 +54,41 @@ export function DropZone({
       onDragLeave={() => setHot(false)}
       onDrop={onDrop}
     >
+      {!compact && (
+        <span className="stamp-mark" aria-hidden="true">
+          {t.noUpload}
+        </span>
+      )}
       <span className="crop tl" />
       <span className="crop tr" />
       <span className="crop bl" />
       <span className="crop br" />
       <p className="sleeve-kicker">{compact ? t.another : t.dropTitle}</p>
-      {!compact && <p className="sleeve-hint">{t.dropHint}</p>}
+      {progress != null && progressLabel && (
+        <div className="bar-row">
+          <div
+            className="bar"
+            role="progressbar"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={progress}
+            aria-label={progressLabel}
+          >
+            <span style={{ width: `${progress}%` }} />
+          </div>
+          <span className="bar-figure">{progress}%</span>
+        </div>
+      )}
+      {!compact && (
+        <p className="sleeve-hint" aria-live="polite">
+          {stageLabel ?? t.dropHint}
+        </p>
+      )}
+      {compact && stageLabel && (
+        <p className="sleeve-hint" aria-live="polite">
+          {stageLabel}
+        </p>
+      )}
       <button type="button" className="ticket" onClick={() => inputRef.current?.click()}>
         {t.browse}
       </button>

@@ -1,5 +1,6 @@
 name: Deploy
 
+# Push to main only. Pull requests do not build or upload.
 on:
   push:
     branches: [main]

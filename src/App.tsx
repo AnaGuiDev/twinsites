@@ -1,21 +1,19 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { DropZone } from "./components/DropZone";
 import { MapView } from "./components/MapView";
 import { REMOVAL_URL, useI18n } from "./i18n";
 import { analyzeImageSource } from "./lib/analyze";
-import { formatRank, rankOf, topShare } from "./lib/calibrate";
+import { formatRank, judgeKin, rankOf, type KinVerdict } from "./lib/calibrate";
 import { canvasToBlob, renderShareCard } from "./lib/card";
-import { loadDataset } from "./lib/dataset";
-import { countTwins, hostOf, nearest, placeUser } from "./lib/match";
-import { embedBlob } from "./lib/model";
+import { countBands, hostOf, nearest, placeUser } from "./lib/match";
 import { suggest, type Suggestion } from "./lib/suggest";
-import type { Calibration, Dataset, Traits, Twin } from "./types";
+import type { Dataset, Traits, Twin } from "./types";
 
 interface Ready {
   traits: Traits;
   twins: Twin[];
-  twinCount: number;
-  calibration: Calibration;
+  verdict: KinVerdict;
+  calibration: Dataset["calibration"];
   spot: { x: number; y: number; cluster: number };
   suggestions: Suggestion[];
   catalogCount: number;
@@ -30,18 +28,50 @@ export function App() {
   const { lang, setLang, t } = useI18n();
   const [catalogCount, setCatalogCount] = useState<number | null>(null);
   const [stage, setStage] = useState<Stage | null>(null);
+  const [progress, setProgress] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [ready, setReady] = useState<Ready | null>(null);
   const [cardUrl, setCardUrl] = useState<string | null>(null);
+  const cardBlob = useRef<Blob | null>(null);
+  const parts = useRef({ read: 0, engine: 0, data: 0, match: 0 });
+
+  const publish = useCallback(() => {
+    const current = parts.current;
+    const value = current.read * 0.04 + current.engine * 0.78 + current.data * 0.16 + current.match * 0.02;
+    setProgress(Math.max(0, Math.min(1, value)));
+  }, []);
 
   useEffect(() => {
     const base = import.meta.env.BASE_URL;
-    fetch(`${base}data/catalog.json`)
+    fetch(`${base}data/stats.json`)
       .then((response) => (response.ok ? response.json() : null))
       .then((json) => {
         if (json && typeof json.count === "number") setCatalogCount(json.count);
       })
       .catch(() => undefined);
+  }, []);
+
+  useEffect(() => {
+    if (!stage) return;
+    document.querySelector(".sleeve")?.scrollIntoView({ block: "center" });
+  }, [stage]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const warm = () => {
+      if (cancelled) return;
+      void import("./lib/model").then((mod) => mod.preloadEngine());
+      void import("./lib/dataset").then((mod) => mod.preloadData());
+    };
+    const idle = window.requestIdleCallback?.(warm, { timeout: 1200 });
+    const timer = idle === undefined ? window.setTimeout(warm, 500) : undefined;
+    window.addEventListener("dragenter", warm, { once: true });
+    return () => {
+      cancelled = true;
+      if (idle !== undefined) window.cancelIdleCallback(idle);
+      if (timer !== undefined) window.clearTimeout(timer);
+      window.removeEventListener("dragenter", warm);
+    };
   }, []);
 
   const onFile = useCallback(
@@ -71,30 +101,47 @@ export function App() {
           return order.indexOf(next) > order.indexOf(current) ? next : current;
         });
       };
+      parts.current = { read: 0, engine: 0, data: 0, match: 0 };
+      setProgress(0);
       advance("read");
+      let unsubEngine: () => void = () => undefined;
+      let unsubData: () => void = () => undefined;
       try {
         const bitmap = await createImageBitmap(file);
         const traits = await analyzeImageSource(bitmap, bitmap.width, bitmap.height);
         bitmap.close();
+        parts.current.read = 1;
+        publish();
         advance("model");
-        const datasetPromise = loadDataset().then((value) => {
-          advance("data");
-          return value;
+        const [modelMod, dataMod] = await Promise.all([import("./lib/model"), import("./lib/dataset")]);
+        unsubEngine = modelMod.subscribeEngine((fraction) => {
+          parts.current.engine = fraction;
+          publish();
         });
-        const vector = await embedBlob(file);
+        unsubData = dataMod.subscribeData((fraction) => {
+          parts.current.data = fraction;
+          if (fraction > 0) advance("data");
+          publish();
+        });
+        const datasetPromise = dataMod.loadDataset();
+        const vectorPromise = modelMod.embedBlob(file);
+        const [vector, dataset] = await Promise.all([vectorPromise, datasetPromise]);
         advance("match");
-        const dataset = await datasetPromise;
         const twins = nearest(vector, dataset, 12);
-        const twinCount = countTwins(vector, dataset);
+        const verdict = judgeKin(countBands(vector, dataset));
         const spot = placeUser(vector, dataset);
         const suggestions = suggest(
           traits,
           twins.map((twin) => twin.site.traits),
         );
+        parts.current.match = 1;
+        parts.current.engine = 1;
+        parts.current.data = 1;
+        publish();
         setReady({
           traits,
           twins,
-          twinCount,
+          verdict,
           calibration: dataset.calibration,
           spot,
           suggestions,
@@ -105,15 +152,21 @@ export function App() {
         });
         setCatalogCount(dataset.catalog.count);
         setStage(null);
+        setProgress(null);
       } catch (err) {
         URL.revokeObjectURL(preview);
         const message = err instanceof Error ? err.message : "";
         if (message.includes("catalog")) setError(t.errorCatalog);
+        else if (err instanceof DOMException || /image|decode|bitmap/i.test(message)) setError(t.errorImage);
         else setError(t.errorModel);
         setStage(null);
+        setProgress(null);
+      } finally {
+        unsubEngine();
+        unsubData();
       }
     },
-    [t],
+    [publish, t],
   );
 
   const shares = useMemo(() => {
@@ -134,16 +187,18 @@ export function App() {
     if (!ready) return;
     let cancelled = false;
     const nearestRank = rankOf(ready.twins[0]?.similarity ?? 0, ready.calibration);
+    const zoneName = zoneLabel(ready, lang);
     renderShareCard({
       lang,
-      count: ready.twinCount,
+      verdict: ready.verdict,
       nearestRank,
-      top: topShare(ready.calibration),
+      zone: zoneName,
       thumbs: ready.twins.slice(0, 4).map((twin) => `${import.meta.env.BASE_URL}data/${twin.site.thumb}`),
     })
       .then(async (canvas) => {
         const blob = await canvasToBlob(canvas);
         if (cancelled) return;
+        cardBlob.current = blob;
         const url = URL.createObjectURL(blob);
         setCardUrl((prev) => {
           if (prev) URL.revokeObjectURL(prev);
@@ -156,10 +211,32 @@ export function App() {
     };
   }, [lang, ready]);
 
+  const stageCopy: Record<Stage, string> = {
+    read: t.stageRead,
+    model: t.stageModel,
+    data: t.stageData,
+    match: t.stageMatch,
+  };
   const zone = ready?.clusters.find((cluster) => cluster.id === ready.spot.cluster);
-  const postHref = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
-    `${t.cardLine(ready?.twinCount ?? 0, ready ? topShare(ready.calibration) : 20)} https://twinsites.com`,
-  )}`;
+  const zoneName = zone ? (lang === "es" ? zone.labelEs : zone.labelEn) : "";
+  const shareText = ready ? `${t.cardLine(ready.verdict, zoneName)} https://twinsites.com` : "";
+  const shown = progress == null ? null : Math.round(progress * 100);
+
+  const onShare = async () => {
+    if (!shareText) return;
+    const blob = cardBlob.current;
+    const file = blob ? new File([blob], "twinsites.png", { type: "image/png" }) : null;
+    if (file && navigator.canShare?.({ files: [file] })) {
+      try {
+        await navigator.share({ text: shareText, files: [file] });
+        return;
+      } catch (err) {
+        if (err instanceof DOMException && err.name === "AbortError") return;
+      }
+    }
+    const href = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
+    window.open(href, "_blank", "noopener,noreferrer");
+  };
 
   return (
     <div className="page">
@@ -198,27 +275,12 @@ export function App() {
                 <li>{t.factNoUpload}</li>
               </ul>
             </div>
-            <DropZone onFile={onFile} />
-          </section>
-        )}
-
-        {stage && (
-          <section className="working" aria-live="polite">
-            <p className="kicker">{t.stageModel}</p>
-            <ol>
-              {(
-                [
-                  ["read", t.stageRead],
-                  ["model", t.stageModel],
-                  ["data", t.stageData],
-                  ["match", t.stageMatch],
-                ] as const
-              ).map(([id, label], index) => (
-                <li key={id} className={["read", "model", "data", "match"].indexOf(stage) >= index ? "on" : ""}>
-                  {label}
-                </li>
-              ))}
-            </ol>
+            <DropZone
+              onFile={onFile}
+              progress={shown}
+              progressLabel={t.progressLabel}
+              stageLabel={stage ? stageCopy[stage] : null}
+            />
           </section>
         )}
 
@@ -235,14 +297,22 @@ export function App() {
               <div>
                 <p className="kicker">{t.you}</p>
                 <p className="again-line">
-                  {ready.twinCount > 0
-                    ? t.highBar(ready.twinCount, topShare(ready.calibration))
-                    : t.noneHigh(rankOf(ready.twins[0]?.similarity ?? 0, ready.calibration), topShare(ready.calibration))}
+                  {t.resultLine(
+                    ready.verdict,
+                    zoneName,
+                    rankOf(ready.twins[0]?.similarity ?? 0, ready.calibration),
+                  )}
                 </p>
                 <p className="score-note">{t.scoreNote}</p>
                 <p className="privacy">{t.privacy}</p>
               </div>
-              <DropZone onFile={onFile} compact />
+              <DropZone
+                onFile={onFile}
+                compact
+                progress={shown}
+                progressLabel={t.progressLabel}
+                stageLabel={stage ? stageCopy[stage] : null}
+              />
             </section>
 
             <section>
@@ -281,7 +351,7 @@ export function App() {
               <MapView sites={ready.sites} clusters={ready.clusters} user={ready.spot} lang={lang} />
               <p className="map-caption">
                 {t.mapHint}
-                {zone ? ` ${t.zone}: ${lang === "es" ? zone.labelEs : zone.labelEn}.` : ""}
+                {zone ? ` ${t.zone}: ${zoneName}.` : ""}
               </p>
             </section>
 
@@ -350,7 +420,7 @@ export function App() {
                 <img
                   className="card-preview"
                   src={cardUrl}
-                  alt={t.cardLine(ready.twinCount, topShare(ready.calibration))}
+                  alt={shareText}
                 />
               )}
               <div className="share-actions">
@@ -359,9 +429,9 @@ export function App() {
                     {t.download}
                   </a>
                 )}
-                <a className="ticket ghost" href={postHref} target="_blank" rel="noreferrer">
+                <button type="button" className="ticket ghost" onClick={() => void onShare()}>
                   {t.post}
-                </a>
+                </button>
               </div>
               <p className="share-note">{t.shareNote}</p>
             </section>
@@ -380,6 +450,12 @@ export function App() {
       </footer>
     </div>
   );
+}
+
+function zoneLabel(ready: Ready, lang: "en" | "es"): string {
+  const zone = ready.clusters.find((cluster) => cluster.id === ready.spot.cluster);
+  if (!zone) return "";
+  return lang === "es" ? zone.labelEs : zone.labelEn;
 }
 
 function Mark({
