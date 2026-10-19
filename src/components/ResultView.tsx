@@ -68,10 +68,14 @@ export function ResultView({
 
   useEffect(() => {
     let cancel = false;
-    const images =
-      showMine || result.source === "catalog"
-        ? [result.preview, thumb(result.twins[0]?.site.thumb ?? "")]
-        : [thumb(result.twins[0]?.site.thumb ?? "")];
+    const both = showMine || result.source === "catalog";
+    const images = both
+      ? [result.preview, thumb(result.twins[0]?.site.thumb ?? "")]
+      : [thumb(result.twins[0]?.site.thumb ?? "")];
+    const clip = (text: string) => (text.length > 34 ? `${text.slice(0, 33).trimEnd()}…` : text);
+    const labels = both
+      ? [result.source === "upload" ? t.cardYou : clip(result.subjectTitle), t.cardTwin]
+      : [t.cardTwin];
     void renderShareCard({
       lang,
       zone: zoneName,
@@ -79,6 +83,7 @@ export function ResultView({
       traits: traitLine(marks.map((mark) => mark.label)),
       pageUrl,
       images,
+      labels,
     })
       .then(async (canvas) => {
         const blob = await canvasToBlob(canvas);
@@ -94,7 +99,7 @@ export function ResultView({
     return () => {
       cancel = true;
     };
-  }, [includeMine, lang, result, zoneName, secondary, marks, pageUrl, showMine]);
+  }, [includeMine, lang, result, zoneName, secondary, marks, pageUrl, showMine, t]);
 
   const onShare = async () => {
     track("share");
@@ -154,6 +159,33 @@ export function ResultView({
         </ul>
       </section>
 
+      <section className="share">
+        <div className="share-card">
+          {cardUrl ? <img className="card-preview" src={cardUrl} alt={shareText} /> : <div className="card-preview is-loading" />}
+        </div>
+        <div className="share-side">
+          <h2>{t.shareTitle}</h2>
+          <p className="dek">{t.shareDek}</p>
+          {result.source === "upload" && (
+            <label className="include">
+              <input type="checkbox" checked={includeMine} onChange={(event) => setIncludeMine(event.target.checked)} />
+              {t.includeMine}
+            </label>
+          )}
+          <div className="share-actions">
+            <button type="button" className="ticket" onClick={() => void onShare()}>
+              {t.post}
+            </button>
+            {cardUrl && (
+              <a className="ticket ghost" href={cardUrl} download="twinsites-card.png" onClick={() => track("share")}>
+                {t.download}
+              </a>
+            )}
+          </div>
+          <p className="share-note">{t.shareNote}</p>
+        </div>
+      </section>
+
       <section>
         <div className="section-head">
           <h2>{t.twinsTitle}</h2>
@@ -181,21 +213,6 @@ export function ResultView({
             </article>
           ))}
         </div>
-      </section>
-
-      <section>
-        <div className="section-head">
-          <h2>{t.mapTitle}</h2>
-          <p>{t.mapDek}</p>
-        </div>
-        {mapSites.length > 100 ? (
-          <MapView sites={mapSites} clusters={mapClusters} user={result.spot} lang={lang} />
-        ) : (
-          <p className="score-note">{t.loadingCatalog}</p>
-        )}
-        <p className="map-caption">
-          {t.mapHint} {t.zone}: {zoneName}.
-        </p>
       </section>
 
       <section className="report">
@@ -232,29 +249,19 @@ export function ResultView({
         </div>
       </section>
 
-      <section className="share">
+      <section>
         <div className="section-head">
-          <h2>{t.shareTitle}</h2>
-          <p>{t.shareDek}</p>
+          <h2>{t.mapTitle}</h2>
+          <p>{t.mapDek}</p>
         </div>
-        {cardUrl && <img className="card-preview" src={cardUrl} alt={shareText} />}
-        {result.source === "upload" && (
-          <label className="include">
-            <input type="checkbox" checked={includeMine} onChange={(event) => setIncludeMine(event.target.checked)} />
-            {t.includeMine}
-          </label>
+        {mapSites.length > 100 ? (
+          <MapView sites={mapSites} clusters={mapClusters} user={result.spot} lang={lang} />
+        ) : (
+          <p className="score-note">{t.loadingCatalog}</p>
         )}
-        <div className="share-actions">
-          {cardUrl && (
-            <a className="ticket" href={cardUrl} download="twinsites-card.png" onClick={() => track("share")}>
-              {t.download}
-            </a>
-          )}
-          <button type="button" className="ticket ghost" onClick={() => void onShare()}>
-            {t.post}
-          </button>
-        </div>
-        <p className="share-note">{t.shareNote}</p>
+        <p className="map-caption">
+          {t.mapHint} {t.zone}: {zoneName}.
+        </p>
       </section>
       <SubscribeForm />
     </div>

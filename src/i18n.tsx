@@ -18,20 +18,29 @@ const copy = {
     zoneLink: (zone: string) => `See every site in ${zone}`,
     revealLabel: "Your page next to its closest twin",
     closest: "Closest twin:",
-    mosaicCaption: "A slice of the catalog, arranged by look. Click any page to see its twins.",
+    mosaicCaption: "Real homepages from the catalog. Point at any of them to see its twins.",
     noShotTitle: "No screenshot at hand?",
     findTitle: "Already in the catalog?",
     privacyMore: "How privacy works",
     footerBy: "Made by",
     footerSource: "Source code (MIT)",
+    cardYou: "Mine",
+    cardTwin: "Closest twin",
+    privacyShort: "Screenshots never leave your browser.",
+    zonesTitle: (n: number) => `${n} zones`,
+    demoVerdict: (verdict: KinVerdict, zone: string) => demoSentence("en", verdict, zone),
+    demoHint: "Point at any page to see its twins.",
+    demoHintTouch: "Tap any page to see its twins.",
+    demoPause: "Pause",
+    demoResume: "Play",
     langName: "Español",
     title: "Your AI-built homepage has twins.",
     lede: (n: number) => `Slop detectors give you a score. Twinsites shows you the relatives: out of ${grouped(n, "en")} sites built with AI tools, the ones that look most like yours.`,
     privacy: "Screenshots are compared on your device and never uploaded. A pasted URL is captured once by a Cloudflare worker and not stored.",
-    dropTitle: "Drop your homepage here",
-    dropHint: "A screenshot of the first screen. You can also paste it.",
+    dropTitle: "Drop a screenshot of your homepage",
+    dropHint: "Or paste it. A PNG or JPG of the first screen.",
     browse: "Choose a file",
-    tryExample: "See an example result",
+    tryExample: "Or see an example result",
     browseZones: "Browse all zones",
     navZones: "Zones",
     searchLabel: "Search the catalog",
@@ -65,7 +74,7 @@ const copy = {
     suggestDek: "Rules of thumb read off those marks. A direction, not a redesign.",
     shareTitle: "Share your zone",
     shareDek: "The card is drawn in this tab. The post links to your zone.",
-    download: "Download PNG",
+    download: "Download the card",
     includeMine: "Include my screenshot on the card",
     post: "Post on X",
     shareNote: "On a phone, sharing can attach the card. On desktop, the post opens with the sentence and the link; download the card to attach it.",
@@ -132,20 +141,29 @@ const copy = {
     zoneLink: (zone: string) => `Ver todas las webs de ${zone}`,
     revealLabel: "Tu página junto a su gemela más cercana",
     closest: "Gemela más cercana:",
-    mosaicCaption: "Una muestra del catálogo, ordenada por parecido. Haz clic en cualquiera para ver sus gemelas.",
+    mosaicCaption: "Portadas reales del catálogo. Señala cualquiera para ver sus gemelas.",
     noShotTitle: "¿Sin captura a mano?",
     findTitle: "¿Ya está en el catálogo?",
     privacyMore: "Cómo funciona la privacidad",
     footerBy: "Hecho por",
     footerSource: "Código fuente (MIT)",
+    cardYou: "La mía",
+    cardTwin: "Gemela más cercana",
+    privacyShort: "Las capturas nunca salen de tu navegador.",
+    zonesTitle: (n: number) => `${n} zonas`,
+    demoVerdict: (verdict: KinVerdict, zone: string) => demoSentence("es", verdict, zone),
+    demoHint: "Señala cualquier portada para ver sus gemelas.",
+    demoHintTouch: "Toca cualquier portada para ver sus gemelas.",
+    demoPause: "Pausa",
+    demoResume: "Reanudar",
     langName: "English",
     title: "Tu web hecha con IA tiene gemelas.",
     lede: (n: number) => `Los detectores de webs genéricas te dan una nota. Twinsites te enseña a las parientes: de ${grouped(n, "es")} webs hechas con herramientas de IA, las que más se parecen a la tuya.`,
     privacy: "Las capturas se comparan en tu dispositivo y nunca se suben. Una URL pegada la captura una vez un worker de Cloudflare, sin guardarla.",
-    dropTitle: "Suelta aquí tu portada",
-    dropHint: "Una captura de la primera pantalla. También puedes pegarla.",
+    dropTitle: "Suelta una captura de tu portada",
+    dropHint: "O pégala. Un PNG o JPG de la primera pantalla.",
     browse: "Elegir archivo",
-    tryExample: "Ver un resultado de ejemplo",
+    tryExample: "O mira un resultado de ejemplo",
     browseZones: "Ver todas las zonas",
     navZones: "Zonas",
     searchLabel: "Buscar en el catálogo",
@@ -179,7 +197,7 @@ const copy = {
     suggestDek: "Reglas sencillas leídas de esas marcas. Una dirección, no un rediseño.",
     shareTitle: "Comparte tu zona",
     shareDek: "La tarjeta se dibuja en esta pestaña. La publicación enlaza a tu zona.",
-    download: "Descargar PNG",
+    download: "Descargar la tarjeta",
     includeMine: "Incluir mi captura en la tarjeta",
     post: "Publicar en X",
     shareNote: "En el móvil, compartir puede adjuntar la tarjeta. En el escritorio, la publicación se abre con la frase y el enlace; descarga la tarjeta para adjuntarla.",
@@ -246,6 +264,23 @@ const copy = {
 function grouped(n: number, lang: Lang): string {
   const separator = lang === "es" ? "." : ",";
   return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, separator);
+}
+
+function demoSentence(lang: Lang, verdict: KinVerdict, zone: string): string {
+  const es = lang === "es";
+  const lit = es ? "Sus parecidas más cercanas en este muro están en amarillo." : "Its closest look-alikes on this wall are in yellow.";
+  if (verdict.mode === "none") {
+    return es ? `Ninguna gemela en el ${verdict.top} % superior: es una rara. ${lit}` : `No twin in the top ${verdict.top}%: a rare one. ${lit}`;
+  }
+  if (verdict.mode === "neighborhood") {
+    return es
+      ? `${verdict.count} vecinas en el ${verdict.top} % superior, en ${zone}. ${lit}`
+      : `${verdict.count} close neighbours in the top ${verdict.top}%, in ${zone}. ${lit}`;
+  }
+  const noun = es ? (verdict.count === 1 ? "gemela" : "gemelas") : verdict.count === 1 ? "twin" : "twins";
+  return es
+    ? `${verdict.count} ${noun} en el ${verdict.top} % superior, en ${zone}. ${lit}`
+    : `${verdict.count} ${noun} in the top ${verdict.top}%, in ${zone}. ${lit}`;
 }
 
 function resultSentence(lang: Lang, verdict: KinVerdict, percentile: number): string {

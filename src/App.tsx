@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { DropZone } from "./components/DropZone";
 import { Mosaic } from "./components/Mosaic";
+import { ZoneIndex } from "./components/ZoneIndex";
 import { PrivacyView } from "./components/PrivacyView";
 import { ResultView } from "./components/ResultView";
 import { SearchBox } from "./components/SearchBox";
@@ -234,6 +235,13 @@ export function App() {
             go("/");
           }}
         >
+          <svg className="logo" viewBox="0 0 64 64" aria-hidden="true">
+            <rect width="64" height="64" rx="10" />
+            <rect x="9" y="12" width="21" height="17" className="lit" />
+            <rect x="34" y="12" width="21" height="17" className="lit" />
+            <rect x="9" y="35" width="21" height="17" className="plain" />
+            <rect x="34" y="35" width="21" height="17" className="plain" />
+          </svg>
           Twinsites
         </a>
         <nav>
@@ -258,34 +266,38 @@ export function App() {
           <section className="hero">
             <Mosaic
               slot={
-                <div className="slot-inner">
+                <>
                   <h1>{t.title}</h1>
                   <p className="lede">{t.lede(catalogCount ?? 2003)}</p>
-                  <DropZone
-                    onFile={onFile}
-                    onIntent={warm}
-                    progress={shown}
-                    progressLabel={t.progressLabel}
-                    stageLabel={stage ? stageCopy[stage] : null}
-                  />
-                </div>
+                  <div className="actions">
+                    <DropZone
+                      inline
+                      onFile={onFile}
+                      onIntent={warm}
+                      progress={shown}
+                      progressLabel={t.progressLabel}
+                      stageLabel={stage ? stageCopy[stage] : null}
+                    />
+                    <UrlShot onFile={onFile} />
+                    <p className="example-row">
+                      <button type="button" className="text-link as-button" onClick={onExample}>
+                        {t.tryExample}
+                      </button>
+                    </p>
+                  </div>
+                  {error && (
+                    <p className="error" role="alert">
+                      {error}
+                    </p>
+                  )}
+                  <p className="privacy">
+                    {t.privacyShort} <RouteLink className="text-link" href="/privacy">{t.privacyMore}</RouteLink>
+                  </p>
+                </>
               }
             />
-            <p className="mosaic-caption">{t.mosaicCaption}</p>
             <div className="hero-more">
-              <div className="hero-alt">
-                <h2>{t.noShotTitle}</h2>
-                <UrlShot onFile={onFile} />
-                <div className="hero-actions">
-                  <button type="button" className="ticket ghost" onClick={onExample}>
-                    {t.tryExample}
-                  </button>
-                  <RouteLink className="text-link" href="/zones">
-                    {t.browseZones}
-                  </RouteLink>
-                </div>
-              </div>
-              <div className="hero-alt">
+              <div>
                 <h2>{t.findTitle}</h2>
                 <SearchBox
                   onPick={(slug) => {
@@ -294,13 +306,11 @@ export function App() {
                   }}
                 />
               </div>
+              <ZoneIndex />
             </div>
-            <p className="privacy">
-              {t.privacy} <RouteLink className="text-link" href="/privacy">{t.privacyMore}</RouteLink>
-            </p>
           </section>
         )}
-        {error && (
+        {error && !(route.name === "home" && !homeResult) && (
           <p className="error" role="alert">
             {error}
           </p>
