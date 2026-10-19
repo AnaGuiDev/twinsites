@@ -1,0 +1,24 @@
+name: Removal request
+description: Ask for a site to be removed from the Twinsites catalog
+title: "Removal request: "
+body:
+  - type: input
+    id: url
+    attributes:
+      label: Site URL
+      description: The homepage that should disappear from the catalog.
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why it should be removed
+    validations:
+      required: true
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: Confirmation
+      options:
+        - label: I control this site or represent the owner.
+          required: true
