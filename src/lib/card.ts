@@ -1,10 +1,11 @@
-import { formatRank, type KinVerdict } from "./calibrate";
+import { formatPercentile, type KinVerdict } from "./calibrate";
 import type { Lang } from "../types";
 
 export interface CardInput {
   lang: Lang;
   verdict: KinVerdict;
-  nearestRank: number;
+  nearestPercentile: number;
+  catalogCount: number;
   zone: string;
   thumbs: string[];
 }
@@ -129,30 +130,29 @@ export async function renderShareCard(input: CardInput): Promise<HTMLCanvasEleme
           ? "Mi web tiene"
           : "My site has";
   const figure = verdict.mode === "neighborhood" ? input.zone : String(verdict.count);
+  const total = es
+    ? String(input.catalogCount).replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+    : String(input.catalogCount).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  const among = es ? `entre ${total} webs hechas con IA` : `among ${total} AI-built sites`;
   const tail =
     verdict.mode === "neighborhood"
       ? es
-        ? `con ${verdict.count} ${noun} en el ${verdict.top} % superior`
-        : `with ${verdict.count} ${noun} in the top ${verdict.top}%`
+        ? `con ${verdict.count} ${noun} ${among}`
+        : `with ${verdict.count} ${noun} ${among}`
       : verdict.mode === "none"
-        ? es
-          ? `en el ${verdict.top} % superior`
-          : `in the top ${verdict.top}%`
+        ? among
         : es
-          ? `${noun} en el ${verdict.top} % superior`
-          : `${noun} in the top ${verdict.top}%`;
+          ? `${noun} ${among}`
+          : `${noun} ${among}`;
+  const nearest = formatPercentile(input.nearestPercentile, input.lang);
   const nearestLine =
     verdict.mode === "none"
       ? es
-        ? `La más cercana queda en el percentil ${input.nearestRank}.`
-        : `Nearest is the ${formatRank(input.nearestRank, "en")} percentile.`
-      : verdict.mode === "neighborhood"
-        ? es
-          ? `Esas vecinas están en ese ${verdict.top} %. La más cercana, percentil ${input.nearestRank}.`
-          : `Those neighbors clear that top ${verdict.top}%. Nearest, ${formatRank(input.nearestRank, "en")} percentile.`
-        : es
-          ? `La más cercana, percentil ${input.nearestRank}. Cada gemela está en ese ${verdict.top} %.`
-          : `Nearest, ${formatRank(input.nearestRank, "en")} percentile. Each twin is in that top ${verdict.top}%.`;
+        ? `La más cercana queda en el percentil ${nearest}.`
+        : `Nearest is percentile ${nearest}.`
+      : es
+        ? `La más cercana, percentil ${nearest}.`
+        : `Nearest, percentile ${nearest}.`;
 
   ctx.fillStyle = "#1b1612";
   ctx.font = '520 42px "Fraunces Variable", serif';

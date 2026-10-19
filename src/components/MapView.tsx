@@ -274,7 +274,7 @@ export function MapView({
       </button>
       {hover && (
         <div className="tip" style={{ left: hover.x, top: hover.y }}>
-          <img src={`${import.meta.env.BASE_URL}data/${hover.site.thumb}`} alt="" />
+          <img src={`${import.meta.env.BASE_URL}data/${hover.site.thumb}`} alt={hover.site.title} />
           <div>
             <strong>{hover.site.title}</strong>
             <span>{hostOf(hover.site.url)}</span>

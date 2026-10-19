@@ -9,6 +9,7 @@
       content="Drop a landing screenshot. Twinsites finds the vibe-coded sites that look like yours. The comparison never leaves your browser."
     />
     <meta name="theme-color" content="#e6dece" />
+    <link rel="canonical" href="https://twinsites.com/" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta property="og:type" content="website" />
@@ -31,9 +32,32 @@
     />
     <meta name="twitter:image" content="https://twinsites.com/og.png" />
     <meta name="twitter:image:alt" content="Twinsites, a field guide to the landing pages that already look like yours." />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Twinsites",
+        "url": "https://twinsites.com/",
+        "description": "Drop a landing screenshot. Twinsites finds the vibe-coded sites that look like yours. The comparison never leaves your browser.",
+        "applicationCategory": "UtilitiesApplication",
+        "operatingSystem": "Any",
+        "browserRequirements": "Requires JavaScript and WebAssembly.",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "author": { "@type": "Person", "name": "Ana Gui", "url": "https://github.com/AnaGuiDev" }
+      }
+    </script>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <h1>Find the sites that already wear your face.</h1>
+      <p>
+        Drop a screenshot of a landing page. Twinsites lines it up against a drawer of vibe-coded websites and names the
+        ones with the same bones.
+      </p>
+      <p>
+        Your screenshot never leaves this browser. The model, the catalog, and the comparison all run on this device.
+      </p>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

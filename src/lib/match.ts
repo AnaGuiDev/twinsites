@@ -1,4 +1,4 @@
-import { KIN_BANDS, rankOf } from "./calibrate";
+import { KIN_BANDS, percentileOf } from "./calibrate";
 import type { Dataset, Twin } from "../types";
 
 export function dotAt(vector: Float32Array, embeddings: Float32Array, index: number, dim: number): number {
@@ -27,13 +27,17 @@ export function nearest(vector: Float32Array, dataset: Dataset, k: number): Twin
   return best;
 }
 
-/** How many sites clear each kin band. Counts are cumulative: p80 includes p99. */
+/**
+ * How many sites clear each kin band. Counts are cumulative: p80 includes p99.
+ * The test uses the unrounded percentile, so 98.5 does not count as the top 1%.
+ */
 export function countBands(vector: Float32Array, dataset: Dataset): Map<number, number> {
   const counts = new Map<number, number>(KIN_BANDS.map((band) => [band, 0]));
+  const knots = dataset.calibration.knots;
   for (let i = 0; i < dataset.catalog.sites.length; i++) {
-    const rank = rankOf(dotAt(vector, dataset.embeddings, i, dataset.dim), dataset.calibration);
+    const percentile = percentileOf(dotAt(vector, dataset.embeddings, i, dataset.dim), knots);
     for (const band of KIN_BANDS) {
-      if (rank >= band) counts.set(band, (counts.get(band) ?? 0) + 1);
+      if (percentile >= band) counts.set(band, (counts.get(band) ?? 0) + 1);
     }
   }
   return counts;

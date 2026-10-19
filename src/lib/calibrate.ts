@@ -71,6 +71,12 @@ export function rankOf(cosine: number, calibration: Calibration): number {
   return Math.round(percentileOf(cosine, calibration.knots));
 }
 
+/** One decimal, so 99.1 and 99.8 do not collapse into the same card. */
+export function formatPercentile(value: number, lang: Lang): string {
+  const text = (Math.round(value * 10) / 10).toFixed(1);
+  return lang === "es" ? text.replace(".", ",") : text;
+}
+
 export function formatRank(rank: number, lang: Lang): string {
   if (lang === "es") return `${rank}.º`;
   const mod100 = rank % 100;

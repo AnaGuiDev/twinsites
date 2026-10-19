@@ -3,8 +3,9 @@ import { DropZone } from "./components/DropZone";
 import { MapView } from "./components/MapView";
 import { REMOVAL_URL, useI18n } from "./i18n";
 import { analyzeImageSource } from "./lib/analyze";
-import { formatRank, judgeKin, rankOf, type KinVerdict } from "./lib/calibrate";
+import { formatPercentile, judgeKin, percentileOf, type KinVerdict } from "./lib/calibrate";
 import { canvasToBlob, renderShareCard } from "./lib/card";
+import { cropHero } from "./lib/crop";
 import { countBands, hostOf, nearest, placeUser } from "./lib/match";
 import { suggest, type Suggestion } from "./lib/suggest";
 import type { Dataset, Traits, Twin } from "./types";
@@ -20,6 +21,18 @@ interface Ready {
   clusters: Dataset["catalog"]["clusters"];
   sites: Dataset["catalog"]["sites"];
   preview: string;
+  portrait: boolean;
+  cropped: boolean;
+}
+
+type NetInfo = { saveData?: boolean; effectiveType?: string };
+
+function deferHeavyLoad(): boolean {
+  const connection = (navigator as Navigator & { connection?: NetInfo }).connection;
+  if (connection?.saveData) return true;
+  const type = connection?.effectiveType;
+  if (type === "slow-2g" || type === "2g" || type === "3g") return true;
+  return window.matchMedia("(max-width: 720px)").matches;
 }
 
 type Stage = "read" | "model" | "data" | "match";
@@ -56,23 +69,25 @@ export function App() {
     document.querySelector(".sleeve")?.scrollIntoView({ block: "center" });
   }, [stage]);
 
+  const warm = useCallback(() => {
+    void import("./lib/model").then((mod) => mod.preloadEngine());
+    void import("./lib/dataset").then((mod) => mod.preloadData());
+  }, []);
+
   useEffect(() => {
-    let cancelled = false;
-    const warm = () => {
-      if (cancelled) return;
-      void import("./lib/model").then((mod) => mod.preloadEngine());
-      void import("./lib/dataset").then((mod) => mod.preloadData());
-    };
+    if (deferHeavyLoad()) return;
     const idle = window.requestIdleCallback?.(warm, { timeout: 1200 });
     const timer = idle === undefined ? window.setTimeout(warm, 500) : undefined;
-    window.addEventListener("dragenter", warm, { once: true });
     return () => {
-      cancelled = true;
       if (idle !== undefined) window.cancelIdleCallback(idle);
       if (timer !== undefined) window.clearTimeout(timer);
-      window.removeEventListener("dragenter", warm);
     };
-  }, []);
+  }, [warm]);
+
+  useEffect(() => {
+    window.addEventListener("dragenter", warm);
+    return () => window.removeEventListener("dragenter", warm);
+  }, [warm]);
 
   const onFile = useCallback(
     async (file: File) => {
@@ -93,7 +108,6 @@ export function App() {
         setError(t.errorLarge);
         return;
       }
-      const preview = URL.createObjectURL(file);
       const order: Stage[] = ["read", "model", "data", "match"];
       const advance = (next: Stage) => {
         setStage((current) => {
@@ -106,10 +120,12 @@ export function App() {
       advance("read");
       let unsubEngine: () => void = () => undefined;
       let unsubData: () => void = () => undefined;
+      let preview: string | null = null;
       try {
-        const bitmap = await createImageBitmap(file);
-        const traits = await analyzeImageSource(bitmap, bitmap.width, bitmap.height);
-        bitmap.close();
+        const frame = await cropHero(file);
+        preview = URL.createObjectURL(frame.blob);
+        const traits = await analyzeImageSource(frame.bitmap, frame.bitmap.width, frame.bitmap.height);
+        frame.bitmap.close();
         parts.current.read = 1;
         publish();
         advance("model");
@@ -124,7 +140,7 @@ export function App() {
           publish();
         });
         const datasetPromise = dataMod.loadDataset();
-        const vectorPromise = modelMod.embedBlob(file);
+        const vectorPromise = modelMod.embedBlob(frame.blob);
         const [vector, dataset] = await Promise.all([vectorPromise, datasetPromise]);
         advance("match");
         const twins = nearest(vector, dataset, 12);
@@ -149,16 +165,21 @@ export function App() {
           clusters: dataset.catalog.clusters,
           sites: dataset.catalog.sites,
           preview,
+          portrait: frame.portrait,
+          cropped: frame.cropped,
         });
         setCatalogCount(dataset.catalog.count);
         setStage(null);
         setProgress(null);
       } catch (err) {
-        URL.revokeObjectURL(preview);
+        if (preview) URL.revokeObjectURL(preview);
         const message = err instanceof Error ? err.message : "";
         if (message.includes("catalog")) setError(t.errorCatalog);
         else if (err instanceof DOMException || /image|decode|bitmap/i.test(message)) setError(t.errorImage);
-        else setError(t.errorModel);
+        else {
+          console.error(err);
+          setError(t.errorModel);
+        }
         setStage(null);
         setProgress(null);
       } finally {
@@ -186,12 +207,13 @@ export function App() {
   useEffect(() => {
     if (!ready) return;
     let cancelled = false;
-    const nearestRank = rankOf(ready.twins[0]?.similarity ?? 0, ready.calibration);
+    const nearestPercentile = percentileOf(ready.twins[0]?.similarity ?? 0, ready.calibration.knots);
     const zoneName = zoneLabel(ready, lang);
     renderShareCard({
       lang,
       verdict: ready.verdict,
-      nearestRank,
+      nearestPercentile,
+      catalogCount: ready.catalogCount,
       zone: zoneName,
       thumbs: ready.twins.slice(0, 4).map((twin) => `${import.meta.env.BASE_URL}data/${twin.site.thumb}`),
     })
@@ -219,7 +241,8 @@ export function App() {
   };
   const zone = ready?.clusters.find((cluster) => cluster.id === ready.spot.cluster);
   const zoneName = zone ? (lang === "es" ? zone.labelEs : zone.labelEn) : "";
-  const shareText = ready ? `${t.cardLine(ready.verdict, zoneName)} https://twinsites.com` : "";
+  const nearestPercentile = ready ? percentileOf(ready.twins[0]?.similarity ?? 0, ready.calibration.knots) : 0;
+  const shareText = ready ? `${t.cardLine(ready.verdict, zoneName, ready.catalogCount)} https://twinsites.com` : "";
   const shown = progress == null ? null : Math.round(progress * 100);
 
   const onShare = async () => {
@@ -247,9 +270,6 @@ export function App() {
         </a>
         <span className="registry">{t.registry}</span>
         <nav>
-          <a className="removal" href={REMOVAL_URL} target="_blank" rel="noreferrer">
-            {t.removal}
-          </a>
           <button
             type="button"
             className="lang"
@@ -277,6 +297,7 @@ export function App() {
             </div>
             <DropZone
               onFile={onFile}
+              onIntent={warm}
               progress={shown}
               progressLabel={t.progressLabel}
               stageLabel={stage ? stageCopy[stage] : null}
@@ -297,17 +318,15 @@ export function App() {
               <div>
                 <p className="kicker">{t.you}</p>
                 <p className="again-line">
-                  {t.resultLine(
-                    ready.verdict,
-                    zoneName,
-                    rankOf(ready.twins[0]?.similarity ?? 0, ready.calibration),
-                  )}
+                  {t.resultLine(ready.verdict, zoneName, nearestPercentile)}
                 </p>
                 <p className="score-note">{t.scoreNote}</p>
-                <p className="privacy">{t.privacy}</p>
+                {ready.cropped && <p className="score-note">{t.cropNote}</p>}
+                {ready.portrait && <p className="score-note">{t.portraitNote}</p>}
               </div>
               <DropZone
                 onFile={onFile}
+                onIntent={warm}
                 compact
                 progress={shown}
                 progressLabel={t.progressLabel}
@@ -323,14 +342,18 @@ export function App() {
               <div className="twin-grid">
                 {ready.twins.map((twin, index) => (
                   <article className="twin-card" key={twin.site.id} style={{ animationDelay: `${index * 70}ms` }}>
-                    <img src={`${import.meta.env.BASE_URL}data/${twin.site.thumb}`} alt="" />
+                    <img src={`${import.meta.env.BASE_URL}data/${twin.site.thumb}`} alt={twin.site.title} />
                     <div className="twin-meta">
                       <div className="sim-row">
-                        <span className="sim">{formatRank(rankOf(twin.similarity, ready.calibration), lang)}</span>
+                        <span className="sim">
+                          {formatPercentile(percentileOf(twin.similarity, ready.calibration.knots), lang)}
+                        </span>
                         <span>{t.simLabel}</span>
                       </div>
                       <div className="meter" aria-hidden="true">
-                        <span style={{ width: `${rankOf(twin.similarity, ready.calibration)}%` }} />
+                        <span
+                          style={{ width: `${Math.max(0, Math.min(100, percentileOf(twin.similarity, ready.calibration.knots)))}%` }}
+                        />
                       </div>
                       <h3>{twin.site.title}</h3>
                       <p className="host">{hostOf(twin.site.url)}</p>
@@ -441,6 +464,11 @@ export function App() {
 
       <footer>
         <p>{t.footerPrivacy}</p>
+        <p>
+          <a className="removal" href={REMOVAL_URL} target="_blank" rel="noreferrer">
+            {t.removal}
+          </a>
+        </p>
         <p>
           <a href="https://github.com/JefferyLee/awesome-vibe-coded-apps">{t.footerCatalog}</a>
         </p>

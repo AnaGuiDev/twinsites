@@ -66,8 +66,12 @@ async function main() {
   console.log("desktop", { interactiveMs: desktopInteractive, resultMs: desktopResult });
   await desktop.context.close();
 
+  const heavyBefore = `(() => performance.getEntriesByType("resource").map((entry) => entry.name).filter((name) => name.includes("ort-wasm") || name.includes("vision_model") || name.includes("embeddings.bin")))()`;
+
   const mobile = await session(browser, true);
   const mobileInteractive = await timeToInteractive(mobile.page);
+  const beforeIntent = await mobile.page.evaluate(heavyBefore);
+  console.log("mobile resources before intent", beforeIntent);
   const resultStarted = Date.now();
   await mobile.page.locator("input[type=file]").setInputFiles(FILE);
   await mobile.page.locator(".bar").waitFor({ timeout: 20000 });
@@ -80,6 +84,7 @@ async function main() {
 
   const warmed = await session(browser, true);
   const warmedInteractive = await timeToInteractive(warmed.page);
+  await warmed.page.locator("button.ticket").first().focus();
   const preloadMs = await warmed.page.evaluate(`(async () => {
     const started = performance.now();
     const ready = () => {
@@ -110,7 +115,8 @@ async function main() {
       interactiveMs: warmedInteractive,
       preloadMs,
       firstResultMs: warmedResult,
-      note: "File chosen after the wasm runtime, vision model, and embeddings have finished downloading.",
+      note: "Mobile does not preload at idle. Focus on the file button starts the download; the file is chosen after it finishes.",
+      resourcesBeforeIntent: beforeIntent,
     },
   };
   await writeFile(path.join(OUT, "perf.json"), JSON.stringify(report, null, 2));
