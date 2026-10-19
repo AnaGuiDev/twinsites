@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { DropZone } from "./DropZone";
+import { SubscribeForm } from "./SubscribeForm";
 import { MapView } from "./MapView";
 import { RouteLink } from "../router";
 import { useI18n } from "../i18n";
@@ -253,6 +254,7 @@ export function ResultView({
         </div>
         <p className="share-note">{t.shareNote}</p>
       </section>
+      <SubscribeForm />
     </div>
   );
 }

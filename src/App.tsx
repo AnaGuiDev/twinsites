@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { DropZone } from "./components/DropZone";
+import { PrivacyView } from "./components/PrivacyView";
 import { ResultView } from "./components/ResultView";
 import { SearchBox } from "./components/SearchBox";
 import { UrlShot } from "./components/UrlShot";
@@ -245,6 +246,7 @@ export function App() {
       </header>
 
       <main>
+        {route.name === "privacy" && <PrivacyView />}
         {route.name === "zones" && <ZonesView />}
         {route.name === "zone" && <ZonesView slug={route.slug} />}
         {route.name === "site" && catalog && (
@@ -310,6 +312,9 @@ export function App() {
         </p>
         <p>
           <a href="https://github.com/JefferyLee/awesome-vibe-coded-apps">{t.footerCatalog}</a>
+        </p>
+        <p>
+          <a href="/privacy">{t.listPrivacy}</a>
         </p>
         <p>
           {t.footerLicense} <a href="https://github.com/AnaGuiDev">Ana Gui</a>
