@@ -26,7 +26,7 @@ From this directory:
 npx wrangler kv namespace create SHOTS
 ```
 
-Paste the printed id into `wrangler.toml` in place of `replace-with-kv-namespace-id`. The namespace stores only counters: one per IP per hour, and one global count per UTC day. It does not store URLs or images.
+The id in `wrangler.toml` is the live `SHOTS` namespace. It stores only counters: one per IP per hour, and one global count per UTC day. It does not store URLs or images.
 
 ## 4. Browser Rendering
 
@@ -75,17 +75,17 @@ npm install
 npx wrangler deploy
 ```
 
-Note the `*.workers.dev` URL, or attach a route of your own. No step here SSHes to the VPS or edits nginx.
+The deployed endpoint is https://twinsites-shot.twinsites.workers.dev. No step here SSHes to the VPS or edits nginx.
 
 ## 7. Show the box on twinsites.com
 
 The box is hidden unless the **site** build saw `VITE_SHOT_ENDPOINT`. In the GitHub repo:
 
 1. Settings → Secrets and variables → Actions → **Variables**.
-2. Add `VITE_SHOT_ENDPOINT` = the Worker URL, for example `https://twinsites-shot.<account>.workers.dev`.
-3. Add `VITE_TURNSTILE_SITEKEY` = the Turnstile site key.
+2. `VITE_SHOT_ENDPOINT` = `https://twinsites-shot.twinsites.workers.dev`.
+3. `VITE_TURNSTILE_SITEKEY` = the Turnstile site key.
 
-The deploy workflow passes those variables into `npm run build`. They are empty when unset, so a push to `main` keeps shipping the site with the URL box hidden. The VPS still only receives `dist/`.
+The deploy workflow passes `vars.VITE_SHOT_ENDPOINT` and `vars.VITE_TURNSTILE_SITEKEY` into `npm run build`. Both repository variables are set. The VPS still only receives `dist/`.
 
 Push to `main` (or re-run the deploy workflow) so the new static files include the box. The Worker must already be answering, with Turnstile, KV, and the browser binding in place.
 
