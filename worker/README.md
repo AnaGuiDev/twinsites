@@ -99,7 +99,7 @@ Push to `main` (or re-run the deploy workflow) so the new static files include t
 - In browser mode, subrequests to those same ranges are aborted.
 - In API mode, any redirect from ScreenshotOne is discarded.
 - Responses that are not PNG or JPEG, or that exceed 3 MB.
-- A hard timeout of about 15 seconds.
+- A hard timeout of about 25 seconds. The page load itself waits for `load` (about 20 seconds) and then a short settle, instead of `networkidle2`.
 - More than 5 shots per IP per hour, or a global day that has reached 80% of `SHOT_DAILY_CAP`.
 - A missing or bad Turnstile token.
 - `SHOT_KILL=1`.

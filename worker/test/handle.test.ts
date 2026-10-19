@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { handle, type Env } from "../src/index.ts";
+import { describeShotError, handle, type Env } from "../src/index.ts";
 import { dayKey, hourKey } from "../src/limit.ts";
 
 function memory(): Env["SHOTS"] {
@@ -59,6 +59,15 @@ describe("handle", () => {
     await shots.put(hourKey(ip, Date.now()), "5");
     const response = await handle(post("https://example.com", ip), env({ SHOTS: shots }));
     assert.equal(response.status, 429);
+  });
+
+  it("maps a browser rate limit to 503 and scrubs URLs from the message", () => {
+    const failure = describeShotError(Object.assign(new Error("429 Too Many Requests for https://stripe.com/pricing"), { status: 429 }));
+    assert.equal(failure.status, 503);
+    assert.equal(failure.retryAfter, "60");
+    assert.equal(failure.message.includes("https://"), false);
+    assert.equal(failure.message.includes("stripe.com"), false);
+    assert.equal(describeShotError(new Error("timeout")).status, 504);
   });
 
   it("enforces the global cap", async () => {

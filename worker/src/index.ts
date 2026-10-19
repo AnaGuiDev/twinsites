@@ -92,7 +92,7 @@ export async function handle(request: Request, env: Env): Promise<Response> {
   ]);
 
   try {
-    const shot = await withTimeout(shoot(env, payload.url), 15000);
+    const shot = await withTimeout(shoot(env, payload.url), 25000);
     const reason = shotRejection(200, shot.type, shot.bytes.byteLength);
     if (reason) {
       log(`image-${reason}`, checked.host);
@@ -100,9 +100,11 @@ export async function handle(request: Request, env: Env): Promise<Response> {
     }
     log("ok", checked.host);
     return new Response(shot.bytes, { status: 200, headers: cors({ "content-type": shot.type }) });
-  } catch {
-    log("fail", checked.host);
-    return json({ error: "unavailable" }, 504);
+  } catch (err) {
+    const failure = describeShotError(err);
+    log("fail", checked.host, failure);
+    const extra = failure.retryAfter ? { "Retry-After": failure.retryAfter } : undefined;
+    return json({ error: "unavailable" }, failure.status, extra);
   }
 }
 
@@ -156,7 +158,8 @@ async function shootWithBrowser(binding: unknown, target: string): Promise<Shot>
       if (subrequestAllowed(incoming.url())) void incoming.continue();
       else void incoming.abort();
     });
-    await page.goto(target, { waitUntil: "networkidle2", timeout: 12000 });
+    await page.goto(target, { waitUntil: "load", timeout: 20000 });
+    await new Promise((resolve) => setTimeout(resolve, 1500));
     const image = await page.screenshot({ type: "png", clip: { x: 0, y: 0, width: 1440, height: 900 } });
     const bytes = image instanceof Uint8Array ? image : new Uint8Array(image);
     return { bytes, type: "image/png" };
@@ -240,8 +243,23 @@ function withTimeout<T>(work: Promise<T>, ms: number): Promise<T> {
   });
 }
 
-function json(body: { error: string }, status: number): Response {
-  return new Response(JSON.stringify(body), { status, headers: cors({ "content-type": "application/json" }) });
+function json(body: { error: string }, status: number, extra?: Record<string, string>): Response {
+  const headers = cors({ "content-type": "application/json" });
+  if (extra) {
+    for (const [key, value] of Object.entries(extra)) headers.set(key, value);
+  }
+  return new Response(JSON.stringify(body), { status, headers });
+}
+
+/** Browser Rendering rate limits become 503. The message never keeps a full URL. */
+export function describeShotError(error: unknown): { name: string; message: string; status: number; retryAfter?: string } {
+  const name = error instanceof Error ? error.name : "Error";
+  const raw = error instanceof Error ? error.message : "fail";
+  const message = raw.replace(/https?:\/\/\S+/gi, "[url]").slice(0, 180);
+  const coded = typeof error === "object" && error !== null && "status" in error ? Number((error as { status: unknown }).status) : NaN;
+  const limited = coded === 429 || /\b429\b|rate limit|too many requests|quota|browser limit|concurrent browsers/i.test(message);
+  if (limited) return { name, message, status: 503, retryAfter: "60" };
+  return { name, message, status: 504 };
 }
 
 function cors(extra?: HeadersInit): Headers {
@@ -256,6 +274,13 @@ function cors(extra?: HeadersInit): Headers {
   return headers;
 }
 
-function log(event: string, host?: string): void {
-  console.log(JSON.stringify(host ? { event, host } : { event }));
+function log(event: string, host?: string, failure?: { name: string; message: string; status: number }): void {
+  const row: Record<string, string | number> = { event };
+  if (host) row.host = host;
+  if (failure) {
+    row.name = failure.name;
+    row.message = failure.message;
+    row.status = failure.status;
+  }
+  console.log(JSON.stringify(row));
 }
