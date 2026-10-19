@@ -1,4 +1,13 @@
 import { decideLimit, dayKey, hourKey } from "./limit";
+import {
+  CONSENT_VERSION,
+  SUB_PER_IP,
+  hashEmail,
+  normalizeEmail,
+  subIpKey,
+  subscriberKey,
+  verifyUnsub,
+} from "./subscribe";
 import { isPrivateOrSpecialIp, shotRejection, subrequestAllowed, validatePublicUrl, MAX_IMAGE_BYTES } from "./url";
 
 const ALLOWED_ORIGIN = "https://twinsites.com";
@@ -10,6 +19,7 @@ export interface Env {
   SHOTS: {
     get(key: string): Promise<string | null>;
     put(key: string, value: string, options?: { expirationTtl?: number }): Promise<void>;
+    delete?(key: string): Promise<void>;
   };
   BROWSER?: unknown;
   TURNSTILE_SECRET?: string;
@@ -17,6 +27,7 @@ export interface Env {
   SHOT_KILL?: string;
   SHOT_DAILY_CAP?: string;
   SHOT_PROVIDER?: string;
+  UNSUB_SECRET?: string;
 }
 
 interface PageLike {
@@ -34,6 +45,13 @@ export default {
 };
 
 export async function handle(request: Request, env: Env): Promise<Response> {
+  const url = new URL(request.url);
+  if (url.pathname === "/unsubscribe") {
+    if (request.method !== "GET") return json({ error: "method" }, 405);
+    return handleUnsubscribe(url, env);
+  }
+  if (url.pathname === "/subscribe") return handleSubscribe(request, env);
+
   const origin = request.headers.get("origin");
   if (request.method === "OPTIONS") {
     if (origin !== ALLOWED_ORIGIN) return json({ error: "origin" }, 403);
@@ -106,6 +124,93 @@ export async function handle(request: Request, env: Env): Promise<Response> {
     const extra = failure.retryAfter ? { "Retry-After": failure.retryAfter } : undefined;
     return json({ error: "unavailable" }, failure.status, extra);
   }
+}
+
+async function handleSubscribe(request: Request, env: Env): Promise<Response> {
+  const origin = request.headers.get("origin");
+  if (request.method === "OPTIONS") {
+    if (origin !== ALLOWED_ORIGIN) return json({ error: "origin" }, 403);
+    return new Response(null, { status: 204, headers: cors() });
+  }
+  if (request.method !== "POST") return json({ error: "method" }, 405);
+  if (origin !== ALLOWED_ORIGIN) return json({ error: "origin" }, 403);
+  const secret = env.UNSUB_SECRET ?? "";
+  if (!secret) {
+    log("subscribe-secret");
+    return json({ error: "unavailable" }, 503);
+  }
+
+  let payload: { email?: unknown; consent?: unknown; consentVersion?: unknown; token?: unknown };
+  try {
+    payload = (await request.json()) as { email?: unknown; consent?: unknown; consentVersion?: unknown; token?: unknown };
+  } catch {
+    return json({ error: "invalid" }, 400);
+  }
+  const email = normalizeEmail(payload.email);
+  if (!email) {
+    log("subscribe-invalid");
+    return json({ error: "invalid" }, 400);
+  }
+  if (payload.consent !== true || payload.consentVersion !== CONSENT_VERSION) {
+    log("subscribe-consent");
+    return json({ error: "invalid" }, 400);
+  }
+
+  const ip = request.headers.get("cf-connecting-ip") || "unknown";
+  const now = Date.now();
+  const limitKey = subIpKey(ip, now);
+  const used = Number((await env.SHOTS.get(limitKey)) ?? "0") || 0;
+  if (used >= SUB_PER_IP) {
+    log("subscribe-limit");
+    return json({ error: "limited" }, 429, { "Retry-After": "60" });
+  }
+  await env.SHOTS.put(limitKey, String(used + 1), { expirationTtl: 2 * 60 * 60 });
+
+  const token = typeof payload.token === "string" ? payload.token : "";
+  const turnstileSecret = env.TURNSTILE_SECRET ?? "";
+  if (!turnstileSecret || !(await turnstileOk(token, turnstileSecret, ip))) {
+    log("subscribe-turnstile");
+    return json({ error: "blocked" }, 403);
+  }
+
+  const hash = await hashEmail(email);
+  const record = JSON.stringify({ email, at: new Date(now).toISOString(), consent: CONSENT_VERSION });
+  await env.SHOTS.put(subscriberKey(hash), record);
+  log("subscribe-ok");
+  return json({ ok: true }, 200);
+}
+
+async function handleUnsubscribe(url: URL, env: Env): Promise<Response> {
+  const secret = env.UNSUB_SECRET ?? "";
+  const token = url.searchParams.get("token") ?? "";
+  if (!secret || !token) {
+    log("unsub-bad");
+    return htmlPage("bad", 400);
+  }
+  const hash = await verifyUnsub(secret, token);
+  if (!hash) {
+    log("unsub-bad");
+    return htmlPage("bad", 400);
+  }
+  await env.SHOTS.delete?.(subscriberKey(hash));
+  log("unsub-ok");
+  return htmlPage("ok", 200);
+}
+
+function htmlPage(kind: "ok" | "bad", status = 200): Response {
+  const title = kind === "ok" ? "You're off the list." : "This link doesn't work.";
+  const body =
+    kind === "ok"
+      ? "We deleted that address. You won't get the monthly report."
+      : "It may already have been used.";
+  const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${title} Twinsites</title><style>body{margin:0;background:#e6dece;color:#1b1612;font-family:Palatino,Georgia,serif}main{max-width:36rem;margin:12vh auto;padding:0 24px}a{color:#b82c1a}p.kicker{font-family:ui-monospace,monospace;letter-spacing:.08em;font-size:12px}</style></head><body><main><p class="kicker">TWINSITES</p><h1>${title}</h1><p>${body}</p><p><a href="https://twinsites.com/">Back to Twinsites</a></p></main></body></html>`;
+  const headers = new Headers({
+    "content-type": "text/html; charset=utf-8",
+    "Cross-Origin-Resource-Policy": "cross-origin",
+    "X-Content-Type-Options": "nosniff",
+    "Cache-Control": "no-store",
+  });
+  return new Response(html, { status, headers });
 }
 
 function killed(env: Env): boolean {
@@ -243,7 +348,7 @@ function withTimeout<T>(work: Promise<T>, ms: number): Promise<T> {
   });
 }
 
-function json(body: { error: string }, status: number, extra?: Record<string, string>): Response {
+function json(body: { error?: string; ok?: boolean }, status: number, extra?: Record<string, string>): Response {
   const headers = cors({ "content-type": "application/json" });
   if (extra) {
     for (const [key, value] of Object.entries(extra)) headers.set(key, value);

@@ -40,7 +40,7 @@ function flush(): void {
   }
 }
 
-export function track(name: "visit" | "example" | "upload" | "explore" | "result" | "share"): void {
+export function track(name: "visit" | "example" | "upload" | "explore" | "result" | "share" | "subscribe"): void {
   const config = configured();
   if (!config) return;
   if (!started) {

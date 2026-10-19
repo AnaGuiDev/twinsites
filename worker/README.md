@@ -104,4 +104,20 @@ Push to `main` (or re-run the deploy workflow) so the new static files include t
 - A missing or bad Turnstile token.
 - `SHOT_KILL=1`.
 
-Logs contain an event name and, at most, the hostname. They do not contain the full URL or the API key.
+Logs contain an event name and, at most, the hostname. They do not contain the full URL, the API key, or an email address.
+
+## Mailing list
+
+`POST /subscribe` and `GET /unsubscribe` live on this same Worker. The site posts to `/subscribe` on `VITE_SHOT_ENDPOINT`. CORS still allows only `https://twinsites.com`.
+
+The list uses the existing `SHOTS` namespace. No new namespace. A subscriber is `sub:` plus the SHA-256 of the lowercased address. The value is the address, an ISO timestamp, and the consent text version `2026-10-19`. Rate-limit counters are `subip:` plus the IP and the hour, five attempts an hour. Logs never include the address.
+
+Unsubscribe tokens are HMAC-SHA256, signed with a secret that is not in this repo:
+
+```bash
+npx wrangler secret put UNSUB_SECRET
+```
+
+`GET /unsubscribe?token=...` checks the signature, deletes that `sub:` record, and shows a short confirmation page. `SHOT_KILL` does not turn the list off.
+
+After this change, deploy the Worker yourself with `npx wrangler deploy` from this directory. The VPS still only receives `dist/`.

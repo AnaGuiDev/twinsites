@@ -4,11 +4,13 @@ export type Route =
   | { name: "home" }
   | { name: "zones" }
   | { name: "zone"; slug: string }
-  | { name: "site"; slug: string };
+  | { name: "site"; slug: string }
+  | { name: "privacy" };
 
 export function parseRoute(pathname: string): Route {
   const path = decodeURIComponent(pathname).replace(/\/+$/, "") || "/";
   if (path === "/zones") return { name: "zones" };
+  if (path === "/privacy") return { name: "privacy" };
   const zone = /^\/zone\/([^/]+)$/.exec(path);
   if (zone) return { name: "zone", slug: zone[1] };
   const site = /^\/site\/([^/]+)$/.exec(path);

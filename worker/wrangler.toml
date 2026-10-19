@@ -7,6 +7,10 @@ compatibility_flags = ["nodejs_compat"]
 [browser]
 binding = "BROWSER"
 
+# SHOTS also holds the mailing list. Records use the prefix sub:.
+# Hourly counters use subip:. They are not a second namespace.
+# Unsubscribe links need a secret, created by you:
+#   npx wrangler secret put UNSUB_SECRET
 [[kv_namespaces]]
 binding = "SHOTS"
 id = "c849f0f6f5ca4813967cefa8b19c5600"
