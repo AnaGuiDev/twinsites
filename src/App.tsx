@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { DropZone } from "./components/DropZone";
+import { Mosaic } from "./components/Mosaic";
 import { PrivacyView } from "./components/PrivacyView";
 import { ResultView } from "./components/ResultView";
 import { SearchBox } from "./components/SearchBox";
@@ -255,42 +256,48 @@ export function App() {
         {route.name === "site" && !catalog && <p className="score-note">{catalogNote ?? t.loadingCatalog}</p>}
         {route.name === "home" && !homeResult && (
           <section className="hero">
-            <div>
-              <h1>{t.title}</h1>
-              <p className="lede">{t.lede}</p>
-              <p className="privacy">{t.privacy}</p>
-              <p className="privacy">{t.analyticsNote}</p>
-              <div className="hero-actions">
-                <button type="button" className="ticket" onClick={onExample}>
-                  {t.tryExample}
-                </button>
-                <RouteLink className="ticket ghost" href="/zones">
-                  {t.browseZones}
-                </RouteLink>
+            <Mosaic
+              slot={
+                <div className="slot-inner">
+                  <h1>{t.title}</h1>
+                  <p className="lede">{t.lede(catalogCount ?? 2003)}</p>
+                  <DropZone
+                    onFile={onFile}
+                    onIntent={warm}
+                    progress={shown}
+                    progressLabel={t.progressLabel}
+                    stageLabel={stage ? stageCopy[stage] : null}
+                  />
+                </div>
+              }
+            />
+            <p className="mosaic-caption">{t.mosaicCaption}</p>
+            <div className="hero-more">
+              <div className="hero-alt">
+                <h2>{t.noShotTitle}</h2>
+                <UrlShot onFile={onFile} />
+                <div className="hero-actions">
+                  <button type="button" className="ticket ghost" onClick={onExample}>
+                    {t.tryExample}
+                  </button>
+                  <RouteLink className="text-link" href="/zones">
+                    {t.browseZones}
+                  </RouteLink>
+                </div>
               </div>
-              <SearchBox
-                onPick={(slug) => {
-                  track("explore");
-                  go(`/site/${slug}`);
-                }}
-              />
-              <p className="phone-note">{t.phoneInvite}</p>
-              <ul className="facts">
-                <li>{t.factModel}</li>
-                <li>{catalogCount ? t.factCatalog(catalogCount) : "…"}</li>
-                <li>{t.factNoUpload}</li>
-              </ul>
+              <div className="hero-alt">
+                <h2>{t.findTitle}</h2>
+                <SearchBox
+                  onPick={(slug) => {
+                    track("explore");
+                    go(`/site/${slug}`);
+                  }}
+                />
+              </div>
             </div>
-            <div className="hero-drop">
-              <DropZone
-                onFile={onFile}
-                onIntent={warm}
-                progress={shown}
-                progressLabel={t.progressLabel}
-                stageLabel={stage ? stageCopy[stage] : null}
-              />
-              <UrlShot onFile={onFile} />
-            </div>
+            <p className="privacy">
+              {t.privacy} <RouteLink className="text-link" href="/privacy">{t.privacyMore}</RouteLink>
+            </p>
           </section>
         )}
         {error && (
@@ -304,21 +311,26 @@ export function App() {
       </main>
 
       <footer>
-        <p>{t.footerPrivacy}</p>
-        <p>
-          <a className="removal" href={REMOVAL_URL} target="_blank" rel="noreferrer">
-            {t.removal}
-          </a>
-        </p>
-        <p>
-          <a href="https://github.com/JefferyLee/awesome-vibe-coded-apps">{t.footerCatalog}</a>
-        </p>
-        <p>
-          <a href="/privacy">{t.listPrivacy}</a>
-        </p>
-        <p>
-          {t.footerLicense} <a href="https://github.com/AnaGuiDev">Ana Gui</a>
-        </p>
+        <p className="footer-mark">Twinsites</p>
+        <ul>
+          <li>
+            {t.footerBy} <a href="https://github.com/AnaGuiDev">Ana Gui</a>
+          </li>
+          <li>
+            <a href="https://github.com/JefferyLee/awesome-vibe-coded-apps">{t.footerCatalog}</a>
+          </li>
+          <li>
+            <RouteLink href="/privacy">{t.listPrivacy}</RouteLink>
+          </li>
+          <li>
+            <a href={REMOVAL_URL} target="_blank" rel="noreferrer">
+              {t.removal}
+            </a>
+          </li>
+          <li>
+            <a href="https://github.com/AnaGuiDev/twinsites">{t.footerSource}</a>
+          </li>
+        </ul>
       </footer>
     </div>
   );

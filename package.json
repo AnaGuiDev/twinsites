@@ -15,12 +15,14 @@
     "dataset:embed": "tsx scripts/embed.ts",
     "dataset:project": "tsx scripts/project.ts",
     "dataset:calibrate": "tsx scripts/refresh-meta.ts",
+    "dataset:mosaic": "tsx scripts/mosaic.ts",
     "typecheck": "tsc --noEmit"
   },
   "engines": {
     "node": ">=20"
   },
   "dependencies": {
+    "@fontsource-variable/archivo": "^5.3.0",
     "@fontsource-variable/fraunces": "^5.2.8",
     "@fontsource/ibm-plex-mono": "^5.2.6",
     "@huggingface/transformers": "3.8.1",

@@ -61,10 +61,6 @@ export function DropZone({
       onDrop={onDrop}
       onPointerEnter={() => onIntent?.()}
     >
-      <span className="crop tl" />
-      <span className="crop tr" />
-      <span className="crop bl" />
-      <span className="crop br" />
       <p className="sleeve-kicker">{compact ? t.another : t.dropTitle}</p>
       {progress != null && progressLabel && (
         <div className="bar-row">

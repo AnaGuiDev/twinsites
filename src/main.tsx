@@ -1,8 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import "@fontsource-variable/fraunces";
-import "@fontsource/ibm-plex-mono/400.css";
-import "@fontsource/ibm-plex-mono/500.css";
+import "@fontsource-variable/archivo/wdth.css";
 import { RouteProvider } from "./router";
 import { App } from "./App";
 import { I18nProvider } from "./i18n";

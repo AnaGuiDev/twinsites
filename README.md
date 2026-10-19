@@ -41,6 +41,7 @@ The offline pipeline in `scripts/` reads the public URL list, screenshots the vi
 - `embeddings.bin` — one normalized vector per site
 - `calibration.json` — the percentile curve of catalog pairs
 - `thumbs/` — small WebP miniatures
+- `mosaic.webp`, `mosaic.json` — the home page wall: 191 thumbnails in one atlas, ordered along a Hilbert curve over the map so neighbours look alike (`npm run dataset:mosaic`)
 
 Vectors come from the quantized MobileCLIP-S0 vision encoder (`Xenova/mobileclip_s0`, 8-bit), the same file the page loads from `/models`. They are computed in headless Chrome against a local build, because the Node ONNX runtime does not match the browser vectors. A shown percentile is how many random pairs in the catalog that cosine beats, not a pixel match. The map is a UMAP of those vectors after a PCA reduction. A new screenshot is not run through UMAP; it is placed among its nearest neighbors, which is what landing in a zone means. Zone names are the traits that lift above the catalog average, phrased as places. `/zones` lists them. `/zone/<slug>` is one zone, and `/site/<slug>` is one catalog site, both served by the SPA fallback. The build also writes a static `index.html` per zone, with its own title and description, under `dist/zone/<slug>/`, and one for `/zones`. A server that tries `$uri/index.html` before the SPA fallback shows that title to a crawler. The SPA still renders the page if it does not. This release does not change nginx.
 

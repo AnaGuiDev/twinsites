@@ -15,13 +15,14 @@ function fitText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number, 
     ctx.font = font.replace("SIZE", String(next));
     if (ctx.measureText(text).width <= maxWidth) return next;
     next -= 2;
-  } while (next > 28);
+  } while (next > 40);
   return next;
 }
 
 function loadImage(src: string): Promise<HTMLImageElement | null> {
   return new Promise((resolve) => {
     const image = new Image();
+  image.decoding = "async";
     image.onload = () => resolve(image);
     image.onerror = () => resolve(null);
     image.src = src;
@@ -43,10 +44,11 @@ function cover(
   const scale = Math.max(w / image.width, h / image.height);
   const dw = image.width * scale;
   const dh = image.height * scale;
-  ctx.drawImage(image, x + (w - dw) / 2, y + (h - dh) / 2, dw, dh);
+  ctx.drawImage(image, x + (w - dw) / 2, y, dw, dh);
   ctx.restore();
-  ctx.strokeStyle = "rgba(27,22,18,0.28)";
-  ctx.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
+  ctx.strokeStyle = "#000000";
+  ctx.lineWidth = 2;
+  ctx.strokeRect(x + 1, y + 1, w - 2, h - 2);
 }
 
 function wrap(ctx: CanvasRenderingContext2D, text: string, maxWidth: number, maxLines: number): string[] {
@@ -64,58 +66,55 @@ function wrap(ctx: CanvasRenderingContext2D, text: string, maxWidth: number, max
   return lines.slice(0, maxLines);
 }
 
+const FAMILY = '"Archivo Variable", "Helvetica Neue", Arial, sans-serif';
+
 export async function renderShareCard(input: CardInput): Promise<HTMLCanvasElement> {
-  await document.fonts.load('560 72px "Fraunces Variable"');
-  await document.fonts.load('500 18px "IBM Plex Mono"');
+  await Promise.all([
+    document.fonts.load(`820 extra-condensed 96px ${FAMILY}`),
+    document.fonts.load(`650 semi-condensed 30px ${FAMILY}`),
+    document.fonts.load(`500 20px ${FAMILY}`),
+  ]);
   const canvas = document.createElement("canvas");
   canvas.width = 1200;
   canvas.height = 630;
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("canvas");
 
-  ctx.fillStyle = "#e7dfd0";
+  // Yellow is the colour of a match on the site; on a feed it is the brand.
+  ctx.fillStyle = "#ffe24a";
   ctx.fillRect(0, 0, 1200, 630);
-  ctx.strokeStyle = "rgba(27,22,18,0.16)";
-  for (let y = 28; y < 630; y += 28) {
-    ctx.beginPath();
-    ctx.moveTo(0, y);
-    ctx.lineTo(1200, y);
-    ctx.stroke();
-  }
+  ctx.fillStyle = "#000000";
+  ctx.textBaseline = "alphabetic";
 
-  ctx.fillStyle = "#1b1612";
-  ctx.font = '500 18px "IBM Plex Mono", monospace';
-  ctx.fillText("TWINSITES", 56, 64);
-  ctx.fillStyle = "#b82c1a";
-  ctx.fillText(input.lang === "es" ? "ZONA" : "ZONE", 230, 64);
+  ctx.font = `800 26px ${FAMILY}`;
+  ctx.fillText("Twinsites", 56, 76);
 
-  const size = fitText(ctx, input.zone, 560, 68, '620 SIZEpx "Fraunces Variable", serif');
-  ctx.font = `620 ${size}px "Fraunces Variable", serif`;
-  ctx.fillStyle = "#1b1612";
+  const size = fitText(ctx, input.zone, 560, 112, `820 extra-condensed SIZEpx ${FAMILY}`);
+  ctx.font = `820 extra-condensed ${size}px ${FAMILY}`;
   const lines = wrap(ctx, input.zone, 560, 3);
-  lines.forEach((line, index) => ctx.fillText(line, 56, 150 + index * (size + 6)));
+  const lead = Math.round(size * 0.9);
+  let y = 150 + lead * 0.8;
+  lines.forEach((line, index) => ctx.fillText(line, 54, y + index * lead));
+  y += (lines.length - 1) * lead + 54;
 
-  let y = 150 + lines.length * (size + 6) + 18;
-  const secondarySize = fitText(ctx, input.secondary, 560, 28, '520 SIZEpx "Fraunces Variable", serif');
-  ctx.font = `520 ${secondarySize}px "Fraunces Variable", serif`;
-  wrap(ctx, input.secondary, 560, 2).forEach((line, index) => {
-    ctx.fillText(line, 56, y + index * (secondarySize + 6));
-  });
-  y += secondarySize + 36;
-  ctx.font = '400 18px "IBM Plex Mono", monospace';
-  ctx.fillStyle = "#4a4036";
-  wrap(ctx, input.traits, 540, 3).forEach((line, index) => ctx.fillText(line, 56, y + index * 26));
+  ctx.font = `650 semi-condensed 30px ${FAMILY}`;
+  wrap(ctx, input.secondary, 560, 2).forEach((line, index) => ctx.fillText(line, 56, y + index * 36));
+  y += 36 + 40;
 
-  ctx.fillStyle = "#1b1612";
-  ctx.font = '400 18px "IBM Plex Mono", monospace';
-  ctx.fillText(input.pageUrl.replace(/^https:\/\//, ""), 56, 580);
+  ctx.font = `500 20px ${FAMILY}`;
+  ctx.fillStyle = "#3a3a3a";
+  wrap(ctx, input.traits, 540, 2).forEach((line, index) => ctx.fillText(line, 56, Math.min(y, 520) + index * 28));
+
+  ctx.fillStyle = "#000000";
+  ctx.font = `600 20px ${FAMILY}`;
+  ctx.fillText(input.pageUrl.replace(/^https:\/\//, ""), 56, 586);
 
   const loaded = (await Promise.all(input.images.map(loadImage))).filter((image): image is HTMLImageElement => image !== null);
   if (loaded.length >= 2) {
-    cover(ctx, loaded[0], 680, 78, 460, 220);
-    cover(ctx, loaded[1], 680, 318, 460, 220);
+    cover(ctx, loaded[0], 660, 56, 484, 250);
+    cover(ctx, loaded[1], 660, 324, 484, 250);
   } else if (loaded.length === 1) {
-    cover(ctx, loaded[0], 680, 120, 460, 288);
+    cover(ctx, loaded[0], 660, 112, 484, 302);
   }
 
   return canvas;
@@ -128,5 +127,5 @@ export function canvasToBlob(canvas: HTMLCanvasElement): Promise<Blob> {
 }
 
 export function traitLine(labels: string[]): string {
-  return labels.filter(Boolean).join(" · ");
+  return labels.filter(Boolean).join(", ");
 }
