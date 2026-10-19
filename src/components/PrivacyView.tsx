@@ -21,7 +21,7 @@ export function PrivacyView() {
       </p>
       <p>
         There are no cookies. If a visit counter is on, it records only aggregate events: a visit, an example, an upload, a
-        result, a share.
+        result, a share, pointing at or opening a page on the wall.
       </p>
       <p>
         Questions: <a href="mailto:twinsites.dev@gmail.com">twinsites.dev@gmail.com</a>

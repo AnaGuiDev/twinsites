@@ -2,6 +2,7 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, typ
 import { useI18n } from "../i18n";
 import { RouteLink, useRoute } from "../router";
 import type { KinVerdict } from "../lib/calibrate";
+import { track } from "../lib/analytics";
 
 interface MosaicSite {
   slug: string;
@@ -67,6 +68,7 @@ export function Mosaic({ slot }: { slot: ReactNode }) {
   const [active, setActive] = useState<Active | null>(null);
   const [hovering, setHovering] = useState(false);
   const [paused, setPaused] = useState(false);
+  const engaged = useRef(false);
   const gridRef = useRef<HTMLDivElement>(null);
   const wallRef = useRef<HTMLDivElement>(null);
   const [threads, setThreads] = useState<{ x1: number; y1: number; x2: number; y2: number }[]>([]);
@@ -220,12 +222,17 @@ export function Mosaic({ slot }: { slot: ReactNode }) {
             aria-hidden="true"
             onPointerEnter={(event) => {
               if (event.pointerType !== "mouse") return;
+              if (!engaged.current) {
+                engaged.current = true;
+                track("wall");
+              }
               setHovering(true);
               setActive({ index, twins: twinsOf(index) });
             }}
             onClick={(event) => {
               if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
               event.preventDefault();
+              track("wall-open");
               go(`/site/${site.slug}`);
             }}
             style={style}
