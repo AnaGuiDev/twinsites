@@ -1,0 +1,13 @@
+node_modules
+dist
+.cache
+.DS_Store
+*.log
+data/raw
+data/cache
+.vite
+*.tsbuildinfo
+.playwright
+.ort-cache
+src/**/*.js
+scripts/**/*.js
