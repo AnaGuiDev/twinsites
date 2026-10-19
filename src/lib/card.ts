@@ -1,10 +1,22 @@
+import { formatRank } from "./calibrate";
 import type { Lang } from "../types";
 
 export interface CardInput {
   lang: Lang;
   count: number;
-  nearest: number;
+  nearestRank: number;
+  top: number;
   thumbs: string[];
+}
+
+function fitText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number, size: number, font: string): number {
+  let next = size;
+  do {
+    ctx.font = font.replace("SIZE", String(next));
+    if (ctx.measureText(text).width <= maxWidth) return next;
+    next -= 2;
+  } while (next > 22);
+  return next;
 }
 
 function loadImage(src: string): Promise<HTMLImageElement | null> {
@@ -37,6 +49,30 @@ function roundedImage(
   ctx.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
 }
 
+function wrapFill(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  x: number,
+  y: number,
+  maxWidth: number,
+  lineHeight: number,
+): void {
+  const words = text.split(" ");
+  const lines: string[] = [];
+  let current = "";
+  for (const word of words) {
+    const next = current ? `${current} ${word}` : word;
+    if (current && ctx.measureText(next).width > maxWidth) {
+      lines.push(current);
+      current = word;
+    } else {
+      current = next;
+    }
+  }
+  if (current) lines.push(current);
+  lines.slice(0, 3).forEach((line, index) => ctx.fillText(line, x, y + index * lineHeight));
+}
+
 export async function renderShareCard(input: CardInput): Promise<HTMLCanvasElement> {
   await document.fonts.load('560 92px "Fraunces Variable"');
   await document.fonts.load('500 22px "IBM Plex Mono"');
@@ -62,28 +98,36 @@ export async function renderShareCard(input: CardInput): Promise<HTMLCanvasEleme
   ctx.fillStyle = "#c5361b";
   ctx.fillText(input.lang === "es" ? "REGISTRO VISUAL" : "VISUAL KIN REGISTRY", 250, 78);
 
-  const headline =
-    input.lang === "es" ? "Mi web tiene" : "My site has";
+  const headline = input.lang === "es" ? "Mi web tiene" : "My site has";
   const tail =
     input.lang === "es"
-      ? `gemela${input.count === 1 ? "" : "s"} al ≥90 %`
-      : `twin${input.count === 1 ? "" : "s"} at ≥90%`;
+      ? `gemela${input.count === 1 ? "" : "s"} en el ${input.top} % superior`
+      : `twin${input.count === 1 ? "" : "s"} in the top ${input.top}%`;
+  const nearestLine =
+    input.count > 0
+      ? input.lang === "es"
+        ? `La más cercana, percentil ${input.nearestRank}. Cada gemela está en ese ${input.top} %.`
+        : `Nearest, ${formatRank(input.nearestRank, "en")} percentile. Each twin is in that top ${input.top}%.`
+      : input.lang === "es"
+        ? `Ninguna entra en ese ${input.top} %. La más cercana, percentil ${input.nearestRank}.`
+        : `None clear that top ${input.top}%. Nearest is the ${formatRank(input.nearestRank, "en")} percentile.`;
 
   ctx.fillStyle = "#1b1612";
   ctx.font = '520 54px "Fraunces Variable", serif';
-  ctx.fillText(headline, 64, 180);
-  ctx.font = '620 168px "Fraunces Variable", serif';
-  ctx.fillText(String(input.count), 64, 360);
-  ctx.font = '560 48px "Fraunces Variable", serif';
-  ctx.fillText(tail, 64, 430);
+  ctx.fillText(headline, 64, 170);
+  const countSize = fitText(ctx, String(input.count), 560, 150, '620 SIZEpx "Fraunces Variable", serif');
+  ctx.font = `620 ${countSize}px "Fraunces Variable", serif`;
+  ctx.fillText(String(input.count), 64, 330);
+  const tailSize = fitText(ctx, tail, 600, 42, '560 SIZEpx "Fraunces Variable", serif');
+  ctx.font = `560 ${tailSize}px "Fraunces Variable", serif`;
+  ctx.fillText(tail, 64, 400);
 
-  const nearestLine =
-    input.lang === "es"
-      ? `La más cercana, ${input.nearest}%. Comparado en este navegador.`
-      : `Nearest match ${input.nearest}%. Compared in this browser.`;
-  ctx.font = '400 22px "IBM Plex Mono", monospace';
+  ctx.font = '400 20px "IBM Plex Mono", monospace';
   ctx.fillStyle = "#4a4036";
-  ctx.fillText(nearestLine, 64, 490);
+  const noteSize = fitText(ctx, nearestLine, 600, 20, '400 SIZEpx "IBM Plex Mono", monospace');
+  ctx.font = `400 ${noteSize}px "IBM Plex Mono", monospace`;
+  wrapFill(ctx, nearestLine, 64, 455, 600, noteSize + 6);
+  ctx.font = '400 20px "IBM Plex Mono", monospace';
   ctx.fillText("twinsites.com", 64, 560);
 
   const images = (await Promise.all(input.thumbs.slice(0, 4).map(loadImage))).filter(

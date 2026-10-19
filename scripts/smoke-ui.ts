@@ -1,5 +1,5 @@
 /**
- * Drive the built site: one in-catalog screenshot and two holdouts.
+ * Drive the built site: one in-catalog screenshot, two holdouts, and a handmade page.
  * Saves images under /opt/cursor/artifacts and /tmp/twinsites-ui.
  */
 import { chromium } from "playwright";
@@ -28,13 +28,24 @@ async function runCase(
   const sim = await page.locator(".twin-card .sim").first().innerText();
   const title = await page.locator(".twin-card h3").first().innerText();
   const high = await page.locator(".again-line").innerText();
+  const note = await page.locator(".score-note").innerText();
   const card = page.locator(".card-preview");
   await card.waitFor({ timeout: 15000 });
   await page.screenshot({ path: path.join(OUT, `${name}-desktop.png`), fullPage: true });
   await page.locator(".map-frame").screenshot({ path: path.join(OUT, `${name}-map.png`) });
   await page.locator(".twin-grid").screenshot({ path: path.join(OUT, `${name}-twins.png`) });
   await card.screenshot({ path: path.join(OUT, `${name}-card.png`) });
-  return { sim, title, high, external: [...external] };
+  return { sim, title, high, note, external: [...external] };
+}
+
+function leading(text: string): number {
+  const match = text.match(/\d+/);
+  return match ? Number(match[0]) : Number.NaN;
+}
+
+function twinCount(line: string): number {
+  if (/^no twin/i.test(line) || /^ninguna/i.test(line)) return 0;
+  return leading(line);
 }
 
 async function main() {
@@ -72,16 +83,30 @@ async function main() {
   const hold2 = await runCase(page, path.join(KEEP, "holdout-2.png"), "holdout-pixel", external);
   console.log("holdout-pixel", hold2);
 
+  const handmade = await runCase(page, path.join(KEEP, "handmade.png"), "handmade", external);
+  console.log("handmade", handmade);
+
   await browser.close();
-  const bad = [known, hold1, hold2].flatMap((row) => row.external);
+  const bad = [known, hold1, hold2, handmade].flatMap((row) => row.external);
   if (bad.length) {
     console.error("external requests", bad);
     process.exit(2);
   }
-  const pct = Number(known.sim.replace("%", ""));
-  if (!(pct >= 90)) {
-    console.error("known match was not near 100%", known.sim);
+  const knownRank = leading(known.sim);
+  const saasTwins = twinCount(hold1.high);
+  const pixelTwins = twinCount(hold2.high);
+  const handmadeTwins = twinCount(handmade.high);
+  if (!(knownRank >= 99)) {
+    console.error("known match was not at the top of the curve", known.sim);
     process.exit(3);
+  }
+  if (!(saasTwins >= 8 && pixelTwins > saasTwins && handmadeTwins === 0)) {
+    console.error("twin counts did not separate typical from original", { saasTwins, pixelTwins, handmadeTwins });
+    process.exit(4);
+  }
+  if (!known.note.toLowerCase().includes("not a copy")) {
+    console.error("score note missing", known.note);
+    process.exit(5);
   }
   console.log("smoke ok");
 }

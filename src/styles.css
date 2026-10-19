@@ -251,6 +251,14 @@ h1 {
   letter-spacing: -0.04em;
   margin: 0 0 10px;
 }
+.score-note {
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--ink-dim);
+  max-width: 40rem;
+  margin: 0 0 12px;
+}
 .section-head {
   display: flex;
   justify-content: space-between;

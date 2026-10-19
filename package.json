@@ -13,6 +13,7 @@
     "dataset:capture": "tsx scripts/capture.ts",
     "dataset:embed": "tsx scripts/embed.ts",
     "dataset:project": "tsx scripts/project.ts",
+    "dataset:calibrate": "tsx scripts/refresh-meta.ts",
     "typecheck": "tsc --noEmit"
   },
   "engines": {

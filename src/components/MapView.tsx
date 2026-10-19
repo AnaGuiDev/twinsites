@@ -132,11 +132,8 @@ export function MapView({
         const p = project(cluster.x, cluster.y, w, h);
         if (p.x < 40 || p.y < 20 || p.x > w - 40 || p.y > h - 16) continue;
         const label = lang === "es" ? cluster.labelEs : cluster.labelEn;
-        ctx.lineWidth = 4;
-        ctx.strokeStyle = "rgba(20,17,14,0.72)";
-        ctx.strokeText(label, p.x, p.y - cluster.r * cam.z * Math.min(w, h) * 0.15);
-        ctx.fillStyle = "rgba(243,236,223,0.88)";
-        ctx.fillText(label, p.x, p.y - cluster.r * cam.z * Math.min(w, h) * 0.15);
+        const anchorY = p.y - cluster.r * cam.z * Math.min(w, h) * 0.15;
+        paintWrapped(ctx, label, p.x, anchorY);
       }
 
       const you = project(user.x, uy, w, h);
@@ -291,6 +288,33 @@ export function MapView({
       </div>
     </div>
   );
+}
+
+function paintWrapped(ctx: CanvasRenderingContext2D, label: string, x: number, y: number): void {
+  const max = 150;
+  const words = label.split(" ");
+  const lines: string[] = [];
+  let current = "";
+  for (const word of words) {
+    const next = current ? `${current} ${word}` : word;
+    if (current && ctx.measureText(next).width > max) {
+      lines.push(current);
+      current = word;
+    } else {
+      current = next;
+    }
+  }
+  if (current) lines.push(current);
+  const lineHeight = 14;
+  const start = y - ((lines.length - 1) * lineHeight) / 2;
+  ctx.lineWidth = 4;
+  ctx.strokeStyle = "rgba(20,17,14,0.72)";
+  ctx.fillStyle = "rgba(243,236,223,0.92)";
+  for (let index = 0; index < lines.length; index++) {
+    const yy = start + index * lineHeight;
+    ctx.strokeText(lines[index], x, yy);
+    ctx.fillText(lines[index], x, yy);
+  }
 }
 
 function thumbFor(

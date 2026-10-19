@@ -77,10 +77,19 @@ export interface Catalog {
   sites: Site[];
 }
 
+export interface Calibration {
+  version: 1;
+  /** Cosine at percentile i / (knots.length - 1). */
+  knots: number[];
+  twinPercentile: number;
+  twinCosine: number;
+}
+
 export interface Dataset {
   catalog: Catalog;
   embeddings: Float32Array;
   dim: number;
+  calibration: Calibration;
 }
 
 export interface Twin {

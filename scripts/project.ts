@@ -8,6 +8,7 @@ import { Matrix, EigenvalueDecomposition } from "ml-matrix";
 import { UMAP } from "umap-js";
 import type { Cluster, Site, Traits } from "../src/types.ts";
 import { labelZones } from "../src/lib/labels.ts";
+import { buildCalibration } from "./calibration.ts";
 
 interface Item {
   slug: string;
@@ -260,6 +261,8 @@ async function main(): Promise<void> {
     nearestP90: nn[Math.floor(nn.length * 0.9)],
     meanNearest: nearestSum / sample,
   };
+  const calibration = buildCalibration(vectors, meta.count, meta.dim);
+  await writeFile(path.join(OUT, "calibration.json"), JSON.stringify(calibration));
   await writeFile(path.join(OUT, "stats.json"), JSON.stringify(stats, null, 2));
   console.log(stats);
   console.log("labels", clusters.map((cluster) => cluster.labelEn).join(" | "));

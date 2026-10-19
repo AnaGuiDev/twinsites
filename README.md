@@ -4,10 +4,10 @@ Every AI landing page has a twin. Twinsites shows you which ones.
 
 Drop a screenshot of a homepage. In the browser, a small vision model lines it up against a field guide of vibe-coded websites and answers four things:
 
-1. The dozen sites that look most like yours, with a similarity and a link to the original.
+1. The dozen sites that look most like yours, as a percentile of catalog pairs, with a link to the original.
 2. Where your page lands on a map of the whole catalog.
 3. The marks you share with those twins, and three plain ways to step aside.
-4. A PNG card: “My site has N twins at ≥90%.”
+4. A PNG card: “My site has N twins in the top 20% of vibe-coded pairs.”
 
 Slop detectors hand out a score. Twinsites names the relatives.
 
@@ -25,11 +25,11 @@ The offline pipeline in `scripts/` reads the public URL list, screenshots the vi
 
 - `catalog.json` — titles, URLs, traits, 2D positions, zone labels
 - `embeddings.bin` — one normalized vector per site
+- `calibration.json` — the percentile curve of catalog pairs
 - `thumbs/` — small WebP miniatures
 
-Vectors come from the quantized MobileCLIP-S0 vision encoder (`Xenova/mobileclip_s0`, 8-bit), the same file the page loads from `/models`. They are computed in headless Chrome against a local build, because the Node ONNX runtime does not match the browser vectors. The map is a UMAP of those vectors after a PCA reduction. A new screenshot is not run through UMAP; it is placed among its nearest neighbors, which is what “landing in the neighborhood” means.
+Vectors come from the quantized MobileCLIP-S0 vision encoder (`Xenova/mobileclip_s0`, 8-bit), the same file the page loads from `/models`. They are computed in headless Chrome against a local build, because the Node ONNX runtime does not match the browser vectors. A shown percentile is how many random pairs in the catalog that cosine beats, not a pixel match. A twin is a page in the top 20% of those pairs. The map is a UMAP of those vectors after a PCA reduction. A new screenshot is not run through UMAP; it is placed among its nearest neighbors, which is what “landing in the neighborhood” means. Zone names are the traits that lift above the catalog average, phrased as places.
 
-Zone names are majority votes of simple traits: dominant hue, light or dark, gradient, density, bento-like repetition. They are descriptive, not a taxonomy.
 
 ## Catalog
 
@@ -64,6 +64,8 @@ npm run dataset:capture -- --attempts 4000 --success 2000
 npm run dataset:embed
 npm run dataset:project
 ```
+
+`npm run dataset:calibrate` rewrites the zone names and the percentile curve from the files already in `public/data`, without recapturing.
 
 Keep thumbnails small. The projection step re-encodes them to 420px WebP. Prefer that over Git LFS.
 

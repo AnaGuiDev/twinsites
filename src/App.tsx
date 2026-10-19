@@ -3,17 +3,19 @@ import { DropZone } from "./components/DropZone";
 import { MapView } from "./components/MapView";
 import { REMOVAL_URL, useI18n } from "./i18n";
 import { analyzeImageSource } from "./lib/analyze";
+import { formatRank, rankOf, topShare } from "./lib/calibrate";
 import { canvasToBlob, renderShareCard } from "./lib/card";
 import { loadDataset } from "./lib/dataset";
-import { countAtLeast, hostOf, nearest, percent, placeUser } from "./lib/match";
+import { countTwins, hostOf, nearest, placeUser } from "./lib/match";
 import { embedBlob } from "./lib/model";
 import { suggest, type Suggestion } from "./lib/suggest";
-import type { Dataset, Traits, Twin } from "./types";
+import type { Calibration, Dataset, Traits, Twin } from "./types";
 
 interface Ready {
   traits: Traits;
   twins: Twin[];
-  count90: number;
+  twinCount: number;
+  calibration: Calibration;
   spot: { x: number; y: number; cluster: number };
   suggestions: Suggestion[];
   catalogCount: number;
@@ -83,7 +85,7 @@ export function App() {
         advance("match");
         const dataset = await datasetPromise;
         const twins = nearest(vector, dataset, 12);
-        const count90 = countAtLeast(vector, dataset, 0.9);
+        const twinCount = countTwins(vector, dataset);
         const spot = placeUser(vector, dataset);
         const suggestions = suggest(
           traits,
@@ -92,7 +94,8 @@ export function App() {
         setReady({
           traits,
           twins,
-          count90,
+          twinCount,
+          calibration: dataset.calibration,
           spot,
           suggestions,
           catalogCount: dataset.catalog.count,
@@ -130,11 +133,12 @@ export function App() {
   useEffect(() => {
     if (!ready) return;
     let cancelled = false;
-    const nearestPct = percent(ready.twins[0]?.similarity ?? 0);
+    const nearestRank = rankOf(ready.twins[0]?.similarity ?? 0, ready.calibration);
     renderShareCard({
       lang,
-      count: ready.count90,
-      nearest: nearestPct,
+      count: ready.twinCount,
+      nearestRank,
+      top: topShare(ready.calibration),
       thumbs: ready.twins.slice(0, 4).map((twin) => `${import.meta.env.BASE_URL}data/${twin.site.thumb}`),
     })
       .then(async (canvas) => {
@@ -154,7 +158,7 @@ export function App() {
 
   const zone = ready?.clusters.find((cluster) => cluster.id === ready.spot.cluster);
   const postHref = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
-    `${t.cardLine(ready?.count90 ?? 0)} https://twinsites.com`,
+    `${t.cardLine(ready?.twinCount ?? 0, ready ? topShare(ready.calibration) : 20)} https://twinsites.com`,
   )}`;
 
   return (
@@ -231,8 +235,11 @@ export function App() {
               <div>
                 <p className="kicker">{t.you}</p>
                 <p className="again-line">
-                  {ready.count90 > 0 ? t.highBar(ready.count90) : t.noneHigh(percent(ready.twins[0]?.similarity ?? 0))}
+                  {ready.twinCount > 0
+                    ? t.highBar(ready.twinCount, topShare(ready.calibration))
+                    : t.noneHigh(rankOf(ready.twins[0]?.similarity ?? 0, ready.calibration), topShare(ready.calibration))}
                 </p>
+                <p className="score-note">{t.scoreNote}</p>
                 <p className="privacy">{t.privacy}</p>
               </div>
               <DropZone onFile={onFile} compact />
@@ -249,11 +256,11 @@ export function App() {
                     <img src={`${import.meta.env.BASE_URL}data/${twin.site.thumb}`} alt="" />
                     <div className="twin-meta">
                       <div className="sim-row">
-                        <span className="sim">{percent(twin.similarity)}%</span>
+                        <span className="sim">{formatRank(rankOf(twin.similarity, ready.calibration), lang)}</span>
                         <span>{t.simLabel}</span>
                       </div>
                       <div className="meter" aria-hidden="true">
-                        <span style={{ width: `${percent(twin.similarity)}%` }} />
+                        <span style={{ width: `${rankOf(twin.similarity, ready.calibration)}%` }} />
                       </div>
                       <h3>{twin.site.title}</h3>
                       <p className="host">{hostOf(twin.site.url)}</p>
@@ -339,7 +346,13 @@ export function App() {
                 <h2>{t.shareTitle}</h2>
                 <p>{t.shareDek}</p>
               </div>
-              {cardUrl && <img className="card-preview" src={cardUrl} alt={t.cardLine(ready.count90)} />}
+              {cardUrl && (
+                <img
+                  className="card-preview"
+                  src={cardUrl}
+                  alt={t.cardLine(ready.twinCount, topShare(ready.calibration))}
+                />
+              )}
               <div className="share-actions">
                 {cardUrl && (
                   <a className="ticket" href={cardUrl} download="twinsites-card.png">

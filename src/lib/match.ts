@@ -1,3 +1,4 @@
+import { rankOf } from "./calibrate";
 import type { Dataset, Twin } from "../types";
 
 export function dotAt(vector: Float32Array, embeddings: Float32Array, index: number, dim: number): number {
@@ -24,6 +25,17 @@ export function nearest(vector: Float32Array, dataset: Dataset, k: number): Twin
   }
   best.sort((a, b) => b.similarity - a.similarity);
   return best;
+}
+
+/** Sites whose calibrated rank is at least the catalog's twin bar. */
+export function countTwins(vector: Float32Array, dataset: Dataset): number {
+  const bar = dataset.calibration.twinPercentile;
+  let count = 0;
+  for (let i = 0; i < dataset.catalog.sites.length; i++) {
+    const similarity = dotAt(vector, dataset.embeddings, i, dataset.dim);
+    if (rankOf(similarity, dataset.calibration) >= bar) count++;
+  }
+  return count;
 }
 
 export function countAtLeast(vector: Float32Array, dataset: Dataset, threshold: number): number {
