@@ -90,7 +90,7 @@ Layout traits read against each page's own background, so dark pages are judged 
 | Trait | Agreement | Note |
 | --- | ---: | --- |
 | Light or dark background | 99% | |
-| Centred headline and button | 80% | right 90% of the time when it says centred; misses some centred pages |
+| Centred headline and button | 88% | reads only the headline band (14–55% of the height); thresholds set on the even-numbered labels, 89% on the odd ones (the earlier whole-band rule: 77%) |
 | Spacing (airy, balanced, packed) | 30% | counts only near-white pixels as empty, so dark and cream pages read as packed; background-relative versions and higher resolutions did not reach a useful level either |
 | Gradient wash | 88% | but a detected gradient was real 3 times in 10 |
 | Box grid | 95% | 0 of 6 grids found; the high agreement is just their rarity |
