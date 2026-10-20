@@ -9,6 +9,7 @@ export function DropZone({
   progress = null,
   progressLabel,
   stageLabel,
+  label,
 }: {
   onFile: (file: File) => void;
   onIntent?: () => void;
@@ -17,6 +18,8 @@ export function DropZone({
   progress?: number | null;
   progressLabel?: string;
   stageLabel?: string | null;
+  /** Replaces the compact kicker ("Compare another screenshot"). */
+  label?: string;
 }) {
   const { t } = useI18n();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -64,7 +67,7 @@ export function DropZone({
       onPointerEnter={() => onIntent?.()}
     >
       <div className="sleeve-text">
-        <p className="sleeve-kicker">{compact ? t.another : t.dropTitle}</p>
+        <p className="sleeve-kicker">{compact ? label ?? t.another : t.dropTitle}</p>
         {progress != null && progressLabel && (
           <div className="bar-row">
             <div

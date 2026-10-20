@@ -187,6 +187,8 @@ try {
   });
 
   await check("home: worked example card loads", async () => {
+    await page.waitForFunction(() => [...document.querySelectorAll<HTMLImageElement>(".example-teaser img")].every((image) => image.complete && image.naturalWidth > 0));
+    assert(/14 → 0/.test(await page.locator(".teaser-num").innerText()), "teaser numbers");
     const card = page.locator(".example-card");
     await card.scrollIntoViewIfNeeded();
     await page.waitForFunction(() => {
@@ -207,7 +209,7 @@ try {
   await check("upload: diagnosis and prompt", async () => {
     await upload(page, before);
     const badge = await assertBadgeContract(page);
-    const verdict = await page.locator(".again-line").innerText();
+    const verdict = await page.locator(".verdict-title").innerText();
     const recipe = await page.locator(".recipe li").count();
     const moves = await page.locator(".moves li").count();
     const prompt = await page.locator(".prompt-box .prompt-text").innerText();
@@ -216,14 +218,36 @@ try {
     return `${verdict} recipe ${recipe}, moves ${moves}; ${badge}`;
   });
 
-  await check("result: one-line summary and marks on the screenshot", async () => {
-    const summary = await page.locator(".summary").first().innerText();
-    assert(/most because|change with the most effect/i.test(summary), `summary “${summary}”`);
+  await check("result: plain verdict, meter, three steps and marks", async () => {
+    const verdict = await page.locator(".verdict-title").innerText();
+    assert(/looks (a lot|somewhat) like \d+ AI-built sites?|looks like none|dozens of AI-built/.test(verdict), `verdict “${verdict}”`);
+    assert((await page.locator(".meter-bar i.is-on").count()) >= 1, "meter empty");
+    await page.locator(".what-is summary").click();
+    assert(/likeness, not copying/.test(await page.locator(".what-is p").innerText()), "what-is text");
+    assert((await page.locator(".steps-nav button").count()) === 3, "steps nav");
+    await page.locator(".steps-nav button").nth(2).click();
+    await page.waitForFunction(() => {
+      const top = document.getElementById("step-fix")?.getBoundingClientRect().top ?? 9999;
+      return Math.abs(top) < 200;
+    });
     await page.locator(".marks-layer").waitFor({ timeout: 10_000 });
-    return summary.slice(0, 90);
+    return verdict;
+  });
+
+  await check("result: the slide comparison moves and switches to side by side", async () => {
+    const range = page.locator(".compare-range");
+    await range.scrollIntoViewIfNeeded();
+    await range.focus();
+    await page.keyboard.press("Home");
+    const clip = await page.locator(".compare-over").evaluate((node) => (node as HTMLElement).style.clipPath);
+    assert(/inset\(0(px)? 100% 0(px)? 0(px)?\)/.test(clip), `clip ${clip}`);
+    await page.locator(".compare-modes button").nth(1).click();
+    assert((await page.locator(".compare-side img").count()) === 2, "side by side");
+    await page.locator(".compare-modes button").nth(0).click();
   });
 
   await check("result: words read and stock phrases flagged", async () => {
+    await page.locator("#words > summary").click();
     await page.waitForFunction(() => document.querySelectorAll(".cliches li").length > 0, null, { timeout: 90_000 });
     const found = await page.locator(".cliches li strong").allInnerTexts();
     const prompt = await page.locator(".prompt-box .prompt-text").innerText();
@@ -265,6 +289,8 @@ try {
   });
 
   await check("result: pages that look like nobody", async () => {
+    await page.locator("#ideas > summary").click();
+    await page.locator(".inspiration .sheet a").first().waitFor({ timeout: 10_000 });
     const chips = await page.locator(".inspiration .chip").count();
     const sites = await page.locator(".inspiration .sheet a").count();
     assert(chips >= 5 && sites >= 3, `chips ${chips}, sites ${sites}`);
@@ -272,6 +298,7 @@ try {
   });
 
   await check("result: a competitor that is the page itself reads as a mix-up", async () => {
+    await page.locator("#rivals > summary").click();
     await page.locator(".rivals input[type=file]").setInputFiles(before);
     await page.locator(".rival-verdict").first().waitFor({ timeout: 60_000 });
     const score = await page.locator(".rival-score strong").first().innerText();
@@ -284,6 +311,7 @@ try {
     await page.locator(".progress .ticket").first().click();
     const numbers = await page.locator(".progress-numbers").innerText();
     assert(/\d+\s*→\s*\d+/.test(numbers), `numbers “${numbers}”`);
+    await page.locator("#share > summary").click();
     await page.waitForFunction(() => {
       const image = document.querySelector<HTMLImageElement>("img.card-preview");
       return Boolean(image && image.complete && image.naturalWidth === 1200);
@@ -366,15 +394,34 @@ try {
   await check("phone: result fits, words wait for a tap", async () => {
     await upload(mobile, before);
     assert(await noOverflow(mobile), "horizontal overflow");
+    await mobile.locator("#words > summary").click();
     assert((await mobile.locator(".copy-start .ticket").count()) === 1, "reader started on its own");
   });
-  await check("phone: secondary sections start folded and open from the index", async () => {
+  await check("phone: everything past the three steps starts folded and loads on open", async () => {
     const folds = await mobile.locator("details.fold").count();
-    assert(folds === 3, `${folds} folds`);
+    assert(folds === 5, `${folds} folds`);
     assert((await mobile.locator(".map-frame, .rivals, .inspiration").count()) === 0, "folded content mounted early");
-    await mobile.locator(".result-nav .chip", { hasText: "Competitors" }).click();
+    await mobile.locator("#rivals > summary").click();
     await mobile.locator("#rivals .rivals").waitFor({ timeout: 5_000 });
     assert(await noOverflow(mobile), "horizontal overflow");
+  });
+  await check("phone: dragging across the map never opens a site", async () => {
+    let opened = 0;
+    phone.on("page", () => opened++);
+    await mobile.locator("#map > summary").click();
+    const canvas = mobile.locator(".map-frame canvas");
+    await canvas.waitFor({ timeout: 30_000 });
+    await canvas.scrollIntoViewIfNeeded();
+    const box = await canvas.boundingBox();
+    assert(box, "no map");
+    // A drag that ends with a tiny last step used to count as a tap.
+    await mobile.mouse.move(box.x + box.width * 0.3, box.y + box.height * 0.5);
+    await mobile.mouse.down();
+    for (let i = 1; i <= 12; i++) await mobile.mouse.move(box.x + box.width * (0.3 + i * 0.03), box.y + box.height * 0.5);
+    await mobile.mouse.move(box.x + box.width * 0.66 + 1, box.y + box.height * 0.5);
+    await mobile.mouse.up();
+    await mobile.waitForTimeout(400);
+    assert(opened === 0, `${opened} tab(s) opened`);
   });
 
   await check("no console or page errors", async () => {

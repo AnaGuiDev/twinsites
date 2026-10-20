@@ -67,6 +67,16 @@ The worked example on the home page is real: `public/example/acme-before.html` a
 
 Layout traits read against each page's own background, so dark pages are judged like light ones. `npm run dataset:layout` recomputes `centered` and `gradient` for the catalog from the thumbnails with the same function the browser runs; zone names stay as they are.
 
+### How a result reads
+
+A result is one page in three steps, in plain words. On top, the answer as a sentence ("Your page looks a lot like 14 AI-built sites"), a three-level meter (a little, somewhat, a lot) and a "What does it mean?" note with the percentile behind it. Then:
+
+1. **See your twins.** The page and its closest twin in one frame, with a divider to slide between them (it sweeps once on first view, not with reduced motion) or side by side. Thumbnails are 420px wide, so the frame stays near 760px on desktop with the other twins beside it.
+2. **Why they look alike.** The traits shared with the twins, marked on the screenshot, each with "Not right?" to correct it.
+3. **How to set it apart.** The moves, the prompt, and a "Changed it already?" block that takes the new screenshot and shows the before and after.
+
+Everything else (words, competitors, ideas, the map and zone, sharing) sits folded under "More" and loads only when opened. On the map a tap pins a card with a link; dragging or scrolling across it never opens a site.
+
 ### More in a result
 
 - **One sentence first:** why the page looks like its twins and the change with the most effect.

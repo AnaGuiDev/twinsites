@@ -7,6 +7,8 @@ interface Hover {
   site: Site;
   x: number;
   y: number;
+  /** Set by a tap: the card stays, with a link to open the site. */
+  pinned?: boolean;
 }
 
 interface Camera {
@@ -33,6 +35,8 @@ export function MapView({
   const autoRef = useRef(true);
   const images = useRef(new Map<string, HTMLImageElement>());
   const [hover, setHover] = useState<Hover | null>(null);
+  const pinnedRef = useRef(false);
+  pinnedRef.current = Boolean(hover?.pinned);
   const sitesRef = useRef(sites);
   sitesRef.current = sites;
 
@@ -192,11 +196,15 @@ export function MapView({
     let lastX = 0;
     let lastY = 0;
 
+    let startX = 0;
+    let startY = 0;
     const onPointerDown = (event: PointerEvent) => {
       dragging = true;
       autoRef.current = false;
       lastX = event.clientX;
       lastY = event.clientY;
+      startX = event.clientX;
+      startY = event.clientY;
       canvas.setPointerCapture(event.pointerId);
     };
     const onPointerMove = (event: PointerEvent) => {
@@ -212,16 +220,19 @@ export function MapView({
         return;
       }
       const found = hit(event);
-      setHover(found);
+      if (!pinnedRef.current) setHover(found);
       canvas.style.cursor = found ? "pointer" : "grab";
     };
     const onPointerUp = (event: PointerEvent) => {
       if (!dragging) return;
-      const moved = Math.hypot(event.clientX - lastX, event.clientY - lastY);
+      // Movement over the whole gesture, not its last step: the end of a drag
+      // or a scroll across the map is not a tap. A tap never opens a site by
+      // itself; it pins a card with a link to it.
+      const moved = Math.hypot(event.clientX - startX, event.clientY - startY);
       dragging = false;
-      if (moved < 4) {
+      if (moved < 6) {
         const found = hit(event);
-        if (found) window.open(found.site.url, "_blank", "noopener,noreferrer");
+        setHover(found ? { ...found, pinned: true } : null);
       }
     };
     const onWheel = (event: WheelEvent) => {
@@ -243,7 +254,9 @@ export function MapView({
     canvas.addEventListener("pointerdown", onPointerDown);
     canvas.addEventListener("pointermove", onPointerMove);
     canvas.addEventListener("pointerup", onPointerUp);
-    canvas.addEventListener("pointerleave", () => setHover(null));
+    canvas.addEventListener("pointerleave", () => {
+      if (!pinnedRef.current) setHover(null);
+    });
     canvas.addEventListener("wheel", onWheel, { passive: false });
 
     const fit = () => {
@@ -273,11 +286,21 @@ export function MapView({
         {t.fit}
       </button>
       {hover && (
-        <div className="tip" style={{ left: hover.x, top: hover.y }}>
+        <div className={hover.pinned ? "tip is-pinned" : "tip"} style={{ left: hover.x, top: hover.y }}>
           <img src={`${import.meta.env.BASE_URL}data/${hover.site.thumb}`} alt={hover.site.title} />
           <div>
             <strong>{hover.site.title}</strong>
             <span>{hostOf(hover.site.url)}</span>
+            {hover.pinned && (
+              <span className="tip-actions">
+                <a href={hover.site.url} target="_blank" rel="noreferrer">
+                  {t.openSite} ↗
+                </a>
+                <button type="button" className="text-link as-button" onClick={() => setHover(null)}>
+                  {t.closeCard}
+                </button>
+              </span>
+            )}
           </div>
         </div>
       )}
