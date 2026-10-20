@@ -395,6 +395,8 @@ try {
     await upload(mobile, before);
     assert(await noOverflow(mobile), "horizontal overflow");
     await mobile.locator("#words > summary").click();
+    // The fold mounts its content on open: wait for it before counting.
+    await mobile.locator("#words .copy-check").waitFor({ timeout: 10_000 });
     assert((await mobile.locator(".copy-start .ticket").count()) === 1, "reader started on its own");
   });
   await check("phone: everything past the three steps starts folded and loads on open", async () => {
