@@ -100,7 +100,7 @@ npm ci
 npm run dev
 ```
 
-`npm run build` writes `dist/`. `npm run preview` serves that build with the same isolation headers as dev.
+`npm run build` writes `dist/`. `npm run qa` builds and checks the whole site end to end in headless Chromium (wall, example, FAQ, upload, before/after, other pages, phone layout); it starts and stops its own preview server. Set `CHROME_PATH` if Chromium is not where Playwright expects it. `npm run preview` serves that build with the same isolation headers as dev.
 
 ## Regenerate or extend the dataset
 

@@ -779,6 +779,45 @@ h3 { font-size: 16px; font-weight: 600; line-height: 1.25; margin: 0; }
   white-space: nowrap;
 }
 
+/* Questions */
+.faq {
+  margin-top: 72px;
+  padding-top: 24px;
+  border-top: 1.5px solid var(--ink);
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  gap: 40px;
+  align-items: start;
+}
+.faq-page { display: block; margin-top: 0; padding-top: 36px; border-top: none; max-width: 52rem; }
+.faq-page h1 { max-width: none; margin-bottom: 28px; }
+.faq-list { border-top: 1px solid var(--rule); }
+.faq details { border-bottom: 1px solid var(--rule); }
+.faq summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 0;
+  font-weight: 600;
+  font-size: 18px;
+}
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after {
+  content: "+";
+  flex: none;
+  font-stretch: 72%;
+  font-weight: 760;
+  font-size: 24px;
+  line-height: 1;
+}
+.faq details[open] summary::after { content: "–"; }
+.faq summary:hover { text-decoration: underline; text-underline-offset: 4px; }
+.faq details p { margin: 0 0 18px; max-width: 40em; color: #333; }
+.caveat { display: block; margin-top: 6px; }
+.progress-ask .score-note { margin-top: 6px; }
+
 /* Privacy */
 .privacy-page { max-width: 38rem; padding-top: 28px; }
 .privacy-page h1 { max-width: none; }
@@ -822,7 +861,7 @@ footer a:hover { color: var(--ink); }
 }
 
 @media (max-width: 980px) {
-  .hero-more, .share, .fix, .example { grid-template-columns: 1fr; }
+  .hero-more, .share, .fix, .example, .faq { grid-template-columns: 1fr; }
   .progress-body { grid-template-columns: 1fr 1fr; }
   .progress-figure { grid-column: 1 / -1; }
   .twin-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }

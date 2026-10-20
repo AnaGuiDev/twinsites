@@ -210,6 +210,7 @@ export function ResultView({
           {compare === null && (
             <div className="progress-ask">
               <p>{t.progressAsk}</p>
+              <p className="score-note">{t.progressCaveat}</p>
               <div className="share-actions">
                 <button
                   type="button"
@@ -282,7 +283,15 @@ export function ResultView({
       <section className="diagnosis">
         <div className="section-head">
           <h2>{t.diagnosisTitle}</h2>
-          <p>{t.diagnosisLine(diagnosis)}</p>
+          <p>
+            {t.diagnosisLine(diagnosis)}{" "}
+            <span className="caveat">
+              {t.diagnosisCaveat}{" "}
+              <RouteLink className="text-link" href="/faq">
+                {t.reliability}
+              </RouteLink>
+            </span>
+          </p>
         </div>
         <ul className="recipe">
           {diagnosis.recipe.map((part) => (
@@ -307,7 +316,9 @@ export function ResultView({
           </div>
           <div className="prompt-box">
             <h3 className="fix-title">{t.promptTitle}</h3>
-            <p className="dek">{t.promptDek}</p>
+            <p className="dek">
+              {t.promptDek} {t.promptCaveat}
+            </p>
             <pre className="prompt-text" tabIndex={0}>
               {promptText}
             </pre>

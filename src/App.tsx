@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { DropZone } from "./components/DropZone";
+import { Faq } from "./components/Faq";
 import { Mosaic } from "./components/Mosaic";
 import { ZoneIndex } from "./components/ZoneIndex";
 import { PrivacyView } from "./components/PrivacyView";
@@ -265,6 +266,9 @@ export function App() {
           <RouteLink className="nav-link" href="/zones">
             {t.navZones}
           </RouteLink>
+          <RouteLink className="nav-link" href="/faq">
+            {t.navFaq}
+          </RouteLink>
           <button type="button" className="lang" onClick={() => setLang(lang === "en" ? "es" : "en")} aria-label={t.langName}>
             {lang === "en" ? "ES" : "EN"}
           </button>
@@ -273,6 +277,7 @@ export function App() {
 
       <main>
         {route.name === "privacy" && <PrivacyView />}
+        {route.name === "faq" && <Faq page />}
         {route.name === "zones" && <ZonesView />}
         {route.name === "zone" && <ZonesView slug={route.slug} />}
         {route.name === "site" && catalog && (
@@ -355,6 +360,7 @@ export function App() {
               </div>
               <ZoneIndex />
             </div>
+            <Faq />
           </section>
         )}
         {error && !(route.name === "home" && !homeResult) && (

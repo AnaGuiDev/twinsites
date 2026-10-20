@@ -17,7 +17,8 @@
     "dataset:calibrate": "tsx scripts/refresh-meta.ts",
     "dataset:mosaic": "tsx scripts/mosaic.ts",
     "dataset:layout": "tsx scripts/refresh-layout.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "qa": "npm run build && tsx scripts/qa-analyzer.ts"
   },
   "engines": {
     "node": ">=20"
