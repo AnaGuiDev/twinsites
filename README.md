@@ -81,7 +81,21 @@ Layout traits read against each page's own background, so dark pages are judged 
 
 ### Report
 
-`/report` is the catalog in numbers: how many pages share four layouts, how many have a look-alike in the top 1%, colours, the most crowded categories, stock phrases (a lower bound, from thumbnails) and the largest zones, with the method and its limits. `scripts/report-data.ts` writes `public/data/report.json` from the files already in `public/data` and runs as part of `npm run build`. The build also writes `dist/report/index.html` with its own title and description for crawlers and link previews.
+`/report` is the catalog in numbers: how many pages have a look-alike in the top 1% and how many have eight or more in the top 5%, light versus dark backgrounds, how often the headline is centred (from the hand-checked sample), colours, the most crowded categories, stock phrases (a lower bound, from thumbnails) and the largest zones, with the method and its limits. `scripts/report-data.ts` writes `public/data/report.json` from the files already in `public/data` and runs as part of `npm run build`. The build also writes `dist/report/index.html` with its own title and description for crawlers and link previews.
+
+### How reliable the layout rules are
+
+`quality/labels-2026-10-20.json` holds 200 random catalog pages labelled one by one by eye, blind to the detector (by Claude, the AI that built the check, not a panel of designers). `npm run reliability` scores the stored traits against them and writes `quality/reliability.json`, which the report reads. On 2026-10-20:
+
+| Trait | Agreement | Note |
+| --- | ---: | --- |
+| Light or dark background | 99% | |
+| Centred headline and button | 80% | right 90% of the time when it says centred; misses some centred pages |
+| Spacing (airy, balanced, packed) | 30% | counts only near-white pixels as empty, so dark and cream pages read as packed; background-relative versions and higher resolutions did not reach a useful level either |
+| Gradient wash | 88% | but a detected gradient was real 3 times in 10 |
+| Box grid | 95% | 0 of 6 grids found; the high agreement is just their rarity |
+
+So the diagnosis, the zone sentences and the report only name the background, the accent colour and centring. The other traits are still computed and stored, never claimed. Rerun the script after any detector change, and add labels to the file rather than tuning on it.
 
 ### What counts as a twin
 

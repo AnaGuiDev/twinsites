@@ -1,0 +1,62 @@
+{
+ "date": "2026-10-20",
+ "labels": "quality/labels-2026-10-20.json",
+ "ground": {
+  "n": 191,
+  "agree": 0.99,
+  "lo": 0.963,
+  "hi": 0.997,
+  "humanPositive": 72,
+  "detectorPositive": 70,
+  "precision": 1,
+  "recall": 0.972,
+  "humanShare": 0.377,
+  "humanShareLo": 0.311,
+  "humanShareHi": 0.447
+ },
+ "centered": {
+  "n": 185,
+  "agree": 0.8,
+  "lo": 0.737,
+  "hi": 0.851,
+  "humanPositive": 101,
+  "detectorPositive": 80,
+  "precision": 0.9,
+  "recall": 0.713,
+  "humanShare": 0.546,
+  "humanShareLo": 0.474,
+  "humanShareHi": 0.616
+ },
+ "gradient": {
+  "n": 168,
+  "agree": 0.875,
+  "lo": 0.816,
+  "hi": 0.917,
+  "humanPositive": 14,
+  "detectorPositive": 17,
+  "precision": 0.294,
+  "recall": 0.357,
+  "humanShare": 0.083,
+  "humanShareLo": 0.05,
+  "humanShareHi": 0.135
+ },
+ "density": {
+  "n": 200,
+  "agree": 0.295,
+  "lo": 0.236,
+  "hi": 0.362
+ },
+ "bento": {
+  "n": 196,
+  "agree": 0.949,
+  "lo": 0.909,
+  "hi": 0.972,
+  "humanPositive": 6,
+  "detectorPositive": 4,
+  "precision": 0,
+  "recall": 0,
+  "humanShare": 0.031,
+  "humanShareLo": 0.014,
+  "humanShareHi": 0.065
+ }
+}

@@ -108,9 +108,6 @@ function zoneChips(zone: ZoneRecord, t: ReturnType<typeof useI18n>["t"]): string
   if (zone.dark >= 0.62) chips.unshift(t.modeDark);
   else if (zone.dark <= 0.38) chips.unshift(t.modeLight);
   if (zone.centered >= 0.58) chips.push(t.centeredYes);
-  if (zone.gradient >= 0.45) chips.push(t.gradientYes);
-  if (zone.bento >= 0.4) chips.push(t.bentoYes);
-  if (zone.packed >= 0.48) chips.push(t.packed);
-  else if (zone.airy >= 0.48) chips.push(t.airy);
+  // Only traits that held up against hand labels (see /faq); no density, gradient or box grid.
   return chips;
 }
