@@ -121,7 +121,7 @@ try {
   await check("home: FAQ opens", async () => {
     const items = page.locator(".faq details");
     const count = await items.count();
-    assert(count >= 8, `${count} questions`);
+    assert(count >= 14, `${count} questions`);
     await items.nth(3).locator("summary").click();
     assert(await items.nth(3).evaluate((node) => (node as HTMLDetailsElement).open), "did not open");
     return `${count} questions`;
@@ -136,6 +136,46 @@ try {
     assert(recipe >= 1 && moves >= 1, `recipe ${recipe}, moves ${moves}`);
     assert(prompt.startsWith("Redesign the first screen"), "prompt missing");
     return `${verdict} recipe ${recipe}, moves ${moves}`;
+  });
+
+  await check("result: one-line summary and marks on the screenshot", async () => {
+    const summary = await page.locator(".summary").first().innerText();
+    assert(/most because|change with the most effect/i.test(summary), `summary “${summary}”`);
+    await page.locator(".marks-layer").waitFor({ timeout: 10_000 });
+    return summary.slice(0, 90);
+  });
+
+  await check("result: words read and stock phrases flagged", async () => {
+    await page.waitForFunction(() => document.querySelectorAll(".cliches li").length > 0, null, { timeout: 90_000 });
+    const found = await page.locator(".cliches li strong").allInnerTexts();
+    const prompt = await page.locator(".prompt-text").innerText();
+    assert(prompt.includes("stock phrases"), "prompt lacks the copy step");
+    return found.join(", ");
+  });
+
+  await check("result: correcting a trait updates the prompt", async () => {
+    const before = await page.locator(".prompt-text").innerText();
+    await page.locator(".recipe-chip").last().click();
+    await page.locator(".correct-box .ticket").first().click();
+    const after = await page.locator(".prompt-text").innerText();
+    assert(before !== after, "prompt unchanged");
+    assert((await page.locator(".fixes li").count()) === 1, "no correction listed");
+    await page.locator(".fixes li .as-button").click();
+  });
+
+  await check("result: pages that look like nobody", async () => {
+    const chips = await page.locator(".inspiration .chip").count();
+    const sites = await page.locator(".inspiration .sheet a").count();
+    assert(chips >= 5 && sites >= 3, `chips ${chips}, sites ${sites}`);
+    return `${chips} categories`;
+  });
+
+  await check("result: a competitor that is the page itself reads as a mix-up", async () => {
+    await page.locator(".rivals input[type=file]").setInputFiles(before);
+    await page.locator(".rival-verdict").first().waitFor({ timeout: 60_000 });
+    const score = await page.locator(".rival-score strong").first().innerText();
+    assert(parseFloat(score) >= 99, `score ${score}`);
+    return score;
   });
 
   await check("second upload: before/after and progress card", async () => {
@@ -176,9 +216,10 @@ try {
     await mobile.goto(`${BASE}/`, { waitUntil: "networkidle" });
     assert(await noOverflow(mobile), "horizontal overflow");
   });
-  await check("phone: result fits", async () => {
+  await check("phone: result fits, words wait for a tap", async () => {
     await upload(mobile, before);
     assert(await noOverflow(mobile), "horizontal overflow");
+    assert((await mobile.locator(".copy-start .ticket").count()) === 1, "reader started on its own");
   });
 
   await check("no console or page errors", async () => {

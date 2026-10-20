@@ -147,6 +147,7 @@ export function App() {
       try {
         const frame = await cropHero(file);
         preview = URL.createObjectURL(frame.blob);
+        const frameWidth = frame.bitmap.width;
         const traits = await analyzeImageSource(frame.bitmap, frame.bitmap.width, frame.bitmap.height);
         frame.bitmap.close();
         parts.current.read = 1;
@@ -188,6 +189,7 @@ export function App() {
         });
         setUpload({
           source: "upload",
+          vector,
           bands,
           previous,
           preview,
@@ -209,6 +211,7 @@ export function App() {
           clusters: dataset.catalog.clusters,
           portrait: frame.portrait,
           cropped: frame.cropped,
+          small: frameWidth < 1000,
           catalogCount: dataset.catalog.count,
         });
         setCatalogCount(dataset.catalog.count);

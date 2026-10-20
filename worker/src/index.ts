@@ -8,6 +8,7 @@ import {
   subscriberKey,
   verifyUnsub,
 } from "./subscribe";
+import { FEEDBACK_PER_IP, feedbackIpKey, feedbackKey, feedbackRecord, parseCorrection } from "./feedback";
 import { isPrivateOrSpecialIp, shotRejection, subrequestAllowed, validatePublicUrl, MAX_IMAGE_BYTES } from "./url";
 
 const ALLOWED_ORIGIN = "https://twinsites.com";
@@ -28,6 +29,8 @@ export interface Env {
   SHOT_DAILY_CAP?: string;
   SHOT_PROVIDER?: string;
   UNSUB_SECRET?: string;
+  /** Salt for the hourly abuse counter of /feedback. Any long random string. */
+  FEEDBACK_SALT?: string;
 }
 
 interface PageLike {
@@ -51,6 +54,7 @@ export async function handle(request: Request, env: Env): Promise<Response> {
     return handleUnsubscribe(url, env);
   }
   if (url.pathname === "/subscribe") return handleSubscribe(request, env);
+  if (url.pathname === "/feedback") return handleFeedback(request, env);
 
   const origin = request.headers.get("origin");
   if (request.method === "OPTIONS") {
@@ -177,6 +181,56 @@ async function handleSubscribe(request: Request, env: Env): Promise<Response> {
   const record = JSON.stringify({ email, at: new Date(now).toISOString(), consent: CONSENT_VERSION });
   await env.SHOTS.put(subscriberKey(hash), record);
   log("subscribe-ok");
+  return json({ ok: true }, 200);
+}
+
+async function handleFeedback(request: Request, env: Env): Promise<Response> {
+  const origin = request.headers.get("origin");
+  if (request.method === "OPTIONS") {
+    if (origin !== ALLOWED_ORIGIN) return json({ error: "origin" }, 403);
+    return new Response(null, { status: 204, headers: cors() });
+  }
+  if (request.method !== "POST") return json({ error: "method" }, 405);
+  if (origin !== ALLOWED_ORIGIN) return json({ error: "origin" }, 403);
+  const salt = env.FEEDBACK_SALT ?? "";
+  if (!salt) {
+    log("feedback-salt");
+    return json({ error: "unavailable" }, 503);
+  }
+
+  let payload: Record<string, unknown>;
+  try {
+    payload = (await request.json()) as Record<string, unknown>;
+  } catch {
+    return json({ error: "invalid" }, 400);
+  }
+  const correction = parseCorrection(payload);
+  if (!correction) {
+    log("feedback-invalid");
+    return json({ error: "invalid" }, 400);
+  }
+
+  const ip = request.headers.get("cf-connecting-ip") || "unknown";
+  const now = Date.now();
+  const limitKey = await feedbackIpKey(ip, now, salt);
+  const used = Number((await env.SHOTS.get(limitKey)) ?? "0") || 0;
+  if (used >= FEEDBACK_PER_IP) {
+    log("feedback-limit");
+    return json({ error: "limited" }, 429, { "Retry-After": "600" });
+  }
+  await env.SHOTS.put(limitKey, String(used + 1), { expirationTtl: 2 * 60 * 60 });
+
+  const token = typeof payload.token === "string" ? payload.token : "";
+  const turnstileSecret = env.TURNSTILE_SECRET ?? "";
+  if (!turnstileSecret || !(await turnstileOk(token, turnstileSecret, ip))) {
+    log("feedback-turnstile");
+    return json({ error: "blocked" }, 403);
+  }
+
+  await env.SHOTS.put(feedbackKey(now, crypto.randomUUID()), feedbackRecord(correction, now), {
+    expirationTtl: 400 * 24 * 60 * 60,
+  });
+  log("feedback-ok");
   return json({ ok: true }, 200);
 }
 

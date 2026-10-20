@@ -1,5 +1,9 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { DropZone } from "./DropZone";
+import { Inspiration } from "./Inspiration";
+import { Rivals } from "./Rivals";
+import { CopyCheck, type WordsState } from "./CopyCheck";
+import { CorrectionReport, type Fix } from "./CorrectionReport";
 import { SubscribeForm } from "./SubscribeForm";
 import { MapView } from "./MapView";
 import { RouteLink } from "../router";
@@ -9,8 +13,10 @@ import { traitLine, canvasToBlob, renderProgressCard, renderShareCard } from "..
 import { mapFor, type ResultData } from "../lib/explore";
 import { hostOf } from "../lib/match";
 import { formatPercentile } from "../lib/calibrate";
-import { diagnose } from "../lib/diagnose";
+import { diagnose, type TraitKey } from "../lib/diagnose";
 import { forgetCheck, progressOf } from "../lib/history";
+import { marksFor, type Marks } from "../lib/regions";
+import { findCliches } from "../lib/cliches";
 import type { Cluster, Site, Traits } from "../types";
 
 export function ResultView({
@@ -35,21 +41,106 @@ export function ResultView({
   const zoneName = lang === "es" ? result.zone.labelEs : result.zone.labelEn;
   const nearest = result.twins[0]?.percentile ?? 0;
   const secondary = t.resultLine(result.verdict, nearest);
-  const marks = useMemo(() => callouts(result.traits, result.twins.map((twin) => twin.site.traits), t), [result, t]);
   const twinTraits = useMemo(() => result.twins.map((twin) => twin.site.traits), [result]);
   const catalogTraits = useMemo(() => mapSites.map((site) => site.traits), [mapSites]);
-  const diagnosis = useMemo(() => diagnose(result.traits, twinTraits, catalogTraits), [result.traits, twinTraits, catalogTraits]);
+  const [fixes, setFixes] = useState<Fix[]>([]);
+  const [editing, setEditing] = useState<TraitKey | null>(null);
+  useEffect(() => {
+    setFixes([]);
+    setEditing(null);
+  }, [result.preview]);
+  // The traits as corrected by the person, when they say the detector got one wrong.
+  const traits = useMemo(() => {
+    const next: Traits = { ...result.traits };
+    for (const fix of fixes) Object.assign(next, patchFor(fix.trait, fix.corrected));
+    return next;
+  }, [result.traits, fixes]);
+  const diagnosis = useMemo(() => diagnose(traits, twinTraits, catalogTraits), [traits, twinTraits, catalogTraits]);
+  const [words, setWords] = useState<WordsState>({ status: "idle", lines: [], found: [] });
+  const [copyCounts, setCopyCounts] = useState<Record<string, number> | null>(null);
+  const [copyTotal, setCopyTotal] = useState(2003);
+  const readWords = useCallback(async () => {
+    setWords({ status: "reading", lines: [], found: [] });
+    track("copy");
+    void fetch(`${import.meta.env.BASE_URL}data/copy.json`)
+      .then((response) => (response.ok ? response.json() : null))
+      .then((file: { total: number; counts: Record<string, number> } | null) => {
+        if (!file) return;
+        setCopyCounts(file.counts);
+        setCopyTotal(file.total);
+      })
+      .catch(() => undefined);
+    try {
+      const { readLargeText } = await import("../lib/ocr");
+      const image = await (await fetch(result.preview)).blob();
+      const read = await readLargeText(image);
+      setWords({ status: "done", lines: read.lines, found: findCliches(read.text) });
+    } catch (error) {
+      console.error("ocr", error);
+      setWords({ status: "failed", lines: [], found: [] });
+    }
+  }, [result.preview]);
+  useEffect(() => {
+    setWords({ status: "idle", lines: [], found: [] });
+    if (result.source !== "upload") return;
+    const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
+    if (connection?.saveData || window.matchMedia("(max-width: 720px)").matches) return;
+    void readWords();
+  }, [result.preview, result.source, readWords]);
   const promptText = useMemo(
     () =>
       t.prompt({
         diagnosis,
-        traits: result.traits,
+        traits: traits,
         verdict: result.verdict,
         zone: zoneName,
-        moves: diagnosis.moves.map((move) => t.suggestion(move.item)),
+        moves: [
+          ...diagnosis.moves.map((move) => t.suggestion(move.item)),
+          ...(words.found.length ? [t.copyMove(words.found.slice(0, 3).map((cliche) => `“${cliche.label}”`).join(", "))] : []),
+        ],
       }),
-    [diagnosis, result.traits, result.verdict, zoneName, t],
+    [diagnosis, traits, result.verdict, zoneName, t, words.found],
   );
+  const topCategory = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const twin of result.twins) {
+      const key = twin.site.category || "other";
+      counts.set(key, (counts.get(key) ?? 0) + 1);
+    }
+    return [...counts.entries()].filter(([key]) => key !== "other").sort((a, b) => b[1] - a[1])[0]?.[0] ?? "productivity";
+  }, [result.twins]);
+  const [regions, setRegions] = useState<Marks | null>(null);
+  const [showMarks, setShowMarks] = useState(true);
+  useEffect(() => {
+    let cancel = false;
+    setRegions(null);
+    void marksFor(result.preview, traits.dominantName)
+      .then((next) => {
+        if (!cancel) setRegions(next);
+      })
+      .catch(() => undefined);
+    return () => {
+      cancel = true;
+    };
+  }, [result.preview, traits.dominantName]);
+  const markKeys = useMemo(() => {
+    const keys = new Set<string>();
+    for (const part of diagnosis.recipe) {
+      if (part.key === "centered" && traits.centered) keys.add("centered");
+      if (part.key === "density" && traits.density === "airy") keys.add("density");
+      if (part.key === "gradient" && traits.gradient) keys.add("gradient");
+      if (part.key === "color" && traits.dominantName !== "neutral") keys.add("color");
+    }
+    return keys;
+  }, [diagnosis.recipe, traits]);
+  const legend = useMemo(() => {
+    const items: { key: string; style: string; label: string }[] = [];
+    if (markKeys.has("centered") && regions?.centre) items.push({ key: "centered", style: "box", label: t.markCentre });
+    if (markKeys.has("density") && regions?.empty.length) items.push({ key: "density", style: "hatch", label: t.markEmpty });
+    if (markKeys.has("gradient")) items.push({ key: "gradient", style: "hatch", label: t.markGradient });
+    if (markKeys.has("color") && regions?.accent.length) items.push({ key: "color", style: "fill", label: t.markAccent(t.colorName(traits.dominantName)) });
+    return items;
+  }, [markKeys, regions, t, traits.dominantName]);
   const [copied, setCopied] = useState(false);
   const [compare, setCompare] = useState<boolean | null>(null);
   const [forgotten, setForgotten] = useState(false);
@@ -131,7 +222,7 @@ export function ResultView({
       lang,
       zone: zoneName,
       secondary,
-      traits: traitLine(marks.map((mark) => mark.label)),
+      traits: traitLine(diagnosis.recipe.map((part) => t.traitLabel(part.key, traits))),
       pageUrl,
       images,
       labels,
@@ -150,7 +241,7 @@ export function ResultView({
     return () => {
       cancel = true;
     };
-  }, [includeMine, lang, result, zoneName, secondary, marks, pageUrl, showMine, showProgress, t]);
+  }, [includeMine, lang, result, zoneName, secondary, diagnosis, traits, pageUrl, showMine, showProgress, t]);
 
   const copyPrompt = async () => {
     track("prompt");
@@ -189,9 +280,11 @@ export function ResultView({
         <div>
           <h1 className="zone-title">{zoneName}</h1>
           <p className="again-line">{secondary}</p>
+          <p className="summary">{t.summary({ diagnosis, traits: traits, verdict: result.verdict })}</p>
           <p className="score-note">{t.scoreNote}</p>
           {result.cropped && <p className="score-note">{t.cropNote}</p>}
           {result.portrait && <p className="score-note">{t.portraitNote}</p>}
+          {result.small && !result.portrait && <p className="score-note">{t.smallNote}</p>}
           <p className="score-note">
             <RouteLink className="text-link" href={`/zone/${result.zone.slug}`}>
               {t.zoneLink(zoneName)}
@@ -265,10 +358,76 @@ export function ResultView({
 
       <section className="reveal" aria-label={t.revealLabel}>
         <figure>
-          <img src={result.preview} alt={result.source === "upload" ? t.you : result.subjectTitle} />
+          <div className="marked">
+            <img src={result.preview} alt={result.source === "upload" ? t.you : result.subjectTitle} />
+            {showMarks && regions && (
+              <svg className="marks-layer" viewBox="0 0 160 100" preserveAspectRatio="none" aria-hidden="true">
+                <defs>
+                  <pattern id="hatch" width="3" height="3" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                    <rect width="1.4" height="3" fill="#ffe24a" />
+                  </pattern>
+                </defs>
+                {markKeys.has("density") &&
+                  regions.empty.map((band) => (
+                    <rect key={band.y0} x="0" y={band.y0 * 100} width="160" height={(band.y1 - band.y0) * 100} fill="url(#hatch)" opacity="0.75" />
+                  ))}
+                {markKeys.has("gradient") && (
+                  <>
+                    <rect x="0" y="12" width="11.2" height="88" fill="url(#hatch)" opacity="0.85" />
+                    <rect x="148.8" y="12" width="11.2" height="88" fill="url(#hatch)" opacity="0.85" />
+                  </>
+                )}
+                {markKeys.has("color") &&
+                  regions.accent.map((cell) => (
+                    <rect key={`${cell.x},${cell.y}`} x={cell.x * 160} y={cell.y * 100} width={160 / 48} height={100 / 30} fill="#ffe24a" opacity="0.7" />
+                  ))}
+                {markKeys.has("centered") && regions.centre && (
+                  <>
+                    <line x1="80" x2="80" y1="0" y2="100" stroke="#fff" strokeWidth="1.6" />
+                    <line x1="80" x2="80" y1="0" y2="100" stroke="#000" strokeWidth="0.6" strokeDasharray="2 1.5" />
+                    <rect
+                      x={regions.centre.x0 * 160}
+                      y={regions.centre.y0 * 100}
+                      width={(regions.centre.x1 - regions.centre.x0) * 160}
+                      height={(regions.centre.y1 - regions.centre.y0) * 100}
+                      fill="none"
+                      stroke="#fff"
+                      strokeWidth="2.2"
+                    />
+                    <rect
+                      x={regions.centre.x0 * 160}
+                      y={regions.centre.y0 * 100}
+                      width={(regions.centre.x1 - regions.centre.x0) * 160}
+                      height={(regions.centre.y1 - regions.centre.y0) * 100}
+                      fill="none"
+                      stroke="#000"
+                      strokeWidth="1"
+                    />
+                  </>
+                )}
+              </svg>
+            )}
+          </div>
           <figcaption>
             <strong>{result.source === "upload" ? t.you : result.subjectTitle}</strong>
           </figcaption>
+          {legend.length > 0 && (
+            <div className="legend">
+              {showMarks && (
+                <ul>
+                  {legend.map((item) => (
+                    <li key={item.key}>
+                      <i className={`key key-${item.style}`} aria-hidden="true" />
+                      {item.label}
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <button type="button" className="text-link as-button" onClick={() => setShowMarks((value) => !value)}>
+                {showMarks ? t.marksHide : t.marksShow}
+              </button>
+            </div>
+          )}
         </figure>
         {result.twins[0] && (
           <figure>
@@ -296,12 +455,70 @@ export function ResultView({
         <ul className="recipe">
           {diagnosis.recipe.map((part) => (
             <li key={part.key}>
-              {part.key === "color" && <i className="swatch" style={{ background: result.traits.dominant }} />}
-              <strong>{t.traitLabel(part.key, result.traits)}</strong>
-              <span>{t.moveEvidence(part.twins, diagnosis.twinTotal)}</span>
+              <button
+                type="button"
+                className={editing === part.key ? "recipe-chip is-open" : "recipe-chip"}
+                aria-expanded={editing === part.key}
+                title={t.correctHint}
+                onClick={() => setEditing((current) => (current === part.key ? null : part.key))}
+              >
+                {part.key === "color" && <i className="swatch" style={{ background: traits.dominant }} />}
+                <strong>{t.traitLabel(part.key, traits)}</strong>
+                <span>{t.moveEvidence(part.twins, diagnosis.twinTotal)}</span>
+              </button>
             </li>
           ))}
         </ul>
+        {editing && (
+          <div className="correct-box">
+            <p>{t.correctAsk(t.traitLabel(editing, traits))}</p>
+            <div className="share-actions">
+              {alternativesFor(editing, traits).map((value) => (
+                <button
+                  key={value}
+                  type="button"
+                  className="ticket ghost"
+                  onClick={() => {
+                    const detected = valueOf(editing, result.traits);
+                    setFixes((current) => [
+                      ...current.filter((fix) => fix.trait !== editing),
+                      ...(value === detected ? [] : [{ trait: editing, detected, corrected: value }]),
+                    ]);
+                    setEditing(null);
+                  }}
+                >
+                  {t.traitLabel(editing, { ...traits, ...patchFor(editing, value) })}
+                </button>
+              ))}
+              <button type="button" className="text-link as-button" onClick={() => setEditing(null)}>
+                {t.correctCancel}
+              </button>
+            </div>
+          </div>
+        )}
+        {!editing && fixes.length === 0 && <p className="score-note">{t.correctHint}</p>}
+        {fixes.length > 0 && (
+          <div className="fixes">
+            <ul>
+              {fixes.map((fix) => (
+                <li key={fix.trait}>
+                  {t.correctedLine(
+                    t.traitLabel(fix.trait, { ...result.traits, ...patchFor(fix.trait, fix.detected) }),
+                    t.traitLabel(fix.trait, { ...result.traits, ...patchFor(fix.trait, fix.corrected) }),
+                  )}{" "}
+                  <button
+                    type="button"
+                    className="text-link as-button"
+                    onClick={() => setFixes((current) => current.filter((item) => item.trait !== fix.trait))}
+                  >
+                    {t.correctUndo}
+                  </button>
+                </li>
+              ))}
+            </ul>
+            <CorrectionReport fixes={fixes} traits={result.traits} />
+          </div>
+        )}
         <div className="fix">
           <div>
             <h3 className="fix-title">{t.movesTitle}</h3>
@@ -328,6 +545,10 @@ export function ResultView({
           </div>
         </div>
       </section>
+
+      {result.source === "upload" && <CopyCheck words={words} counts={copyCounts} total={copyTotal} onRead={() => void readWords()} />}
+
+      <Inspiration initial={topCategory} />
 
       <section className="share">
         <div className="share-card">
@@ -392,6 +613,8 @@ export function ResultView({
         </div>
       </section>
 
+      <Rivals result={result} />
+
 
       <section>
         <div className="section-head">
@@ -412,23 +635,54 @@ export function ResultView({
   );
 }
 
-function callouts(
-  traits: Traits,
-  twins: Traits[],
-  t: ReturnType<typeof useI18n>["t"],
-): { label: string; note: string }[] {
-  const n = (pred: (trait: Traits) => boolean) => twins.filter(pred).length;
-  const rows = [
-    { n: n((item) => item.mode === traits.mode), label: traits.mode === "dark" ? t.modeDark : t.modeLight },
-    { n: n((item) => item.dominantName === traits.dominantName), label: t.colorName(traits.dominantName) },
-    {
-      n: n((item) => item.density === traits.density),
-      label: traits.density === "airy" ? t.airy : traits.density === "packed" ? t.packed : t.balanced,
-    },
-    { n: n((item) => item.gradient === traits.gradient), label: traits.gradient ? t.gradientYes : t.gradientNo },
-    { n: n((item) => item.bento === traits.bento), label: traits.bento ? t.bentoYes : t.bentoNo },
-    { n: n((item) => item.centered === traits.centered), label: traits.centered ? t.centeredYes : t.centeredNo },
-  ].sort((a, b) => b.n - a.n);
-  const strong = rows.filter((row) => row.n >= 6);
-  return (strong.length >= 2 ? strong : rows).slice(0, 4).map((row) => ({ label: row.label, note: t.shared(row.n) }));
+
+const COLORS = ["red", "orange", "amber", "yellow", "lime", "green", "teal", "cyan", "blue", "indigo", "purple", "magenta", "pink", "neutral"] as const;
+
+function valueOf(key: TraitKey, traits: Traits): string {
+  switch (key) {
+    case "mode":
+      return traits.mode;
+    case "density":
+      return traits.density;
+    case "color":
+      return traits.dominantName;
+    case "centered":
+      return String(traits.centered);
+    case "gradient":
+      return String(traits.gradient);
+    case "bento":
+      return String(traits.bento);
+  }
+}
+
+function patchFor(key: TraitKey, value: string): Partial<Traits> {
+  switch (key) {
+    case "mode":
+      return { mode: value === "dark" ? "dark" : "light" };
+    case "density":
+      return { density: value === "packed" ? "packed" : value === "airy" ? "airy" : "balanced" };
+    case "color":
+      return { dominantName: (COLORS as readonly string[]).includes(value) ? (value as Traits["dominantName"]) : "neutral" };
+    case "centered":
+      return { centered: value === "true" };
+    case "gradient":
+      return { gradient: value === "true" };
+    case "bento":
+      return { bento: value === "true" };
+  }
+}
+
+/** What else the trait could be, offered when someone says it was read wrong. */
+function alternativesFor(key: TraitKey, traits: Traits): string[] {
+  const current = valueOf(key, traits);
+  switch (key) {
+    case "mode":
+      return [current === "dark" ? "light" : "dark"];
+    case "density":
+      return ["airy", "balanced", "packed"].filter((value) => value !== current);
+    case "color":
+      return current === "neutral" ? [] : ["neutral"];
+    default:
+      return [current === "true" ? "false" : "true"];
+  }
 }

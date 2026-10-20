@@ -41,7 +41,7 @@ function flush(): void {
 }
 
 export function track(
-  name: "visit" | "example" | "upload" | "explore" | "result" | "share" | "subscribe" | "wall" | "wall-open" | "prompt" | "progress",
+  name: "visit" | "example" | "upload" | "explore" | "result" | "share" | "subscribe" | "wall" | "wall-open" | "prompt" | "progress" | "inspiration" | "correction" | "rivals" | "copy",
 ): void {
   const config = configured();
   if (!config) return;

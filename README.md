@@ -67,6 +67,16 @@ The worked example on the home page is real: `public/example/acme-before.html` a
 
 Layout traits read against each page's own background, so dark pages are judged like light ones. `npm run dataset:layout` recomputes `centered` and `gradient` for the catalog from the thumbnails with the same function the browser runs; zone names stay as they are.
 
+### More in a result
+
+- **One sentence first:** why the page looks like its twins and the change with the most effect.
+- **Marks on the screenshot:** the centred block, empty bands, the accent and gradient margins the diagnosis found.
+- **Correct the detector:** tap a trait that was read wrong; the diagnosis and prompt update. Only with a ticked box, the correction is sent anonymously to the worker's `/feedback` (trait, both values, six rounded measurements, day; no image, URL or IP). Needs `npx wrangler secret put FEEDBACK_SALT` and a redeploy of `worker/`; until then corrections stay local.
+- **What the words say:** Tesseract reads the large text in the browser (files in `public/ocr`, about 7 MB, loaded after the result; on phones only on request) and flags stock phrases from `src/lib/cliches.ts`. `npm run dataset:copy` reads the catalog thumbnails to count how many homepages use each phrase (`public/data/copy.json`, a lower bound).
+- **Pages that look like nobody:** per category, the catalog pages with the fewest twins (`npm run dataset:distinct`). Different, not certified better.
+- **Next to your competitors:** up to three competitor screenshots measured against the page on the twins' percentile scale, in the browser.
+- **Small screenshots:** under 1000px wide, the result warns that likeness reads less reliably.
+
 ### What counts as a twin
 
 A single global cut does not work. On the 2,003-site pair curve (400,000 seeded pairs), the median cosine is about 0.32 and the 80th percentile is about 0.62. Measured against that curve in Chrome:
@@ -130,6 +140,8 @@ Keep thumbnails small. The projection step re-encodes them to 420px WebP. Prefer
 On a local preview, the drop zone is usable in about 0.1 s on desktop and 0.4 s on an emulated phone. That phone's first load, before any intent, transfers about 149 KB: the document, the script, the stylesheet, the two used font files, a tiny catalog count, and the favicon. The vision runtime, the embeddings, and the catalog index are not in that load. Desktop, with no throttle and the cache off, returns the first twins in about 2.2 s. A cold fast-4G phone (375 px, 40 ms latency, 9 Mbit/s down, 1.5 Mbit/s up, 4× CPU, cache off) does not download the runtime or the embeddings until there is intent. Focusing the file button starts that download, about 31 s, and the first twins then come back in about 3.4 s. Choosing a file the instant the page appears, which is itself the intent, takes about 34 s.
 
 ## Next
+
+- Compare competitors by pasting their URLs, through the screenshot worker. Planned as a paid feature.
 
 The suggestions are rules read off shared marks. A later version can go further: one concrete move per trait (type, image, grid, motion), and a redesign prompt you can paste into Cursor or v0. The square letterbox described above is the dataset half of that pass.
 

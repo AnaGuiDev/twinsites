@@ -17,6 +17,8 @@
     "dataset:calibrate": "tsx scripts/refresh-meta.ts",
     "dataset:mosaic": "tsx scripts/mosaic.ts",
     "dataset:layout": "tsx scripts/refresh-layout.ts",
+    "dataset:distinct": "tsx scripts/distinct.ts",
+    "dataset:copy": "tsx scripts/catalog-copy.ts",
     "typecheck": "tsc --noEmit",
     "qa": "npm run build && tsx scripts/qa-analyzer.ts"
   },
@@ -29,9 +31,12 @@
     "@fontsource/ibm-plex-mono": "^5.2.6",
     "@huggingface/transformers": "3.8.1",
     "react": "^19.1.1",
-    "react-dom": "^19.1.1"
+    "react-dom": "^19.1.1",
+    "tesseract.js": "^7.0.0"
   },
   "devDependencies": {
+    "@tesseract.js-data/eng": "^1.0.0",
+    "@tesseract.js-data/spa": "^1.0.0",
     "@types/react": "^19.1.13",
     "@types/react-dom": "^19.1.9",
     "@vitejs/plugin-react": "^5.0.2",

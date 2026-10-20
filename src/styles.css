@@ -457,6 +457,14 @@ h3 { font-size: 16px; font-weight: 600; line-height: 1.25; margin: 0; }
   margin: 0 0 12px;
 }
 .score-note { margin: 0 0 6px; }
+.summary {
+  margin: 0 0 14px;
+  max-width: 38em;
+  font-size: 20px;
+  line-height: 1.4;
+  padding-left: 14px;
+  border-left: 4px solid var(--mark);
+}
 .reveal {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -473,6 +481,16 @@ h3 { font-size: 16px; font-weight: 600; line-height: 1.25; margin: 0; }
   border: 1px solid var(--rule);
 }
 .reveal figure:last-of-type img { outline: 4px solid var(--mark); outline-offset: -4px; }
+.marked { position: relative; }
+.marks-layer { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.legend { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; margin-top: 8px; }
+.legend ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 14px; }
+.legend li { display: inline-flex; align-items: center; gap: 6px; }
+.legend .as-button { font-size: 14px; }
+.key { width: 16px; height: 11px; display: inline-block; }
+.key-box { box-shadow: inset 0 0 0 1.5px var(--ink); }
+.key-hatch { background: repeating-linear-gradient(45deg, var(--mark) 0 2px, transparent 2px 4px); box-shadow: inset 0 0 0 1px var(--rule); }
+.key-fill { background: var(--mark); }
 .reveal figcaption {
   margin-top: 8px;
   font-size: 14px;
@@ -581,23 +599,42 @@ h3 { font-size: 16px; font-weight: 600; line-height: 1.25; margin: 0; }
 /* Diagnosis: why you look like them, and how to stop */
 .recipe {
   list-style: none;
-  margin: 0 0 32px;
+  margin: 0 0 10px;
   padding: 0;
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
 }
-.recipe li {
+.recipe-chip {
   display: inline-flex;
   align-items: center;
   gap: 10px;
   padding: 10px 14px;
+  background: var(--bg);
   border: 1.5px solid var(--ink);
   border-radius: 6px;
+  cursor: pointer;
+  text-align: left;
 }
+.recipe-chip:hover, .recipe-chip.is-open { background: var(--mark); }
 .recipe strong { font-stretch: 85%; font-weight: 700; font-size: 18px; }
 .recipe span { font-size: 14px; color: var(--gray); }
 .swatch { width: 14px; height: 14px; border-radius: 3px; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3); display: inline-block; }
+.correct-box {
+  margin: 0 0 16px;
+  padding: 14px 16px;
+  border: 1.5px dashed var(--ink);
+  border-radius: 6px;
+  max-width: 40rem;
+}
+.correct-box p { margin: 0; font-weight: 600; }
+.correct-box .share-actions { margin-top: 10px; align-items: center; }
+.fixes { margin: 0 0 20px; }
+.fixes ul { list-style: none; margin: 0 0 10px; padding: 0; font-size: 15px; }
+.fixes li { padding: 4px 0; }
+.report-box { max-width: 40rem; }
+.report-box .list-consent { margin: 8px 0 10px; }
+.diagnosis .score-note { margin-bottom: 24px; }
 .fix {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
@@ -649,6 +686,79 @@ h3 { font-size: 16px; font-weight: 600; line-height: 1.25; margin: 0; }
   line-height: 1.5;
   white-space: pre-wrap;
 }
+
+/* Words */
+.copy-start { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
+.copy-start .score-note { margin: 0; }
+.read-text {
+  margin: 0 0 18px;
+  padding: 14px 18px;
+  border-left: 4px solid var(--ink);
+  background: #f5f5f3;
+  font-size: 18px;
+  line-height: 1.4;
+  max-width: 44em;
+}
+.read-text p { margin: 0 0 4px; }
+.cliches { list-style: none; margin: 0 0 14px; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; }
+.cliches li {
+  display: inline-flex;
+  flex-direction: column;
+  padding: 8px 12px;
+  background: var(--mark);
+  border-radius: 6px;
+}
+.cliches strong { font-stretch: 85%; font-size: 18px; }
+.cliches span { font-size: 13px; color: #3a3a3a; }
+
+/* Inspiration */
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 20px; }
+.chip {
+  background: var(--bg);
+  border: 1.5px solid var(--ink);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.chip:hover { background: var(--mark); }
+.chip.is-on { background: var(--ink); color: var(--bg); }
+.inspo-sheet small { display: block; margin-top: 2px; font-size: 12px; color: var(--gray); }
+
+/* Competitors */
+.rival-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+.rival img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16/10;
+  object-fit: cover;
+  object-position: top;
+  background: var(--tile);
+  border: 1px solid var(--rule);
+}
+.rival-meta { padding-top: 8px; }
+.rival-name {
+  width: 100%;
+  border: none;
+  border-bottom: 1px dashed var(--rule);
+  padding: 2px 0;
+  font-weight: 600;
+  font-size: 16px;
+  background: transparent;
+}
+.rival-score { margin: 8px 0 0; font-size: 14px; color: var(--gray); }
+.rival-score strong { font-stretch: 72%; font-weight: 760; font-size: 26px; color: var(--ink); }
+.rival-verdict { margin: 2px 0 6px; font-weight: 600; }
+.rival-verdict.v-mixup { background: var(--mark); display: inline-block; padding: 0 6px; }
+.rival-add { min-height: 0; justify-content: flex-start; padding: 16px; }
+.rival-add .sleeve-kicker { font-size: 20px; }
+.rival-summary { margin-top: 20px; }
 
 /* Progress: this version against the last one */
 .progress-ask p { margin: 0; font-size: 20px; font-weight: 600; }
@@ -864,7 +974,7 @@ footer a:hover { color: var(--ink); }
   .hero-more, .share, .fix, .example, .faq { grid-template-columns: 1fr; }
   .progress-body { grid-template-columns: 1fr 1fr; }
   .progress-figure { grid-column: 1 / -1; }
-  .twin-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .twin-grid, .rival-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .result-head { grid-template-columns: 1fr; align-items: start; }
   .section-head { grid-template-columns: 1fr; gap: 10px; }
 }
@@ -883,7 +993,7 @@ footer a:hover { color: var(--ink); }
   .zone-index a { font-size: 21px; }
   .sleeve { padding: 16px; }
   .sleeve-kicker { font-size: 26px; }
-  .twin-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 12px; }
+  .twin-grid, .rival-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 12px; }
   .reveal { grid-template-columns: 1fr; }
   footer { grid-template-columns: 1fr; }
   .results { gap: 56px; }

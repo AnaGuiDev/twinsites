@@ -5,6 +5,7 @@ import { formatPercentile, type KinVerdict } from "./lib/calibrate";
 import { COLOR_EN, COLOR_ES } from "./lib/labels";
 import type { Diagnosis, TraitKey } from "./lib/diagnose";
 import type { Progress } from "./lib/history";
+import type { RivalBand } from "./components/Rivals";
 
 const REMOVAL_URL =
   "https://github.com/AnaGuiDev/twinsites/issues/new?title=" +
@@ -28,6 +29,58 @@ const copy = {
     footerSource: "Source code (MIT)",
     cardYou: "Mine",
     cardTwin: "Closest twin",
+    summary: (input: SummaryInput) => summarySentence("en", input),
+    inspoTitle: "Pages that look like nobody",
+    inspoDek: "In each kind of product, the pages with the fewest twins in the catalog. Different isn't automatically better: use them as a nudge, not a template.",
+    inspoCategory: "Kind of product",
+    inspoTwins: (n: number) => (n === 0 ? "No twin in the top 20%" : n === 1 ? "1 twin in the top 20%" : `${n} twins in the top 20%`),
+    markCentre: "Centred block and axis",
+    markEmpty: "Empty bands",
+    markGradient: "Gradient in the margins",
+    markAccent: (color: string) => `${color} accent`,
+    marksHide: "Hide the marks",
+    marksShow: "Show what makes it generic",
+    correctHint: "Read something wrong? Tap it to correct it; the diagnosis and the prompt update.",
+    correctAsk: (label: string) => `Not “${label}”? It's actually:`,
+    correctCancel: "Cancel",
+    correctedLine: (from: string, to: string) => `You corrected “${from}” to “${to}”.`,
+    correctUndo: "Undo",
+    correctionConsent: "Send these corrections anonymously to improve Twinsites: only the trait, both values and six rounded measurements. No image, no URL.",
+    correctionSend: "Send corrections",
+    correctionSent: "Thank you. Corrections like yours tune the rules for everyone.",
+    correctionError: "That didn't send. Try again in a moment.",
+    correctionLocal: "Your corrections apply here only.",
+    rivalsTitle: "Next to your competitors",
+    rivalsDek: "Add screenshots of up to three competitors' homepages. Each is measured against yours on the same scale as the twins, here in your browser.",
+    rivalAdd: "Add a competitor",
+    rivalHint: (n: number): string => (n === 1 ? "One more screenshot of their first screen." : `Up to ${n} screenshots of their first screen.`),
+    rivalName: "Competitor name",
+    rivalDefault: "Competitor",
+    rivalMeasuring: "Measuring…",
+    rivalFailed: "That image couldn't be read.",
+    rivalRemove: "Remove",
+    rivalSmall: "Small image: a rough reading.",
+    rivalVerdict: (band: RivalBand): string =>
+      band === "mixup" ? "Easy to mix up with yours" : band === "close" ? "Close to yours" : band === "some" ? "Some likeness" : "Clearly different",
+    rivalSummary: (name: string, band: RivalBand): string =>
+      band === "mixup"
+        ? `Visitors could mistake you for ${name}. Start with the first change above.`
+        : band === "close"
+          ? `${name} is the closest; the moves above will widen the gap.`
+          : `None of them looks much like you. ${name} is the nearest.`,
+    rivalUrlSoon: "Coming later: compare by pasting their URLs.",
+    smallNote: "This image is small. Likeness reads best on a full-size desktop screenshot (1280px wide or more); small or blurry captures can match the wrong pages.",
+    copyTitle: "What the words say",
+    copyDek: "The large text on your first screen, read in this browser, checked against the stock phrases of AI-built landing pages.",
+    copyRead: "Read the words too",
+    copyWeight: "Downloads a reader of about 7 MB once. The screenshot stays on your device.",
+    copyReading: "Reading the large text…",
+    copyFailed: "The words couldn't be read here. The rest of the result still holds.",
+    copyNothing: "No large text was readable on this screenshot.",
+    copyCount: (n: number, total: number) => `on at least ${n} of ${grouped(total, "en")} catalog homepages`,
+    copyClean: "No stock phrases in the large text. The words aren't what makes you look like the others.",
+    copyCaveat: "Read automatically from the image: it can miss or garble words. Counts come from the catalog thumbnails, so they are a floor, not an exact figure.",
+    copyMove: (phrases: string) => `Rewrite the headline and subhead without stock phrases like ${phrases}: say what the product does and for whom, in plain words.`,
     diagnosisTitle: "Why you look like them",
     diagnosisLine: (d: Diagnosis) => recipeSentence("en", d),
     traitLabel: (key: TraitKey, traits: Traits) => traitWord("en", key, traits),
@@ -73,6 +126,10 @@ const copy = {
       { q: "How does Twinsites compare pages?", a: "A small vision model (MobileCLIP) runs in your browser and turns the first screen of your page into a set of numbers. Those are compared with the same numbers for every page in the catalog, which comes from the open list awesome-vibe-coded-apps. Nothing about your page is sent to a server." },
       { q: "Is having twins bad?", a: "Not by itself. It means your first screen follows the same look as many other AI-built pages. That matters if you want people to remember your product or tell it apart from the rest. Some shared conventions, like a clear headline and one obvious button, are there because they work." },
       { q: "How reliable is “Why you look like them”?", a: "The traits (light or dark, accent colour, spacing, gradient, box grid, centring) are read from a very small version of your screenshot with simple rules. Checked by hand on random samples, they are right most of the time, roughly 3 in 4 for gradient and a bit better for centring, but not always: a dark photo behind the headline can read as a gradient, for example. Treat them as rules of thumb, not as a design review." },
+      { q: "How does Twinsites read the words on my page?", a: "After the result, a text reader (Tesseract) runs in your browser and reads the large text on your screenshot. It looks for stock phrases of AI-built landing pages, like “All-in-one” or “Watch demo”, and adds a step to the prompt when it finds them. It can miss or garble words, especially on photos or decorative type. The counts next to each phrase come from reading the catalog thumbnails, so they are a minimum. On phones it only runs when you ask, because it downloads about 7 MB." },
+      { q: "How does the comparison with competitors work?", a: "Add screenshots of up to three competitors' homepages. Each one is measured against yours with the same model and the same percentile scale as the twins, all in your browser. Above 95 means a visitor could mix you up. Comparing by pasting their URLs will come later." },
+      { q: "Why does a small screenshot give a different result?", a: "The model compares fine detail. A small, blurry or heavily compressed image can match the wrong pages, even its own original. Use a full-size desktop screenshot, at least 1280 pixels wide; Twinsites warns you when the image is smaller than 1000." },
+      { q: "What happens when I correct a trait?", a: "The diagnosis, the summary and the prompt update at once, in your browser. Only if you tick the box, the correction is sent anonymously: which trait, what Twinsites read, what you chose and six rounded measurements of the screenshot. Never the image, the URL, your IP or cookies. Corrections like these are used to tune the rules." },
       { q: "Will the redesign prompt fix my page?", a: "It tells your AI tool what to change, not exactly how the page should end up. Different tools, and different runs of the same tool, will interpret it differently, so check the new version here before you keep it. Some results will drop a lot, some a little, and a change can also add new twins." },
       { q: "Is the Acme Notes example real?", a: "The page is made up, built on purpose with the usual AI-builder look. The numbers are real: Twinsites measured 14 twins in the top 5% before and none after. But the drop depends on how that page was rebuilt from the prompt. Your page and your tool will give a different result. Both versions are published so you can check them yourself." },
       { q: "How does the before and after comparison work?", a: "Your last screenshot check (its scores and a small preview) is kept in this browser only. When you check a new screenshot, Twinsites asks whether it is a new version of the same page, because it cannot tell on its own. Answer yes only if it is. You can forget the last check from the result page at any time." },
@@ -207,6 +264,58 @@ const copy = {
     footerSource: "Código fuente (MIT)",
     cardYou: "La mía",
     cardTwin: "Gemela más cercana",
+    summary: (input: SummaryInput) => summarySentence("es", input),
+    inspoTitle: "Webs que no se parecen a nadie",
+    inspoDek: "En cada tipo de producto, las páginas con menos gemelas del catálogo. Distinta no significa mejor por sí sola: úsalas como empujón, no como plantilla.",
+    inspoCategory: "Tipo de producto",
+    inspoTwins: (n: number) => (n === 0 ? "Ninguna gemela en el 20 % superior" : n === 1 ? "1 gemela en el 20 % superior" : `${n} gemelas en el 20 % superior`),
+    markCentre: "Bloque y eje centrados",
+    markEmpty: "Franjas vacías",
+    markGradient: "Degradado en los márgenes",
+    markAccent: (color: string) => `Acento ${color}`,
+    marksHide: "Ocultar las marcas",
+    marksShow: "Mostrar qué la hace genérica",
+    correctHint: "¿Algo mal leído? Tócalo para corregirlo; el diagnóstico y el prompt se actualizan.",
+    correctAsk: (label: string) => `¿No es «${label}»? En realidad es:`,
+    correctCancel: "Cancelar",
+    correctedLine: (from: string, to: string) => `Has corregido «${from}» por «${to}».`,
+    correctUndo: "Deshacer",
+    correctionConsent: "Enviar estas correcciones de forma anónima para mejorar Twinsites: solo el rasgo, los dos valores y seis medidas redondeadas. Ni imagen ni URL.",
+    correctionSend: "Enviar correcciones",
+    correctionSent: "Gracias. Correcciones como la tuya ajustan las reglas para todos.",
+    correctionError: "No se envió. Inténtalo de nuevo en un momento.",
+    correctionLocal: "Tus correcciones solo se aplican aquí.",
+    rivalsTitle: "Junto a tus competidores",
+    rivalsDek: "Añade capturas de las portadas de hasta tres competidores. Cada una se mide contra la tuya con la misma escala que las gemelas, aquí en tu navegador.",
+    rivalAdd: "Añadir un competidor",
+    rivalHint: (n: number): string => (n === 1 ? "Una captura más de su primera pantalla." : `Hasta ${n} capturas de su primera pantalla.`),
+    rivalName: "Nombre del competidor",
+    rivalDefault: "Competidor",
+    rivalMeasuring: "Midiendo…",
+    rivalFailed: "No se pudo leer esa imagen.",
+    rivalRemove: "Quitar",
+    rivalSmall: "Imagen pequeña: lectura aproximada.",
+    rivalVerdict: (band: RivalBand): string =>
+      band === "mixup" ? "Fácil de confundir con la tuya" : band === "close" ? "Cerca de la tuya" : band === "some" ? "Algo de parecido" : "Claramente distinta",
+    rivalSummary: (name: string, band: RivalBand): string =>
+      band === "mixup"
+        ? `Un visitante podría confundirte con ${name}. Empieza por el primer cambio de arriba.`
+        : band === "close"
+          ? `${name} es la más cercana; los cambios de arriba ampliarán la distancia.`
+          : `Ninguna se parece mucho a ti. ${name} es la más cercana.`,
+    rivalUrlSoon: "Más adelante: comparar pegando sus URLs.",
+    smallNote: "Esta imagen es pequeña. El parecido se mide mejor con una captura de escritorio a tamaño completo (1280 px de ancho o más); las capturas pequeñas o borrosas pueden coincidir con las páginas equivocadas.",
+    copyTitle: "Lo que dicen las palabras",
+    copyDek: "El texto grande de tu primera pantalla, leído en este navegador y comparado con las frases hechas de las landings creadas con IA.",
+    copyRead: "Leer también las palabras",
+    copyWeight: "Descarga una vez un lector de unos 7 MB. La captura no sale de tu dispositivo.",
+    copyReading: "Leyendo el texto grande…",
+    copyFailed: "No se pudieron leer las palabras aquí. El resto del resultado sigue siendo válido.",
+    copyNothing: "No se pudo leer texto grande en esta captura.",
+    copyCount: (n: number, total: number) => `en al menos ${n} de ${grouped(total, "es")} portadas del catálogo`,
+    copyClean: "No hay frases hechas en el texto grande. Las palabras no son lo que te hace parecida a las demás.",
+    copyCaveat: "Leído automáticamente de la imagen: puede saltarse o confundir palabras. Las cifras salen de las miniaturas del catálogo, así que son un mínimo, no un dato exacto.",
+    copyMove: (phrases: string) => `Reescribe el titular y el subtítulo sin frases hechas como ${phrases}: di qué hace el producto y para quién, con palabras sencillas.`,
     diagnosisTitle: "Por qué te pareces a ellas",
     diagnosisLine: (d: Diagnosis) => recipeSentence("es", d),
     traitLabel: (key: TraitKey, traits: Traits) => traitWord("es", key, traits),
@@ -252,6 +361,10 @@ const copy = {
       { q: "¿Cómo compara Twinsites las páginas?", a: "Un modelo de visión pequeño (MobileCLIP) se ejecuta en tu navegador y convierte la primera pantalla de tu página en una serie de números. Se comparan con los mismos números de cada página del catálogo, que sale de la lista abierta awesome-vibe-coded-apps. Nada de tu página se envía a un servidor." },
       { q: "¿Tener gemelas es malo?", a: "No por sí mismo. Significa que tu primera pantalla sigue el mismo aspecto que muchas otras webs hechas con IA. Importa si quieres que la gente recuerde tu producto o lo distinga del resto. Algunas convenciones compartidas, como un titular claro y un botón evidente, existen porque funcionan." },
       { q: "¿Qué fiabilidad tiene «Por qué te pareces a ellas»?", a: "Los rasgos (claro u oscuro, color de acento, espaciado, degradado, retícula de cajas, centrado) se leen de una versión muy pequeña de tu captura con reglas sencillas. Revisados a mano sobre muestras al azar, aciertan la mayoría de las veces, más o menos 3 de cada 4 en el degradado y algo más en el centrado, pero no siempre: una foto oscura detrás del titular puede leerse como degradado, por ejemplo. Tómalos como reglas orientativas, no como una revisión de diseño." },
+      { q: "¿Cómo lee Twinsites las palabras de mi página?", a: "Tras el resultado, un lector de texto (Tesseract) se ejecuta en tu navegador y lee el texto grande de tu captura. Busca frases hechas de las landings creadas con IA, como «Todo en uno» o «Ver demo», y añade un paso al prompt cuando las encuentra. Puede saltarse o confundir palabras, sobre todo en fotos o tipografías decorativas. Las cifras junto a cada frase salen de leer las miniaturas del catálogo, así que son un mínimo. En el móvil solo se ejecuta si lo pides, porque descarga unos 7 MB." },
+      { q: "¿Cómo funciona la comparación con competidores?", a: "Añade capturas de las portadas de hasta tres competidores. Cada una se mide contra la tuya con el mismo modelo y la misma escala de percentiles que las gemelas, todo en tu navegador. Por encima de 95, un visitante podría confundiros. Comparar pegando sus URLs llegará más adelante." },
+      { q: "¿Por qué una captura pequeña da otro resultado?", a: "El modelo compara detalles finos. Una imagen pequeña, borrosa o muy comprimida puede coincidir con las páginas equivocadas, incluso no reconocer su propio original. Usa una captura de escritorio a tamaño completo, de al menos 1280 píxeles de ancho; Twinsites te avisa cuando la imagen mide menos de 1000." },
+      { q: "¿Qué pasa cuando corrijo un rasgo?", a: "El diagnóstico, el resumen y el prompt se actualizan al instante, en tu navegador. Solo si marcas la casilla, la corrección se envía de forma anónima: qué rasgo, qué leyó Twinsites, qué elegiste y seis medidas redondeadas de la captura. Nunca la imagen, la URL, tu IP ni cookies. Esas correcciones sirven para ajustar las reglas." },
       { q: "¿El prompt de rediseño arreglará mi página?", a: "Le dice a tu herramienta de IA qué cambiar, no cómo debe quedar exactamente. Cada herramienta, e incluso cada intento con la misma, lo interpretará de forma distinta, así que comprueba aquí la nueva versión antes de quedártela. Unas veces bajarán mucho las gemelas, otras poco, y un cambio también puede traer gemelas nuevas." },
       { q: "¿El ejemplo de Acme Notes es real?", a: "La página es inventada, hecha a propósito con el aspecto típico de los constructores con IA. Los números son reales: Twinsites midió 14 gemelas en el 5 % superior antes y ninguna después. Pero esa bajada depende de cómo se rehízo la página a partir del prompt. Tu página y tu herramienta darán otro resultado. Las dos versiones están publicadas para que lo compruebes tú." },
       { q: "¿Cómo funciona la comparación de antes y después?", a: "Tu última comprobación (sus resultados y una vista previa pequeña) se guarda solo en este navegador. Cuando compruebas una captura nueva, Twinsites te pregunta si es una nueva versión de la misma página, porque no puede saberlo por sí solo. Responde que sí solo si lo es. Puedes olvidar la última comprobación desde la página de resultado cuando quieras." },
@@ -483,6 +596,54 @@ function buildPrompt(lang: Lang, input: PromptInput): string {
 
 function cap(value: string): string {
   return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
+export interface SummaryInput {
+  diagnosis: Diagnosis;
+  traits: Traits;
+  verdict: KinVerdict;
+}
+
+/** The single change worth making first, as a short imperative. */
+function moveShort(lang: Lang, item: Suggestion): string {
+  const es = lang === "es";
+  switch (item.id) {
+    case "shift-hue":
+      return es ? `cambiar el acento ${COLOR_ES[item.from]} por ${COLOR_ES[item.to]}` : `move the accent from ${COLOR_EN[item.from]} to ${COLOR_EN[item.to]}`;
+    case "add-accent":
+      return es ? `añadir un único acento ${COLOR_ES[item.to]} y fuerte` : `add one strong ${COLOR_EN[item.to]} accent`;
+    case "flip-mode":
+      return item.mode === "light" ? (es ? "pasar a fondo claro" : "switch to a light background") : es ? "pasar a fondo oscuro" : "switch to a dark background";
+    case "open-space":
+      return es ? "dar más aire a la primera pantalla" : "give the first screen more room";
+    case "add-density":
+      return es ? "enseñar más producto en la primera pantalla" : "show more of the product on the first screen";
+    case "drop-gradient":
+      return es ? "quitar el degradado suave" : "drop the soft gradient";
+    case "leave-bento":
+      return es ? "cambiar la retícula de cajas por una sola imagen fuerte" : "replace the box grid with one strong visual";
+    case "break-center":
+      return es ? "sacar el titular del centro" : "move the headline off-centre";
+    case "add-grain":
+      return es ? "cambiar el color plano por textura o una foto" : "trade flat colour for texture or a photograph";
+  }
+}
+
+function summarySentence(lang: Lang, input: SummaryInput): string {
+  const es = lang === "es";
+  const d = input.diagnosis;
+  if (input.verdict.mode === "none") {
+    return es
+      ? "Tu página no se parece a ninguna del catálogo. Lo que la hace distinta merece quedarse."
+      : "Your page doesn't look like anything in the catalog. Whatever makes it different is worth keeping.";
+  }
+  const recipe = listOf(d.recipe.map((part) => traitPhrase(lang, part.key, input.traits)), es);
+  const first = d.moves[0];
+  const why = es
+    ? `Te pareces a tus gemelas sobre todo por ${recipe}.`
+    : `You look like your twins mostly because of ${recipe}.`;
+  if (!first) return why;
+  return es ? `${why} El cambio con más efecto: ${moveShort(lang, first.item)}.` : `${why} The change with the most effect: ${moveShort(lang, first.item)}.`;
 }
 
 function grouped(n: number, lang: Lang): string {
