@@ -55,6 +55,18 @@ A visitor's image is cropped to the top 16:10 before the traits and the embeddin
 
 MobileCLIP resizes the short side to 256 and then center-crops a square. On a 16:10 frame that drops about 19% on each side, often the logo and the button. Letterboxing both the catalog shots and the upload into a square would keep that margin, but it changes every stored vector, the map, and the percentile curve. The raw shots are already on disk under `data/raw` (gitignored, 2,003 files). Re-encoding them in headless Chrome and refitting the map is a dataset rebuild, so this release leaves the stored embeddings as they are. After the 16:10 crop, an upload and a catalog shot still go through the same center crop.
 
+### From diagnosis to fix
+
+A result does three things after naming the twins:
+
+1. **Why you look like them.** The recipe is the set of traits (ground, accent, density, gradient, grid, centring) that most of your twelve twins share with you, with how common that exact recipe is across the catalog.
+2. **What to change.** Moves that fit your page and stand on at least half of the twins, strongest first, and a redesign prompt built from them to paste into Lovable, v0, Bolt or Cursor.
+3. **Before and after.** Your last screenshot check (scores and a small preview) stays in this browser's local storage. Check a new version and Twinsites compares both on the same band, then draws a card with the drop (for example 14 → 0 twins in the top 5%). There is a link to forget it.
+
+The worked example on the home page is real: `public/example/acme-before.html` and `acme-after.html` are a made-up page and its redesign following the prompt; the card shows what Twinsites measured for both.
+
+Layout traits read against each page's own background, so dark pages are judged like light ones. `npm run dataset:layout` recomputes `centered` and `gradient` for the catalog from the thumbnails with the same function the browser runs; zone names stay as they are.
+
 ### What counts as a twin
 
 A single global cut does not work. On the 2,003-site pair curve (400,000 seeded pairs), the median cosine is about 0.32 and the 80th percentile is about 0.62. Measured against that curve in Chrome:

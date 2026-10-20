@@ -5,11 +5,12 @@ import { MapView } from "./MapView";
 import { RouteLink } from "../router";
 import { useI18n } from "../i18n";
 import { track } from "../lib/analytics";
-import { traitLine, canvasToBlob, renderShareCard } from "../lib/card";
+import { traitLine, canvasToBlob, renderProgressCard, renderShareCard } from "../lib/card";
 import { mapFor, type ResultData } from "../lib/explore";
 import { hostOf } from "../lib/match";
 import { formatPercentile } from "../lib/calibrate";
-import { suggest } from "../lib/suggest";
+import { diagnose } from "../lib/diagnose";
+import { forgetCheck, progressOf } from "../lib/history";
 import type { Cluster, Site, Traits } from "../types";
 
 export function ResultView({
@@ -35,13 +36,34 @@ export function ResultView({
   const nearest = result.twins[0]?.percentile ?? 0;
   const secondary = t.resultLine(result.verdict, nearest);
   const marks = useMemo(() => callouts(result.traits, result.twins.map((twin) => twin.site.traits), t), [result, t]);
-  const suggestions = useMemo(
-    () => suggest(result.traits, result.twins.map((twin) => twin.site.traits)),
-    [result],
+  const twinTraits = useMemo(() => result.twins.map((twin) => twin.site.traits), [result]);
+  const catalogTraits = useMemo(() => mapSites.map((site) => site.traits), [mapSites]);
+  const diagnosis = useMemo(() => diagnose(result.traits, twinTraits, catalogTraits), [result.traits, twinTraits, catalogTraits]);
+  const promptText = useMemo(
+    () =>
+      t.prompt({
+        diagnosis,
+        traits: result.traits,
+        verdict: result.verdict,
+        zone: zoneName,
+        moves: diagnosis.moves.map((move) => t.suggestion(move.item)),
+      }),
+    [diagnosis, result.traits, result.verdict, zoneName, t],
   );
-  const shares = useMemo(() => countShares(result), [result]);
-  const pageUrl = `https://twinsites.com/zone/${result.zone.slug}`;
-  const shareText = `${t.cardLine(result.verdict, zoneName, result.catalogCount)} ${pageUrl}`;
+  const [copied, setCopied] = useState(false);
+  const [compare, setCompare] = useState<boolean | null>(null);
+  const [forgotten, setForgotten] = useState(false);
+  const [includeBoth, setIncludeBoth] = useState(true);
+  const previous = result.source === "upload" && !forgotten ? result.previous ?? null : null;
+  const delta = useMemo(
+    () => (previous && result.bands ? progressOf(previous, result.bands, nearest) : null),
+    [previous, result.bands, nearest],
+  );
+  const showProgress = Boolean(delta && compare);
+  const pageUrl = showProgress ? "https://twinsites.com" : `https://twinsites.com/zone/${result.zone.slug}`;
+  const shareText = showProgress && delta
+    ? `${t.progressPost(delta, result.catalogCount)} ${pageUrl}`
+    : `${t.cardLine(result.verdict, zoneName, result.catalogCount)} ${pageUrl}`;
   const showMine = result.source === "upload" && includeMine;
   const thumb = (path: string) => `${import.meta.env.BASE_URL}data/${path}`;
 
@@ -67,6 +89,35 @@ export function ResultView({
   }, [result]);
 
   useEffect(() => {
+    if (!showProgress || !delta || !previous) return;
+    let cancel = false;
+    void renderProgressCard({
+      before: delta.before,
+      after: delta.after,
+      unit: t.progressUnit(delta.top),
+      among: t.progressAmong(result.catalogCount),
+      pageUrl,
+      images: includeBoth ? [previous.preview, result.preview] : ["", ""],
+      labels: [t.cardBefore, t.cardAfter],
+    })
+      .then(async (canvas) => {
+        const blob = await canvasToBlob(canvas);
+        if (cancel) return;
+        cardBlob.current = blob;
+        const url = URL.createObjectURL(blob);
+        setCardUrl((prev) => {
+          if (prev) URL.revokeObjectURL(prev);
+          return url;
+        });
+      })
+      .catch(() => undefined);
+    return () => {
+      cancel = true;
+    };
+  }, [showProgress, delta, previous, includeBoth, pageUrl, result.preview, result.catalogCount, t]);
+
+  useEffect(() => {
+    if (showProgress) return;
     let cancel = false;
     const both = showMine || result.source === "catalog";
     const images = both
@@ -99,7 +150,23 @@ export function ResultView({
     return () => {
       cancel = true;
     };
-  }, [includeMine, lang, result, zoneName, secondary, marks, pageUrl, showMine, t]);
+  }, [includeMine, lang, result, zoneName, secondary, marks, pageUrl, showMine, showProgress, t]);
+
+  const copyPrompt = async () => {
+    track("prompt");
+    try {
+      await navigator.clipboard.writeText(promptText);
+    } catch {
+      const area = document.createElement("textarea");
+      area.value = promptText;
+      document.body.appendChild(area);
+      area.select();
+      document.execCommand("copy");
+      area.remove();
+    }
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 2400);
+  };
 
   const onShare = async () => {
     track("share");
@@ -134,6 +201,67 @@ export function ResultView({
         <DropZone onFile={onFile} onIntent={onIntent} compact progress={progress} progressLabel={t.progressLabel} stageLabel={stageLabel} />
       </section>
 
+      {delta && previous && compare !== false && (
+        <section className="progress" aria-live="polite">
+          <div className="section-head">
+            <h2>{t.progressTitle}</h2>
+            <p>{new Date(previous.at).toLocaleString(lang === "es" ? "es-ES" : "en-GB", { dateStyle: "medium", timeStyle: "short" })}</p>
+          </div>
+          {compare === null && (
+            <div className="progress-ask">
+              <p>{t.progressAsk}</p>
+              <div className="share-actions">
+                <button
+                  type="button"
+                  className="ticket"
+                  onClick={() => {
+                    track("progress");
+                    setCompare(true);
+                  }}
+                >
+                  {t.progressYes}
+                </button>
+                <button type="button" className="ticket ghost" onClick={() => setCompare(false)}>
+                  {t.progressNo}
+                </button>
+              </div>
+            </div>
+          )}
+          {compare && (
+            <div className="progress-body">
+              <figure>
+                {previous.preview && <img src={previous.preview} alt="" />}
+                <figcaption>{t.cardBefore}</figcaption>
+              </figure>
+              <figure>
+                <img src={result.preview} alt="" />
+                <figcaption>{t.cardAfter}</figcaption>
+              </figure>
+              <div className="progress-figure">
+                <p className="progress-numbers">
+                  {delta.before} → {delta.after}
+                </p>
+                <p className="progress-unit">{t.progressUnit(delta.top)}</p>
+                <p>{delta.after < delta.before ? t.progressBetter : delta.after > delta.before ? t.progressWorse : t.progressSame}</p>
+                <p className="score-note">{t.progressNearest(delta)}</p>
+              </div>
+            </div>
+          )}
+          <button
+            type="button"
+            className="text-link as-button forget"
+            onClick={() => {
+              forgetCheck();
+              setForgotten(true);
+              setCompare(false);
+            }}
+          >
+            {t.forgetCheck}
+          </button>
+        </section>
+      )}
+      {forgotten && <p className="score-note">{t.forgottenCheck}</p>}
+
       <section className="reveal" aria-label={t.revealLabel}>
         <figure>
           <img src={result.preview} alt={result.source === "upload" ? t.you : result.subjectTitle} />
@@ -149,14 +277,45 @@ export function ResultView({
             </figcaption>
           </figure>
         )}
-        <ul className="trait-row" aria-label={t.traitsTitle}>
-          {marks.map((mark) => (
-            <li key={mark.label}>
-              {mark.label}
-              <span>{mark.note}</span>
+      </section>
+
+      <section className="diagnosis">
+        <div className="section-head">
+          <h2>{t.diagnosisTitle}</h2>
+          <p>{t.diagnosisLine(diagnosis)}</p>
+        </div>
+        <ul className="recipe">
+          {diagnosis.recipe.map((part) => (
+            <li key={part.key}>
+              {part.key === "color" && <i className="swatch" style={{ background: result.traits.dominant }} />}
+              <strong>{t.traitLabel(part.key, result.traits)}</strong>
+              <span>{t.moveEvidence(part.twins, diagnosis.twinTotal)}</span>
             </li>
           ))}
         </ul>
+        <div className="fix">
+          <div>
+            <h3 className="fix-title">{t.movesTitle}</h3>
+            <ol className="moves">
+              {diagnosis.moves.map((move) => (
+                <li key={move.item.id}>
+                  <p>{t.suggestion(move.item)}</p>
+                  <span>{t.moveEvidence(move.twins, diagnosis.twinTotal)}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
+          <div className="prompt-box">
+            <h3 className="fix-title">{t.promptTitle}</h3>
+            <p className="dek">{t.promptDek}</p>
+            <pre className="prompt-text" tabIndex={0}>
+              {promptText}
+            </pre>
+            <button type="button" className="ticket" onClick={() => void copyPrompt()}>
+              {copied ? t.copiedPrompt : t.copyPrompt}
+            </button>
+          </div>
+        </div>
       </section>
 
       <section className="share">
@@ -164,13 +323,20 @@ export function ResultView({
           {cardUrl ? <img className="card-preview" src={cardUrl} alt={shareText} /> : <div className="card-preview is-loading" />}
         </div>
         <div className="share-side">
-          <h2>{t.shareTitle}</h2>
-          <p className="dek">{t.shareDek}</p>
-          {result.source === "upload" && (
+          <h2>{showProgress ? t.shareProgressTitle : t.shareTitle}</h2>
+          <p className="dek">{showProgress ? t.shareProgressDek : t.shareDek}</p>
+          {showProgress ? (
             <label className="include">
-              <input type="checkbox" checked={includeMine} onChange={(event) => setIncludeMine(event.target.checked)} />
-              {t.includeMine}
+              <input type="checkbox" checked={includeBoth} onChange={(event) => setIncludeBoth(event.target.checked)} />
+              {t.includeBoth}
             </label>
+          ) : (
+            result.source === "upload" && (
+              <label className="include">
+                <input type="checkbox" checked={includeMine} onChange={(event) => setIncludeMine(event.target.checked)} />
+                {t.includeMine}
+              </label>
+            )
           )}
           <div className="share-actions">
             <button type="button" className="ticket" onClick={() => void onShare()}>
@@ -215,39 +381,6 @@ export function ResultView({
         </div>
       </section>
 
-      <section className="report">
-        <div>
-          <div className="section-head">
-            <h2>{t.traitsTitle}</h2>
-          </div>
-          <p className="dek">{t.traitsDek}</p>
-          <ul className="marks">
-            <Mark label={t.dominant} value={t.colorName(result.traits.dominantName)} swatch={result.traits.dominant} note={t.shared(shares.color)} />
-            <Mark label={t.mode} value={result.traits.mode === "dark" ? t.modeDark : t.modeLight} note={t.shared(shares.mode)} />
-            <Mark
-              label={t.density}
-              value={result.traits.density === "airy" ? t.airy : result.traits.density === "packed" ? t.packed : t.balanced}
-              note={t.shared(shares.density)}
-            />
-            <Mark label={t.gradient} value={result.traits.gradient ? t.gradientYes : t.gradientNo} note={t.shared(shares.gradient)} />
-            <Mark label={t.bento} value={result.traits.bento ? t.bentoYes : t.bentoNo} note={t.shared(shares.bento)} />
-            <Mark label={t.centered} value={result.traits.centered ? t.centeredYes : t.centeredNo} note={t.shared(shares.centered)} />
-          </ul>
-        </div>
-        <div>
-          <div className="section-head">
-            <h2>{t.suggestTitle}</h2>
-          </div>
-          <p className="dek">{t.suggestDek}</p>
-          <ul className="suggestions">
-            {suggestions.map((item) => (
-              <li key={item.id}>
-                <p>{t.suggestion(item)}</p>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
 
       <section>
         <div className="section-head">
@@ -266,19 +399,6 @@ export function ResultView({
       <SubscribeForm />
     </div>
   );
-}
-
-function countShares(result: ResultData) {
-  const twins = result.twins.map((twin) => twin.site.traits);
-  const count = (pred: (trait: Traits) => boolean) => twins.filter(pred).length;
-  return {
-    color: count((trait) => trait.dominantName === result.traits.dominantName),
-    mode: count((trait) => trait.mode === result.traits.mode),
-    density: count((trait) => trait.density === result.traits.density),
-    gradient: count((trait) => trait.gradient === result.traits.gradient),
-    bento: count((trait) => trait.bento === result.traits.bento),
-    centered: count((trait) => trait.centered === result.traits.centered),
-  };
 }
 
 function callouts(
@@ -300,17 +420,4 @@ function callouts(
   ].sort((a, b) => b.n - a.n);
   const strong = rows.filter((row) => row.n >= 6);
   return (strong.length >= 2 ? strong : rows).slice(0, 4).map((row) => ({ label: row.label, note: t.shared(row.n) }));
-}
-
-function Mark({ label, value, note, swatch }: { label: string; value: string; note: string; swatch?: string }) {
-  return (
-    <li>
-      <span className="mark-label">{label}</span>
-      <span className="mark-value">
-        {swatch && <i className="swatch" style={{ background: swatch }} />}
-        {value}
-      </span>
-      <span className="mark-note">{note}</span>
-    </li>
-  );
 }

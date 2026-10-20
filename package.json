@@ -16,6 +16,7 @@
     "dataset:project": "tsx scripts/project.ts",
     "dataset:calibrate": "tsx scripts/refresh-meta.ts",
     "dataset:mosaic": "tsx scripts/mosaic.ts",
+    "dataset:layout": "tsx scripts/refresh-layout.ts",
     "typecheck": "tsc --noEmit"
   },
   "engines": {

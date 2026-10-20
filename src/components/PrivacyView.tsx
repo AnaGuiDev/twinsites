@@ -20,8 +20,13 @@ export function PrivacyView() {
         A screenshot you upload never leaves your browser. A URL you paste is visited by the Cloudflare worker to take one screenshot, which is not stored.
       </p>
       <p>
+        Your last screenshot check (its scores and a small preview) is kept in this browser's local storage so the next
+        version of your page can be compared with it. It never leaves the browser, and the result page has a link to forget
+        it.
+      </p>
+      <p>
         There are no cookies. If a visit counter is on, it records only aggregate events: a visit, an example, an upload, a
-        result, a share, pointing at or opening a page on the wall.
+        result, a share, pointing at or opening a page on the wall, copying the redesign prompt, comparing with a previous check.
       </p>
       <p>
         Questions: <a href="mailto:twinsites.dev@gmail.com">twinsites.dev@gmail.com</a>

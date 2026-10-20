@@ -1,8 +1,10 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import type { ColorName, Lang } from "./types";
+import type { ColorName, Lang, Traits } from "./types";
 import type { Suggestion } from "./lib/suggest";
 import { formatPercentile, type KinVerdict } from "./lib/calibrate";
 import { COLOR_EN, COLOR_ES } from "./lib/labels";
+import type { Diagnosis, TraitKey } from "./lib/diagnose";
+import type { Progress } from "./lib/history";
 
 const REMOVAL_URL =
   "https://github.com/AnaGuiDev/twinsites/issues/new?title=" +
@@ -26,6 +28,43 @@ const copy = {
     footerSource: "Source code (MIT)",
     cardYou: "Mine",
     cardTwin: "Closest twin",
+    diagnosisTitle: "Why you look like them",
+    diagnosisLine: (d: Diagnosis) => recipeSentence("en", d),
+    traitLabel: (key: TraitKey, traits: Traits) => traitWord("en", key, traits),
+    movesTitle: "What to change, strongest first",
+    moveEvidence: (n: number, total: number) => `${n} of ${total} twins`,
+    promptTitle: "Your redesign prompt",
+    promptDek: "Paste it into Lovable, v0, Bolt or Cursor with your current page. Then check the new version here: Twinsites shows the before and after.",
+    copyPrompt: "Copy prompt",
+    copiedPrompt: "Copied",
+    prompt: (input: PromptInput) => buildPrompt("en", input),
+    progressTitle: "Since your last check",
+    progressAsk: "Is this a new version of the page you checked before?",
+    progressYes: "Yes, compare them",
+    progressNo: "No, it's a different page",
+    progressLine: (p: Progress) => `${p.before} → ${p.after} twins in the top ${p.top}%`,
+    progressNearest: (p: Progress) => `Closest twin: ${p.nearestBefore.toFixed(1)} → ${p.nearestAfter.toFixed(1)} percentile.`,
+    progressWorse: "More twins than before. Check the moves above and try another version.",
+    progressBetter: "Fewer twins than before. This is the one worth sharing.",
+    progressSame: "Same number of twins. The moves above go further.",
+    forgetCheck: "Forget my last check",
+    forgottenCheck: "Forgotten. Your last check only lived in this browser.",
+    progressPost: (p: Progress, total: number) =>
+      `My homepage went from ${p.before} to ${p.after} twins in the top ${p.top}% of ${grouped(total, "en")} AI-built sites.`,
+    progressUnit: (top: number) => `twins in the top ${top}%`,
+    progressAmong: (total: number) => `among ${grouped(total, "en")} AI-built homepages`,
+    shareProgressTitle: "Share your progress",
+    shareProgressDek: "The card is drawn in this tab. The post links to Twinsites so others can check theirs.",
+    cardBefore: "Before",
+    cardAfter: "After",
+    includeBoth: "Show both screenshots on the card",
+    exampleTitle: "What's worth sharing",
+    exampleDek: "A made-up page, measured for real: checked, fixed with the prompt Twinsites wrote for it, checked again.",
+    exampleSteps: ["Check your page: see its twins and why.", "Paste the redesign prompt into the tool you built it with.", "Check the new version and share the drop."],
+    exampleNote: "Acme Notes is a made-up page built for this example. The numbers are what Twinsites measured, and you can run the two pages yourself:",
+    exampleBefore: "before",
+    exampleAfter: "after",
+    exampleAlt: "Example card: a made-up landing page went from many twins to few after following its redesign prompt.",
     privacyShort: "Screenshots never leave your browser.",
     zonesTitle: (n: number) => `${n} zones`,
     demoVerdict: (verdict: KinVerdict, zone: string) => demoSentence("en", verdict, zone),
@@ -35,7 +74,7 @@ const copy = {
     demoResume: "Play",
     langName: "Español",
     title: "Your AI-built homepage has twins.",
-    lede: (n: number) => `Slop detectors give you a score. Twinsites shows you the relatives: out of ${grouped(n, "en")} sites built with AI tools, the ones that look most like yours.`,
+    lede: (n: number) => `Twinsites compares your homepage with ${grouped(n, "en")} sites built with AI tools, shows you its twins and why, and writes the prompt that makes it stand apart.`,
     privacy: "Screenshots are compared on your device and never uploaded. A pasted URL is captured once by a Cloudflare worker and not stored.",
     dropTitle: "Drop a screenshot of your homepage",
     dropHint: "Or paste it. A PNG or JPG of the first screen.",
@@ -149,6 +188,43 @@ const copy = {
     footerSource: "Código fuente (MIT)",
     cardYou: "La mía",
     cardTwin: "Gemela más cercana",
+    diagnosisTitle: "Por qué te pareces a ellas",
+    diagnosisLine: (d: Diagnosis) => recipeSentence("es", d),
+    traitLabel: (key: TraitKey, traits: Traits) => traitWord("es", key, traits),
+    movesTitle: "Qué cambiar, de más a menos efecto",
+    moveEvidence: (n: number, total: number) => `${n} de ${total} gemelas`,
+    promptTitle: "Tu prompt de rediseño",
+    promptDek: "Pégalo en Lovable, v0, Bolt o Cursor junto con tu página actual. Después comprueba aquí la nueva versión: Twinsites te enseña el antes y el después.",
+    copyPrompt: "Copiar prompt",
+    copiedPrompt: "Copiado",
+    prompt: (input: PromptInput) => buildPrompt("es", input),
+    progressTitle: "Desde tu última comprobación",
+    progressAsk: "¿Es una nueva versión de la página que comprobaste antes?",
+    progressYes: "Sí, compáralas",
+    progressNo: "No, es otra página",
+    progressLine: (p: Progress) => `${p.before} → ${p.after} gemelas en el ${p.top} % superior`,
+    progressNearest: (p: Progress) => `Gemela más cercana: percentil ${p.nearestBefore.toFixed(1).replace(".", ",")} → ${p.nearestAfter.toFixed(1).replace(".", ",")}.`,
+    progressWorse: "Más gemelas que antes. Revisa los cambios de arriba y prueba otra versión.",
+    progressBetter: "Menos gemelas que antes. Esta es la que merece compartirse.",
+    progressSame: "Las mismas gemelas. Los cambios de arriba llegan más lejos.",
+    forgetCheck: "Olvidar mi última comprobación",
+    forgottenCheck: "Olvidada. Tu última comprobación solo vivía en este navegador.",
+    progressPost: (p: Progress, total: number) =>
+      `Mi web ha pasado de ${p.before} a ${p.after} gemelas en el ${p.top} % superior de ${grouped(total, "es")} webs hechas con IA.`,
+    progressUnit: (top: number) => `gemelas en el ${top} % superior`,
+    progressAmong: (total: number) => `entre ${grouped(total, "es")} portadas hechas con IA`,
+    shareProgressTitle: "Comparte tu progreso",
+    shareProgressDek: "La tarjeta se dibuja en esta pestaña. La publicación enlaza a Twinsites para que otros comprueben la suya.",
+    cardBefore: "Antes",
+    cardAfter: "Después",
+    includeBoth: "Mostrar las dos capturas en la tarjeta",
+    exampleTitle: "Lo que merece compartirse",
+    exampleDek: "Una página inventada, medida de verdad: comprobada, corregida con el prompt que Twinsites escribió para ella y vuelta a comprobar.",
+    exampleSteps: ["Comprueba tu página: sus gemelas y por qué.", "Pega el prompt de rediseño en la herramienta con la que la hiciste.", "Comprueba la nueva versión y comparte la bajada."],
+    exampleNote: "Acme Notes es una página inventada para este ejemplo. Los números son los que midió Twinsites, y puedes comprobar tú las dos páginas:",
+    exampleBefore: "antes",
+    exampleAfter: "después",
+    exampleAlt: "Tarjeta de ejemplo: una landing inventada pasó de muchas gemelas a pocas tras seguir su prompt de rediseño.",
     privacyShort: "Las capturas nunca salen de tu navegador.",
     zonesTitle: (n: number) => `${n} zonas`,
     demoVerdict: (verdict: KinVerdict, zone: string) => demoSentence("es", verdict, zone),
@@ -158,7 +234,7 @@ const copy = {
     demoResume: "Reanudar",
     langName: "English",
     title: "Tu web hecha con IA tiene gemelas.",
-    lede: (n: number) => `Los detectores de webs genéricas te dan una nota. Twinsites te enseña a las parientes: de ${grouped(n, "es")} webs hechas con herramientas de IA, las que más se parecen a la tuya.`,
+    lede: (n: number) => `Twinsites compara tu portada con ${grouped(n, "es")} webs hechas con herramientas de IA, te enseña sus gemelas y por qué, y escribe el prompt para que se distinga.`,
     privacy: "Las capturas se comparan en tu dispositivo y nunca se suben. Una URL pegada la captura una vez un worker de Cloudflare, sin guardarla.",
     dropTitle: "Suelta una captura de tu portada",
     dropHint: "O pégala. Un PNG o JPG de la primera pantalla.",
@@ -260,6 +336,116 @@ const copy = {
     } as Record<string, string>,
   },
 };
+
+export interface PromptInput {
+  diagnosis: Diagnosis;
+  traits: Traits;
+  verdict: KinVerdict;
+  zone: string;
+  moves: string[];
+}
+
+/** Short label for the value a page has on one trait, as used in chips. */
+function traitWord(lang: Lang, key: TraitKey, traits: Traits): string {
+  const es = lang === "es";
+  switch (key) {
+    case "mode":
+      return traits.mode === "dark" ? (es ? "Oscuro" : "Dark") : es ? "Claro" : "Light";
+    case "color":
+      return traits.dominantName === "neutral"
+        ? es ? "Sin color de acento" : "No accent colour"
+        : es ? `Acento ${COLOR_ES[traits.dominantName]}` : `${cap(COLOR_EN[traits.dominantName])} accent`;
+    case "density":
+      return traits.density === "airy" ? (es ? "Mucho aire" : "Lots of air") : traits.density === "packed" ? (es ? "Denso" : "Dense") : es ? "Espaciado uniforme" : "Even spacing";
+    case "gradient":
+      return traits.gradient ? (es ? "Degradado suave" : "Soft gradient") : es ? "Color plano" : "Flat colour";
+    case "bento":
+      return traits.bento ? (es ? "Retícula de cajas" : "Box grid") : es ? "Sin retícula de cajas" : "No box grid";
+    case "centered":
+      return traits.centered ? (es ? "Todo centrado" : "Centred") : es ? "Descentrado" : "Off-centre";
+  }
+}
+
+/** The same values, as phrases inside a sentence. */
+function traitPhrase(lang: Lang, key: TraitKey, traits: Traits): string {
+  const es = lang === "es";
+  switch (key) {
+    case "mode":
+      return traits.mode === "dark" ? (es ? "fondo oscuro" : "a dark background") : es ? "fondo claro" : "a light background";
+    case "color":
+      return traits.dominantName === "neutral"
+        ? es ? "colores neutros" : "mostly neutral colours"
+        : es ? `acento ${COLOR_ES[traits.dominantName]}` : `a ${COLOR_EN[traits.dominantName]} accent`;
+    case "density":
+      return traits.density === "airy" ? (es ? "mucho espacio vacío" : "a lot of empty space") : traits.density === "packed" ? (es ? "una composición muy densa" : "a densely packed layout") : es ? "un espaciado uniforme" : "even, tidy spacing";
+    case "gradient":
+      return traits.gradient ? (es ? "un degradado suave de fondo" : "a soft gradient wash") : es ? "color plano" : "flat colour";
+    case "bento":
+      return traits.bento ? (es ? "una retícula de cajas redondeadas" : "a bento grid of rounded boxes") : es ? "sin retícula de cajas" : "no box grid";
+    case "centered":
+      return traits.centered ? (es ? "titular y botón centrados" : "a centred headline and button") : es ? "una composición descentrada" : "an off-centre layout";
+  }
+}
+
+function listOf(parts: string[], es: boolean): string {
+  if (parts.length <= 1) return parts.join("");
+  return `${parts.slice(0, -1).join(", ")} ${es ? "y" : "and"} ${parts[parts.length - 1]}`;
+}
+
+function recipeSentence(lang: Lang, d: Diagnosis): string {
+  const es = lang === "es";
+  const pct = Math.round(d.recipeCatalog * 100);
+  const total = grouped(d.catalogTotal, lang);
+  return es
+    ? `${d.recipeTwins} de tus ${d.twinTotal} gemelas comparten tu receta completa. En todo el catálogo, la sigue el ${pct} % de las ${total} webs.`
+    : `${d.recipeTwins} of your ${d.twinTotal} twins share your whole recipe. Across the catalog, ${pct}% of the ${total} sites follow it.`;
+}
+
+function buildPrompt(lang: Lang, input: PromptInput): string {
+  const es = lang === "es";
+  const d = input.diagnosis;
+  const recipe = listOf(
+    d.recipe.map((part) => traitPhrase(lang, part.key, input.traits)),
+    es,
+  );
+  const pct = Math.round(d.recipeCatalog * 100);
+  const total = grouped(d.catalogTotal, lang);
+  const steps = input.moves.map((move, index) => `${index + 1}. ${move}`).join("\n");
+  if (es) {
+    return [
+      "Rediseña la primera pantalla de mi landing para que deje de parecer una plantilla genérica hecha con IA.",
+      "",
+      "Mantén el nombre del producto, los textos y la marca, salvo donde un paso de abajo diga lo contrario.",
+      "",
+      `Ahora mismo la primera pantalla tiene ${recipe}. Comparada con ${total} portadas hechas con IA, cae en la zona «${input.zone}»: ${d.recipeTwins} de sus ${d.twinTotal} gemelas más cercanas siguen esta misma receta, y también el ${pct} % de todo el catálogo.`,
+      "",
+      "Cámbiala así:",
+      steps,
+      "",
+      "Evita también los recursos por defecto de los constructores con IA: titular centrado sobre un degradado suave, un botón principal en forma de píldora junto a un botón fantasma de «Ver demo», tres tarjetas de funciones idénticas con iconos, una fila de logos de relleno y tarjetas translúcidas con sombras suaves.",
+      "",
+      "Haz una elección audaz y concreta que encaje con lo que el producto es de verdad, y deja el resto en calma. Que siga siendo responsive y accesible: buen contraste, foco visible al navegar con teclado y texto real, no texto dentro de imágenes.",
+    ].join("\n");
+  }
+  return [
+    "Redesign the first screen of my landing page so it stops looking like a generic AI-built template.",
+    "",
+    "Keep the product name, the copy and the brand, except where a step below says otherwise.",
+    "",
+    `Right now the first screen has ${recipe}. Compared with ${total} AI-built homepages, it lands in the "${input.zone}" zone: ${d.recipeTwins} of its ${d.twinTotal} closest twins follow this same recipe, and so do ${pct}% of the whole catalog.`,
+    "",
+    "Change it like this:",
+    steps,
+    "",
+    "Also avoid the usual AI-builder defaults: a centred headline over a soft gradient, a pill-shaped primary button next to a ghost \"Watch demo\" button, three identical feature cards with icons, a row of placeholder logos, and glassy cards with soft shadows.",
+    "",
+    "Make one bold, specific choice that fits what the product actually is, and keep everything else quiet. Keep it responsive and accessible: good contrast, visible keyboard focus, and real text rather than text in images.",
+  ].join("\n");
+}
+
+function cap(value: string): string {
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
 
 function grouped(n: number, lang: Lang): string {
   const separator = lang === "es" ? "." : ",";

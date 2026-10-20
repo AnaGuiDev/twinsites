@@ -1,5 +1,6 @@
 import { KIN_BANDS, judgeKin, type KinVerdict } from "./calibrate";
 import type { ZoneRecord } from "./zones";
+import type { Check } from "./history";
 import type { Cluster, ColorName, Density, Mode, Site, Traits } from "../types";
 
 export interface ZoneRef {
@@ -62,6 +63,10 @@ export interface ResultData {
   portrait: boolean;
   cropped: boolean;
   catalogCount: number;
+  /** Sites clearing each kin band (uploads only), for before/after comparison. */
+  bands?: Record<number, number>;
+  /** The check before this one in this browser, if any (uploads only). */
+  previous?: Check | null;
 }
 
 const base = () => import.meta.env.BASE_URL;

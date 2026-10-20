@@ -16,6 +16,7 @@ import { cropHero } from "./lib/crop";
 import { loadExample, siteResult, type ResultData } from "./lib/explore";
 import { countBands, nearest, placeUser } from "./lib/match";
 import { zoneSlug } from "./lib/zones";
+import { loadCheck, saveCheck, smallPreview } from "./lib/history";
 
 type NetInfo = { saveData?: boolean; effectiveType?: string };
 type Stage = "read" | "model" | "data" | "match";
@@ -163,15 +164,31 @@ export function App() {
         const [vector, dataset] = await Promise.all([modelMod.embedBlob(frame.blob), dataMod.loadDataset()]);
         advance("match");
         const twins = nearest(vector, dataset, 12);
-        const verdict = judgeKin(countBands(vector, dataset));
+        const bandCounts = countBands(vector, dataset);
+        const verdict = judgeKin(bandCounts);
+        const bands = Object.fromEntries(bandCounts) as Record<number, number>;
         const spot = placeUser(vector, dataset);
         const cluster = dataset.catalog.clusters.find((item) => item.id === spot.cluster);
         parts.current.match = 1;
         parts.current.engine = 1;
         parts.current.data = 1;
         publish();
+        const nearestPercentile = twins[0] ? percentileOf(twins[0].similarity, dataset.calibration.knots) : 0;
+        const previous = loadCheck();
+        const small = await smallPreview(frame.blob).catch(() => "");
+        saveCheck({
+          at: Date.now(),
+          verdict,
+          bands,
+          nearest: nearestPercentile,
+          zoneEn: cluster?.labelEn ?? "",
+          zoneEs: cluster?.labelEs ?? "",
+          preview: small,
+        });
         setUpload({
           source: "upload",
+          bands,
+          previous,
           preview,
           subjectTitle: "",
           traits,
@@ -296,6 +313,36 @@ export function App() {
                 </>
               }
             />
+            <section className="example" aria-labelledby="example-title">
+              <div className="example-text">
+                <h2 id="example-title">{t.exampleTitle}</h2>
+                <p className="dek">{t.exampleDek}</p>
+                <ol className="steps">
+                  {t.exampleSteps.map((step) => (
+                    <li key={step}>{step}</li>
+                  ))}
+                </ol>
+                <p className="score-note">
+                  {t.exampleNote}{" "}
+                  <a className="text-link" href="/example/acme-before.html" target="_blank" rel="noreferrer">
+                    {t.exampleBefore}
+                  </a>
+                  {", "}
+                  <a className="text-link" href="/example/acme-after.html" target="_blank" rel="noreferrer">
+                    {t.exampleAfter}
+                  </a>
+                  .
+                </p>
+              </div>
+              <img
+                className="example-card"
+                src={`/example/progress-${lang}.webp`}
+                alt={t.exampleAlt}
+                width={1200}
+                height={630}
+                loading="lazy"
+              />
+            </section>
             <div className="hero-more">
               <div>
                 <h2>{t.findTitle}</h2>
