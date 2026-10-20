@@ -170,20 +170,19 @@ function zoneStubs(): Plugin {
       );
       const report = JSON.parse(readFileSync(path.resolve("public/data/report.json"), "utf8")) as {
         total: number;
-        topFourShare: number;
-        twins: { top1Any: number };
+        twins: { top1Any: number; top5Crowd: number };
       };
       const total = report.total.toLocaleString("en-GB");
       writeStub(
         html,
         path.resolve("dist/report"),
         `What ${total} AI-built homepages have in common — Twinsites`,
-        `Four layouts cover ${report.topFourShare}% of ${total} AI-built homepages, and ${report.twins.top1Any}% have a look-alike in the top 1% of all pairs. Layouts, colours, crowded categories and stock phrases, measured.`,
+        `${report.twins.top1Any}% of ${total} AI-built homepages have a look-alike in the top 1% of all pairs, and ${report.twins.top5Crowd}% have eight or more in the top 5%. Colours, crowded categories and stock phrases, measured, with what the rules can and can't tell.`,
         "https://twinsites.com/report",
         `What ${total} AI-built homepages have in common`,
         // A 1200×630 image for link previews, when public/og-report.png exists.
         existsSync(path.resolve("public/og-report.png"))
-          ? { url: "https://twinsites.com/og-report.png", alt: `Four layouts cover ${report.topFourShare}% of ${total} AI-built homepages.` }
+          ? { url: "https://twinsites.com/og-report.png", alt: `${report.twins.top1Any}% of ${total} AI-built homepages have a look-alike in the top 1%.` }
           : undefined,
       );
     },

@@ -6,9 +6,10 @@ import { track } from "../lib/analytics";
 interface Report {
   generated: string;
   total: number;
-  recipes: { mode: "light" | "dark"; density: "airy" | "packed" | "balanced"; centered: boolean; gradient: boolean; count: number; share: number }[];
-  topFourShare: number;
-  traits: { light: number; dark: number; airy: number; packed: number; centered: number; gradient: number; bento: number };
+  ground: { light: number; dark: number };
+  /** From the hand-checked sample, not the detector. */
+  centred: { share: number; lo: number; hi: number; n: number };
+  reliability: { sample: number; ground: number; centred: number; centredPrecision: number; density: number; gradientPrecision: number };
   colors: { name: string; share: number }[];
   twins: { top1Any: number; top5Any: number; top5Crowd: number };
   zones: { count: number; topFourShare: number; largest: { slug: string; labelEn: string; labelEs: string; size: number }[] };
@@ -38,29 +39,24 @@ const COPY = {
     pageTitle: "What 2,003 AI-built homepages have in common",
     kicker: (date: string) => `Report · catalog captured ${date}`,
     title: (n: string) => `What ${n} AI-built homepages have in common`,
-    lede: (n: string, four: string) =>
-      `We took the first screen of every site in the awesome-vibe-coded-apps list, ${n} homepages, and measured how they look. Four layouts cover ${four} of them.`,
-    statFour: "of the pages use one of four layouts, out of 24 possible combinations",
+    lede: (n: string, top1: string) =>
+      `We took the first screen of every site in the awesome-vibe-coded-apps list, ${n} homepages, and measured how alike they look. ${top1} of them have a look-alike in the top 1% of all pairs.`,
     statTop1: "have a look-alike in the top 1% of all pairs in the catalog",
-    statCentred: "centre the headline and the button",
-    statColors: "are mostly grey, blue or orange",
-    recipesTitle: "Four layouts, most of the pages",
-    recipesDek:
-      "Each page gets four labels read from its pixels: light or dark ground, how much empty space, whether the headline and button sit centred, and whether a gradient washes the background. Most pages land in the same few boxes.",
-    recipe: (r: Report["recipes"][number]) =>
-      [
-        r.mode === "light" ? "Light" : "Dark",
-        r.density === "airy" ? "lots of empty space" : r.density === "packed" ? "packed" : "balanced",
-        r.centered ? "centred headline" : "headline to one side",
-        ...(r.gradient ? ["gradient wash"] : []),
-      ].join(", "),
-    pages: (n: string) => `${n} pages`,
+    statCrowd: "have eight or more look-alikes in the top 5%",
+    statLight: "sit on a light background",
+    statCentred: "centre the headline and the button (hand-checked sample)",
     twinsTitle: "Look-alikes are the rule",
     twinsDek:
-      "Every pair of pages gets a similarity score from a vision model. A page in the top 1% of pairs is closer to yours than 99 in 100 random pairs in the catalog.",
+      "Every pair of pages gets a similarity score from an image model. A page in the top 1% of pairs is closer to yours than 99 in 100 random pairs in the catalog.",
     twinTop1: "have at least one look-alike in the top 1%",
     twinTop5: "have at least one in the top 5%",
     twinCrowd: "have eight or more in the top 5%",
+    layoutTitle: "Light, and centred about half the time",
+    layoutDek: (n: number, lo: number, hi: number) =>
+      `The background is counted on every page. Centring comes from ${n} pages checked one by one (likely between ${lo}% and ${hi}% of the catalog), because the detector misses some centred pages.`,
+    light: "Light background",
+    dark: "Dark background",
+    centred: "Centred headline and button",
     colorsTitle: "Three colours, two thirds of the pages",
     colorsDek: "The colour that covers most of the first screen, background included.",
     categoriesTitle: "Where it's most crowded",
@@ -72,18 +68,20 @@ const COPY = {
     zonesTitle: (n: number) => `${n} zones`,
     zonesDek: (four: string) => `Grouping pages by look gives zones with names like places. The four largest hold ${four} of the catalog.`,
     zonesAll: "See every zone",
+    pages: (n: string) => `${n} pages`,
     methodTitle: "How this was measured, and what it can't say",
-    method: [
+    method: (r: Report["reliability"]) => [
       "Source: the public awesome-vibe-coded-apps list (CC0). Sites built with AI tools, not a random sample of the web.",
       "One screenshot per site: the first 1440×900 screen, captured by headless Chrome. Anything below the fold is not measured.",
       "Similarity comes from MobileCLIP-S0, an image model. Percentiles compare against every pair in the catalog: they measure likeness, not copying.",
-      "Layout labels (ground, space, centring, gradient) are rules read off a small version of each screenshot. They are right most of the time, not always.",
+      `The layout rules were checked against ${r.sample} random pages labelled one by one by eye, without seeing the detector's answer. Background: ${r.ground}% agreement. Centring: ${r.centred}% (right ${r.centredPrecision}% of the time when it says centred). The labelling was done by Claude, the AI that built this check, not by a panel of designers.`,
+      `What we stopped claiming: spacing (${r.density}% agreement), gradient washes (a detected gradient was real ${Math.round(r.gradientPrecision / 10)} times in 10) and box grids. They are not in this report or in the diagnosis.`,
       "Text was read with Tesseract on small thumbnails. It misses small type and garbles some words.",
     ],
     ctaTitle: "Is yours one of them?",
     ctaDek: "Drop a screenshot of your page. Twinsites names its look-alikes, says why, and gives you a prompt to change it. Your image stays in your browser.",
     ctaButton: "Check your page",
-    shareText: (four: string, n: string) => `Four layouts cover ${four} of ${n} AI-built homepages. Is yours one of them?`,
+    shareText: (top1: string, n: string) => `${top1} of ${n} AI-built homepages have a look-alike in the top 1%. Is yours one of them?`,
     share: "Post",
     copyLink: "Copy link",
     copied: "Link copied",
@@ -94,29 +92,24 @@ const COPY = {
     pageTitle: "Lo que tienen en común 2.003 webs hechas con IA",
     kicker: (date: string) => `Informe · catálogo capturado en ${date}`,
     title: (n: string) => `Lo que tienen en común ${n} webs hechas con IA`,
-    lede: (n: string, four: string) =>
-      `Tomamos la primera pantalla de cada web de la lista awesome-vibe-coded-apps, ${n} portadas, y medimos cómo se ven. Cuatro maquetaciones cubren el ${four}.`,
-    statFour: "usa una de cuatro maquetaciones, de 24 combinaciones posibles",
+    lede: (n: string, top1: string) =>
+      `Tomamos la primera pantalla de cada web de la lista awesome-vibe-coded-apps, ${n} portadas, y medimos cuánto se parecen. El ${top1} tiene una gemela en el 1 % de pares más parecidos.`,
     statTop1: "tiene una gemela en el 1 % de pares más parecidos del catálogo",
-    statCentred: "centra el titular y el botón",
-    statColors: "es sobre todo gris, azul o naranja",
-    recipesTitle: "Cuatro maquetaciones, la mayoría de las webs",
-    recipesDek:
-      "Cada web recibe cuatro etiquetas leídas de sus píxeles: fondo claro u oscuro, cuánto espacio vacío, si el titular y el botón van centrados y si un degradado tiñe el fondo. La mayoría cae en las mismas pocas casillas.",
-    recipe: (r: Report["recipes"][number]) =>
-      [
-        r.mode === "light" ? "Clara" : "Oscura",
-        r.density === "airy" ? "mucho espacio vacío" : r.density === "packed" ? "densa" : "equilibrada",
-        r.centered ? "titular centrado" : "titular a un lado",
-        ...(r.gradient ? ["con degradado"] : []),
-      ].join(", "),
-    pages: (n: string) => `${n} webs`,
+    statCrowd: "tiene ocho o más gemelas en el 5 % más parecido",
+    statLight: "usa fondo claro",
+    statCentred: "centra el titular y el botón (muestra revisada una a una)",
     twinsTitle: "Parecerse es lo normal",
     twinsDek:
-      "Cada par de webs recibe una puntuación de parecido de un modelo de visión. Una web en el 1 % de pares más parecidos está más cerca de la tuya que 99 de cada 100 pares al azar del catálogo.",
+      "Cada par de webs recibe una puntuación de parecido de un modelo de imagen. Una web en el 1 % de pares más parecidos está más cerca de la tuya que 99 de cada 100 pares al azar del catálogo.",
     twinTop1: "tiene al menos una gemela en el 1 % más parecido",
     twinTop5: "tiene al menos una en el 5 % más parecido",
     twinCrowd: "tiene ocho o más en el 5 % más parecido",
+    layoutTitle: "Claras, y centradas más o menos la mitad",
+    layoutDek: (n: number, lo: number, hi: number) =>
+      `El fondo se cuenta en todas las webs. El centrado sale de ${n} webs revisadas una a una (en el catálogo, probablemente entre el ${lo} % y el ${hi} %), porque el detector se deja algunas webs centradas.`,
+    light: "Fondo claro",
+    dark: "Fondo oscuro",
+    centred: "Titular y botón centrados",
     colorsTitle: "Tres colores, dos tercios de las webs",
     colorsDek: "El color que más ocupa la primera pantalla, fondo incluido.",
     categoriesTitle: "Dónde hay más aglomeración",
@@ -128,18 +121,20 @@ const COPY = {
     zonesTitle: (n: number) => `${n} zonas`,
     zonesDek: (four: string) => `Agrupar las webs por aspecto da zonas con nombre de lugar. Las cuatro mayores reúnen el ${four} del catálogo.`,
     zonesAll: "Ver todas las zonas",
+    pages: (n: string) => `${n} webs`,
     methodTitle: "Cómo se ha medido y qué no puede decir",
-    method: [
+    method: (r: Report["reliability"]) => [
       "Fuente: la lista pública awesome-vibe-coded-apps (CC0). Webs hechas con herramientas de IA, no una muestra al azar de internet.",
       "Una captura por web: la primera pantalla de 1440×900, tomada con Chrome sin interfaz. Lo que queda por debajo no se mide.",
       "El parecido sale de MobileCLIP-S0, un modelo de imagen. Los percentiles comparan con todos los pares del catálogo: miden parecido, no copia.",
-      "Las etiquetas de maquetación (fondo, espacio, centrado, degradado) son reglas leídas sobre una versión pequeña de cada captura. Aciertan casi siempre, no siempre.",
+      `Las reglas de maquetación se comprobaron con ${r.sample} webs al azar etiquetadas una a una a ojo, sin ver la respuesta del detector. Fondo: ${r.ground} % de coincidencia. Centrado: ${r.centred} % (acierta el ${r.centredPrecision} % de las veces que dice «centrado»). Etiquetó Claude, la IA que construyó esta comprobación, no un panel de diseñadores.`,
+      `Lo que dejamos de afirmar: el espaciado (${r.density} % de coincidencia), los degradados (un degradado detectado era real ${Math.round(r.gradientPrecision / 10)} de cada 10 veces) y las retículas de cajas. No aparecen ni en este informe ni en el diagnóstico.`,
       "El texto se leyó con Tesseract sobre miniaturas pequeñas. Se le escapa la letra pequeña y lee mal algunas palabras.",
     ],
     ctaTitle: "¿La tuya es una de ellas?",
     ctaDek: "Sube una captura de tu web. Twinsites te dice a cuáles se parece, por qué y te da un prompt para cambiarla. La imagen no sale de tu navegador.",
     ctaButton: "Comprueba tu web",
-    shareText: (four: string, n: string) => `Cuatro maquetaciones cubren el ${four} de ${n} webs hechas con IA. ¿La tuya es una de ellas?`,
+    shareText: (top1: string, n: string) => `El ${top1} de ${n} webs hechas con IA tiene una gemela en el 1 % más parecido. ¿La tuya es una de ellas?`,
     share: "Publicar",
     copyLink: "Copiar enlace",
     copied: "Enlace copiado",
@@ -186,13 +181,17 @@ export function ReportView() {
   const num = (value: number) => new Intl.NumberFormat(locale).format(value);
   const total = num(report.total);
   const date = new Intl.DateTimeFormat(locale, { month: "long", year: "numeric" }).format(new Date(report.generated));
-  const threeColors = report.colors.slice(0, 3).reduce((sum, color) => sum + color.share, 0);
   const pageUrl = "https://twinsites.com/report";
-  const shareText = c.shareText(pct(report.topFourShare), total);
-  const maxRecipe = report.recipes[0]?.share ?? 1;
+  const shareText = c.shareText(pct(report.twins.top1Any), total);
   const maxColor = report.colors[0]?.share ?? 1;
   const maxCategory = report.categories[0]?.crowded ?? 1;
   const maxPhrase = report.phrases.top[0]?.count ?? 1;
+  const layoutBars = [
+    { label: c.light, share: report.ground.light, lit: report.ground.light >= report.ground.dark },
+    { label: c.dark, share: report.ground.dark, lit: report.ground.dark > report.ground.light },
+    // A sample of under 200: a whole percent, not a false decimal.
+    { label: c.centred, share: Math.round(report.centred.share), lit: true },
+  ];
 
   const post = () => {
     track("report-share");
@@ -219,7 +218,7 @@ export function ReportView() {
             .split(/(AI-built)/)
             .map((part, index) => (part === "AI-built" ? <span key={index} className="nowrap">{part}</span> : part))}
         </h1>
-        <p className="lede">{c.lede(total, pct(report.topFourShare))}</p>
+        <p className="lede">{c.lede(total, pct(report.twins.top1Any))}</p>
         <div className="share-actions">
           <button type="button" className="ticket" onClick={post}>
             {c.share}
@@ -232,42 +231,22 @@ export function ReportView() {
 
       <ul className="report-stats">
         <li className="is-key">
-          <strong>{pct(report.topFourShare)}</strong>
-          <span>{c.statFour}</span>
-        </li>
-        <li>
           <strong>{pct(report.twins.top1Any)}</strong>
           <span>{c.statTop1}</span>
         </li>
         <li>
-          <strong>{pct(report.traits.centered)}</strong>
-          <span>{c.statCentred}</span>
+          <strong>{pct(report.twins.top5Crowd)}</strong>
+          <span>{c.statCrowd}</span>
         </li>
         <li>
-          <strong>{pct(Math.round(threeColors * 10) / 10)}</strong>
-          <span>{c.statColors}</span>
+          <strong>{pct(report.ground.light)}</strong>
+          <span>{c.statLight}</span>
+        </li>
+        <li>
+          <strong>{pct(Math.round(report.centred.share))}</strong>
+          <span>{c.statCentred}</span>
         </li>
       </ul>
-
-      <section className="report-section">
-        <div className="section-head">
-          <h2>{c.recipesTitle}</h2>
-          <p>{c.recipesDek}</p>
-        </div>
-        <ol className="bars">
-          {report.recipes.map((recipe, index) => (
-            <li key={index} className={index < 4 ? "is-lit" : undefined}>
-              <span className="bar-label">{c.recipe(recipe)}</span>
-              <span className="bar-track" aria-hidden="true">
-                <i style={{ width: `${(recipe.share / maxRecipe) * 100}%` }} />
-              </span>
-              <span className="bar-value">
-                {pct(recipe.share)} <small>{c.pages(num(recipe.count))}</small>
-              </span>
-            </li>
-          ))}
-        </ol>
-      </section>
 
       <section className="report-section">
         <div className="section-head">
@@ -288,6 +267,24 @@ export function ReportView() {
             <span>{c.twinCrowd}</span>
           </li>
         </ul>
+      </section>
+
+      <section className="report-section">
+        <div className="section-head">
+          <h2>{c.layoutTitle}</h2>
+          <p>{c.layoutDek(report.centred.n, report.centred.lo, report.centred.hi)}</p>
+        </div>
+        <ol className="bars">
+          {layoutBars.map((bar) => (
+            <li key={bar.label} className={bar.lit ? "is-lit" : undefined}>
+              <span className="bar-label">{bar.label}</span>
+              <span className="bar-track" aria-hidden="true">
+                <i style={{ width: `${bar.share}%` }} />
+              </span>
+              <span className="bar-value">{pct(bar.share)}</span>
+            </li>
+          ))}
+        </ol>
       </section>
 
       <section className="report-section">
@@ -382,7 +379,7 @@ export function ReportView() {
       <section className="report-section report-method">
         <h2>{c.methodTitle}</h2>
         <ul>
-          {c.method.map((line) => (
+          {c.method(report.reliability).map((line) => (
             <li key={line}>{line}</li>
           ))}
         </ul>

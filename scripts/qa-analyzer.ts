@@ -330,7 +330,7 @@ try {
     // nginx serves this file for /report (try_files … $uri/index.html); vite preview does not.
     const html = await (await fetch(`${BASE}/report/index.html`)).text();
     assert(/<title>What [\d,]+ AI-built homepages have in common/.test(html), "static title missing");
-    assert(/Four layouts cover [\d.]+%/.test(html), "static description missing");
+    assert(/[\d.]+% of [\d,]+ AI-built homepages have a look-alike/.test(html), "static description missing");
     assertNoInline(html, "/report/index.html");
   });
 
