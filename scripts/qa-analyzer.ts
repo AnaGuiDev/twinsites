@@ -103,6 +103,29 @@ async function upload(page: Page, file: string): Promise<void> {
   await page.locator(".diagnosis").waitFor({ timeout: 120_000 });
 }
 
+/**
+ * The badge is for a page with nobody in the top 5% (bands[95] === 0), which
+ * is the typical SaaS landing in this catalog, not the darker redesign.
+ * The badge reuses `.prompt-text`, so prompt checks stay inside `.prompt-box`.
+ */
+async function assertBadgeContract(page: Page): Promise<string> {
+  const top5 = await page.evaluate(() => {
+    const raw = localStorage.getItem("twinsites.lastCheck");
+    const check = raw ? (JSON.parse(raw) as { bands?: Record<string, number> }) : null;
+    const count = check?.bands?.["95"];
+    return typeof count === "number" ? count : null;
+  });
+  assert(top5 !== null, "no top-5% count stored");
+  const badges = await page.locator(".badge-box").count();
+  const expectBadge = top5 === 0;
+  assert(badges === (expectBadge ? 1 : 0), `badge ${badges}, top 5% count ${top5}`);
+  if (!expectBadge) return `top 5% count ${top5}, no badge`;
+  const code = await page.locator(".badge-code").innerText();
+  assert(code.startsWith('<a href="https://twinsites.com/?ref=badge"') && code.includes("<svg"), "badge code shape");
+  assert(!/<script|src=|url\(/i.test(code), "badge loads something");
+  return "top 5% count 0, self-contained badge";
+}
+
 async function noOverflow(page: Page): Promise<boolean> {
   return page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
 }
@@ -175,14 +198,14 @@ try {
 
   await check("upload: diagnosis and prompt", async () => {
     await upload(page, before);
-    assert((await page.locator(".badge-box").count()) === 0, "badge offered to a page with twins");
+    const badge = await assertBadgeContract(page);
     const verdict = await page.locator(".again-line").innerText();
     const recipe = await page.locator(".recipe li").count();
     const moves = await page.locator(".moves li").count();
-    const prompt = await page.locator(".prompt-text").innerText();
+    const prompt = await page.locator(".prompt-box .prompt-text").innerText();
     assert(recipe >= 1 && moves >= 1, `recipe ${recipe}, moves ${moves}`);
     assert(prompt.startsWith("Redesign the first screen"), "prompt missing");
-    return `${verdict} recipe ${recipe}, moves ${moves}`;
+    return `${verdict} recipe ${recipe}, moves ${moves}; ${badge}`;
   });
 
   await check("result: one-line summary and marks on the screenshot", async () => {
@@ -195,17 +218,17 @@ try {
   await check("result: words read and stock phrases flagged", async () => {
     await page.waitForFunction(() => document.querySelectorAll(".cliches li").length > 0, null, { timeout: 90_000 });
     const found = await page.locator(".cliches li strong").allInnerTexts();
-    const prompt = await page.locator(".prompt-text").innerText();
+    const prompt = await page.locator(".prompt-box .prompt-text").innerText();
     assert(prompt.includes("stock phrases"), "prompt lacks the copy step");
     return found.join(", ");
   });
 
   await check("result: correcting a trait updates the prompt", async () => {
-    const before = await page.locator(".prompt-text").innerText();
+    const beforePrompt = await page.locator(".prompt-box .prompt-text").innerText();
     await page.locator(".recipe-chip").last().click();
     await page.locator(".correct-box .ticket").first().click();
-    const after = await page.locator(".prompt-text").innerText();
-    assert(before !== after, "prompt unchanged");
+    const afterPrompt = await page.locator(".prompt-box .prompt-text").innerText();
+    assert(beforePrompt !== afterPrompt, "prompt unchanged");
     assert((await page.locator(".fixes li").count()) === 1, "no correction listed");
   });
 
@@ -260,13 +283,11 @@ try {
     return numbers.replace(/\s+/g, " ");
   });
 
-  await check("result: a page with no look-alike gets a self-contained badge", async () => {
-    await page.locator(".badge-box").waitFor({ timeout: 10_000 });
-    const code = await page.locator(".badge-code").innerText();
-    assert(code.startsWith('<a href="https://twinsites.com/?ref=badge"') && code.includes("<svg"), "badge code shape");
-    assert(!/<script|src=|url\(/i.test(code), "badge loads something");
+  await check("result: badge follows the top 5% count", async () => {
+    const badge = await assertBadgeContract(page);
     // Let the text reader finish before the next test navigates away.
     await page.waitForFunction(() => !document.querySelector(".copy-check")?.textContent?.match(/Reading|Leyendo/), null, { timeout: 90_000 });
+    return badge;
   });
 
   await check("forget last check", async () => {
