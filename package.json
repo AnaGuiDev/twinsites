@@ -7,7 +7,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsx scripts/precompute-explore.ts && tsc --noEmit && vite build",
+    "build": "tsx scripts/precompute-explore.ts && tsx scripts/report-data.ts && tsc --noEmit && vite build",
     "preview": "vite preview --host 127.0.0.1 --port 4173",
     "test:worker": "tsx --test worker/test/*.test.ts",
     "dataset": "tsx scripts/build-dataset.ts",
@@ -20,7 +20,8 @@
     "dataset:distinct": "tsx scripts/distinct.ts",
     "dataset:copy": "tsx scripts/catalog-copy.ts",
     "typecheck": "tsc --noEmit",
-    "qa": "npm run build && tsx scripts/qa-analyzer.ts"
+    "qa": "VITE_SHOT_ENDPOINT=https://twinsites-shot.twinsites.workers.dev VITE_TURNSTILE_SITEKEY=1x00000000000000000000AA npm run build && tsx scripts/qa-analyzer.ts",
+    "dataset:report": "tsx scripts/report-data.ts"
   },
   "engines": {
     "node": ">=20"

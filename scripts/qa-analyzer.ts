@@ -8,11 +8,13 @@
  *   CHROME_PATH=/path/to/chrome npm run qa
  */
 import { spawn } from "node:child_process";
-import { mkdtemp, rm } from "node:fs/promises";
+import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { chromium, type Browser, type Page } from "playwright";
+import { chromium, type Browser, type BrowserContext, type Page } from "playwright";
 
+/** Must match the VITE_SHOT_ENDPOINT the qa build uses (package.json). */
+const SHOT = "https://twinsites-shot.twinsites.workers.dev";
 const PORT = Number(process.env.QA_PORT ?? 4319);
 const BASE = `http://127.0.0.1:${PORT}`;
 const root = process.cwd();
@@ -50,6 +52,40 @@ function watch(page: Page, label: string): void {
   page.on("pageerror", (error) => errors.push(`${label}: ${error.message}`));
   page.on("console", (message) => {
     if (message.type() === "error") errors.push(`${label}: ${message.text()}`);
+  });
+}
+
+/**
+ * Stands in for Cloudflare: a Turnstile that passes at once, and a worker that
+ * answers the capture with a screenshot and accepts /subscribe and /feedback.
+ * The requests still go through the page's real CSP and COEP, which is the point.
+ */
+async function fakeCloudflare(context: BrowserContext, screenshot: string, sent: string[]): Promise<void> {
+  const png = await readFile(screenshot);
+  await context.route("https://challenges.cloudflare.com/**", (route) =>
+    route.fulfill({
+      contentType: "application/javascript",
+      headers: { "Cross-Origin-Resource-Policy": "cross-origin" },
+      body: `window.turnstile = {
+        render(el, options) { setTimeout(() => options.callback && options.callback("qa-token"), 20); return "qa"; },
+        reset() {}, remove() {},
+      };`,
+    }),
+  );
+  await context.route(`${SHOT}/**`, async (route) => {
+    const request = route.request();
+    const cors = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "content-type", "Access-Control-Allow-Methods": "POST, OPTIONS" };
+    if (request.method() === "OPTIONS") return route.fulfill({ status: 204, headers: cors });
+    const pathname = new URL(request.url()).pathname;
+    sent.push(`${pathname} ${request.postData() ?? ""}`);
+    if (pathname === "/") return route.fulfill({ status: 200, contentType: "image/png", headers: cors, body: png });
+    return route.fulfill({ status: 200, contentType: "application/json", headers: cors, body: '{"ok":true}' });
+  });
+  // A blocked resource also shows up here, so the "no console errors" check catches CSP violations.
+  await context.addInitScript(() => {
+    document.addEventListener("securitypolicyviolation", (event) => {
+      console.error(`CSP blocked ${event.blockedURI || "inline"} (${event.effectiveDirective})`);
+    });
   });
 }
 
@@ -97,11 +133,21 @@ try {
   await snap(browser, "public/example/acme-after.html", after);
 
   const desktop = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  const sent: string[] = [];
+  await fakeCloudflare(desktop, before, sent);
   const page = await desktop.newPage();
   watch(page, "desktop");
 
+  await check("headers: production CSP and isolation are served", async () => {
+    const response = await page.goto(`${BASE}/`, { waitUntil: "networkidle" });
+    const headers = response?.headers() ?? {};
+    for (const name of ["content-security-policy", "cross-origin-embedder-policy", "x-frame-options", "referrer-policy", "permissions-policy"]) {
+      assert(headers[name], `missing ${name}`);
+    }
+    assert(await page.evaluate(() => crossOriginIsolated), "not cross-origin isolated");
+  });
+
   await check("home: the wall lights up real twins", async () => {
-    await page.goto(`${BASE}/`, { waitUntil: "networkidle" });
     await page.locator(".tile.is-twin").first().waitFor({ timeout: 8_000 });
     const lit = await page.locator(".tile.is-twin").count();
     const caption = await page.locator(".demo-title").innerText();
@@ -129,6 +175,7 @@ try {
 
   await check("upload: diagnosis and prompt", async () => {
     await upload(page, before);
+    assert((await page.locator(".badge-box").count()) === 0, "badge offered to a page with twins");
     const verdict = await page.locator(".again-line").innerText();
     const recipe = await page.locator(".recipe li").count();
     const moves = await page.locator(".moves li").count();
@@ -160,7 +207,30 @@ try {
     const after = await page.locator(".prompt-text").innerText();
     assert(before !== after, "prompt unchanged");
     assert((await page.locator(".fixes li").count()) === 1, "no correction listed");
+  });
+
+  await check("result: a correction is sent only when ticked, and holds no image or URL", async () => {
+    assert(!sent.some((line) => line.startsWith("/feedback")), "sent before the box was ticked");
+    await page.locator(".report-box input[type=checkbox]").check();
+    const send = page.locator(".report-box .ticket");
+    await send.waitFor();
+    await page.waitForFunction(() => !document.querySelector<HTMLButtonElement>(".report-box .ticket")?.disabled);
+    await send.click();
+    await page.getByText("Thank you. Corrections like yours").waitFor({ timeout: 10_000 });
+    const body = sent.find((line) => line.startsWith("/feedback")) ?? "";
+    assert(!/data:image|https?:\/\/|blob:/.test(body), "payload carries an image or a URL");
     await page.locator(".fixes li .as-button").click();
+    return body.replace(/^\/feedback /, "").slice(0, 100);
+  });
+
+  await check("result: subscribe through the worker", async () => {
+    const form = page.locator(".list-note");
+    await form.scrollIntoViewIfNeeded();
+    await form.locator("input[type=email]").fill("qa@example.com");
+    await form.locator("input[type=checkbox]").check();
+    await page.waitForFunction(() => !document.querySelector<HTMLButtonElement>(".list-note button.ticket")?.disabled);
+    await form.locator("button.ticket").click();
+    await page.locator(".list-success").waitFor({ timeout: 10_000 });
   });
 
   await check("result: pages that look like nobody", async () => {
@@ -190,14 +260,32 @@ try {
     return numbers.replace(/\s+/g, " ");
   });
 
+  await check("result: a page with no look-alike gets a self-contained badge", async () => {
+    await page.locator(".badge-box").waitFor({ timeout: 10_000 });
+    const code = await page.locator(".badge-code").innerText();
+    assert(code.startsWith('<a href="https://twinsites.com/?ref=badge"') && code.includes("<svg"), "badge code shape");
+    assert(!/<script|src=|url\(/i.test(code), "badge loads something");
+    // Let the text reader finish before the next test navigates away.
+    await page.waitForFunction(() => !document.querySelector(".copy-check")?.textContent?.match(/Reading|Leyendo/), null, { timeout: 90_000 });
+  });
+
   await check("forget last check", async () => {
     await page.locator(".forget").click();
     const stored = await page.evaluate(() => localStorage.getItem("twinsites.lastCheck"));
     assert(stored === null, "still stored");
   });
 
+  await check("home: a pasted URL is captured through the worker", async () => {
+    await page.goto(`${BASE}/`, { waitUntil: "networkidle" });
+    await page.locator("#page-url").fill("https://example.com");
+    await page.waitForFunction(() => !document.querySelector<HTMLButtonElement>(".url-shot button.ticket")?.disabled);
+    await page.locator(".url-shot button.ticket").click();
+    await page.locator(".diagnosis").waitFor({ timeout: 120_000 });
+  });
+
   for (const [route, selector] of [
     ["/faq", ".faq-page h1"],
+    ["/report", ".report-stats li strong"],
     ["/zones", ".zone-card"],
     ["/zone/warm-paper-atoll", ".sheet a"],
     ["/site/fancanon", ".diagnosis"],
@@ -209,7 +297,15 @@ try {
     });
   }
 
+  await check("report: crawlers get its own title and numbers", async () => {
+    // nginx serves this file for /report (try_files … $uri/index.html); vite preview does not.
+    const html = await (await fetch(`${BASE}/report/index.html`)).text();
+    assert(/<title>What [\d,]+ AI-built homepages have in common/.test(html), "static title missing");
+    assert(/Four layouts cover [\d.]+%/.test(html), "static description missing");
+  });
+
   const phone = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+  await fakeCloudflare(phone, before, []);
   const mobile = await phone.newPage();
   watch(mobile, "phone");
   await check("phone: home fits", async () => {
@@ -220,6 +316,14 @@ try {
     await upload(mobile, before);
     assert(await noOverflow(mobile), "horizontal overflow");
     assert((await mobile.locator(".copy-start .ticket").count()) === 1, "reader started on its own");
+  });
+  await check("phone: secondary sections start folded and open from the index", async () => {
+    const folds = await mobile.locator("details.fold").count();
+    assert(folds === 3, `${folds} folds`);
+    assert((await mobile.locator(".map-frame, .rivals, .inspiration").count()) === 0, "folded content mounted early");
+    await mobile.locator(".result-nav .chip", { hasText: "Competitors" }).click();
+    await mobile.locator("#rivals .rivals").waitFor({ timeout: 5_000 });
+    assert(await noOverflow(mobile), "horizontal overflow");
   });
 
   await check("no console or page errors", async () => {

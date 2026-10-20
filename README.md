@@ -76,6 +76,12 @@ Layout traits read against each page's own background, so dark pages are judged 
 - **Pages that look like nobody:** per category, the catalog pages with the fewest twins (`npm run dataset:distinct`). Different, not certified better.
 - **Next to your competitors:** up to three competitor screenshots measured against the page on the twins' percentile scale, in the browser.
 - **Small screenshots:** under 1000px wide, the result warns that likeness reads less reliably.
+- **A badge for pages that stand apart:** with no catalog page in the top 5%, the result offers a badge to put on the site. It is self-contained HTML with an inline SVG that links to twinsites.com: it loads nothing from this server and tracks nobody.
+- **On a phone:** a section index sits under the verdict, and ideas, competitors and the map start folded; their content only loads when opened.
+
+### Report
+
+`/report` is the catalog in numbers: how many pages share four layouts, how many have a look-alike in the top 1%, colours, the most crowded categories, stock phrases (a lower bound, from thumbnails) and the largest zones, with the method and its limits. `scripts/report-data.ts` writes `public/data/report.json` from the files already in `public/data` and runs as part of `npm run build`. The build also writes `dist/report/index.html` with its own title and description for crawlers and link previews.
 
 ### What counts as a twin
 
@@ -132,6 +138,10 @@ npm run dataset:project
 `npm run dataset:calibrate` rewrites the zone names and the percentile curve from the files already in `public/data`, without recapturing.
 
 Keep thumbnails small. The projection step re-encodes them to 420px WebP. Prefer that over Git LFS.
+
+## Security headers
+
+`ops/nginx/twinsites-security.conf` is the one copy of the security headers and the Content-Security-Policy. `vite preview` and `npm run qa` serve it (the CSP always enforced, HSTS dropped on plain HTTP), and production includes the same file in the twinsites nginx server block. `npm run qa` builds with the worker endpoint and Cloudflare's test Turnstile key, stands in for Turnstile and the worker, and fails on any CSP violation or console error, so a change that needs a new origin fails before it reaches production. Change the policy in that file, then copy it to the server.
 
 ## Deploy
 

@@ -8,6 +8,7 @@ import { ResultView } from "./components/ResultView";
 import { SearchBox } from "./components/SearchBox";
 import { UrlShot } from "./components/UrlShot";
 import { ZonesView } from "./components/ZonesView";
+import { ReportView } from "./components/ReportView";
 import { REMOVAL_URL, useI18n } from "./i18n";
 import { RouteLink, useRoute } from "./router";
 import { track } from "./lib/analytics";
@@ -266,6 +267,9 @@ export function App() {
           Twinsites
         </a>
         <nav>
+          <RouteLink className="nav-link" href="/report">
+            {t.navReport}
+          </RouteLink>
           <RouteLink className="nav-link" href="/zones">
             {t.navZones}
           </RouteLink>
@@ -281,6 +285,7 @@ export function App() {
       <main>
         {route.name === "privacy" && <PrivacyView />}
         {route.name === "faq" && <Faq page />}
+        {route.name === "report" && <ReportView />}
         {route.name === "zones" && <ZonesView />}
         {route.name === "zone" && <ZonesView slug={route.slug} />}
         {route.name === "site" && catalog && (

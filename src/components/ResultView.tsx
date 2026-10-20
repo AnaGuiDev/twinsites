@@ -5,6 +5,8 @@ import { Rivals } from "./Rivals";
 import { CopyCheck, type WordsState } from "./CopyCheck";
 import { CorrectionReport, type Fix } from "./CorrectionReport";
 import { SubscribeForm } from "./SubscribeForm";
+import { Fold, jumpTo } from "./Fold";
+import { Badge } from "./Badge";
 import { MapView } from "./MapView";
 import { RouteLink } from "../router";
 import { useI18n } from "../i18n";
@@ -33,6 +35,7 @@ export function ResultView({
   stageLabel: string | null;
 }) {
   const { lang, t } = useI18n();
+  const phone = useMemo(() => window.matchMedia("(max-width: 720px)").matches, []);
   const [includeMine, setIncludeMine] = useState(false);
   const [cardUrl, setCardUrl] = useState<string | null>(null);
   const cardBlob = useRef<Blob | null>(null);
@@ -59,7 +62,17 @@ export function ResultView({
   const [words, setWords] = useState<WordsState>({ status: "idle", lines: [], found: [] });
   const [copyCounts, setCopyCounts] = useState<Record<string, number> | null>(null);
   const [copyTotal, setCopyTotal] = useState(2003);
+  // The preview on screen now: a reading started for an earlier result is dropped.
+  const shown = useRef(result.preview);
+  shown.current = result.preview;
+  useEffect(
+    () => () => {
+      shown.current = "";
+    },
+    [],
+  );
   const readWords = useCallback(async () => {
+    const preview = result.preview;
     setWords({ status: "reading", lines: [], found: [] });
     track("copy");
     void fetch(`${import.meta.env.BASE_URL}data/copy.json`)
@@ -72,10 +85,12 @@ export function ResultView({
       .catch(() => undefined);
     try {
       const { readLargeText } = await import("../lib/ocr");
-      const image = await (await fetch(result.preview)).blob();
+      const image = await (await fetch(preview)).blob();
       const read = await readLargeText(image);
+      if (shown.current !== preview) return;
       setWords({ status: "done", lines: read.lines, found: findCliches(read.text) });
     } catch (error) {
+      if (shown.current !== preview) return;
       console.error("ocr", error);
       setWords({ status: "failed", lines: [], found: [] });
     }
@@ -356,6 +371,24 @@ export function ResultView({
       )}
       {forgotten && <p className="score-note">{t.forgottenCheck}</p>}
 
+      <nav className="result-nav" aria-label={t.navLabel}>
+        {(
+          [
+            ["fix", t.navFix],
+            ...(result.source === "upload" ? ([["words", t.navWords]] as const) : []),
+            ["share", t.navShare],
+            ["twins", t.navTwins],
+            ["ideas", t.navIdeas],
+            ["rivals", t.navRivals],
+            ["map", t.navMap],
+          ] as const
+        ).map(([id, label]) => (
+          <button key={id} type="button" className="chip" onClick={() => jumpTo(id)}>
+            {label}
+          </button>
+        ))}
+      </nav>
+
       <section className="reveal" aria-label={t.revealLabel}>
         <figure>
           <div className="marked">
@@ -439,7 +472,7 @@ export function ResultView({
         )}
       </section>
 
-      <section className="diagnosis">
+      <section className="diagnosis" id="fix">
         <div className="section-head">
           <h2>{t.diagnosisTitle}</h2>
           <p>
@@ -546,11 +579,13 @@ export function ResultView({
         </div>
       </section>
 
-      {result.source === "upload" && <CopyCheck words={words} counts={copyCounts} total={copyTotal} onRead={() => void readWords()} />}
+      {result.source === "upload" && (
+        <div id="words">
+          <CopyCheck words={words} counts={copyCounts} total={copyTotal} onRead={() => void readWords()} />
+        </div>
+      )}
 
-      <Inspiration initial={topCategory} />
-
-      <section className="share">
+      <section className="share" id="share">
         <div className="share-card">
           {cardUrl ? <img className="card-preview" src={cardUrl} alt={shareText} /> : <div className="card-preview is-loading" />}
         </div>
@@ -584,7 +619,9 @@ export function ResultView({
         </div>
       </section>
 
-      <section>
+      {result.source === "upload" && !result.small && result.bands?.[95] === 0 && <Badge total={result.catalogCount} />}
+
+      <section id="twins">
         <div className="section-head">
           <h2>{t.twinsTitle}</h2>
           <p>{t.twinsDek}</p>
@@ -613,23 +650,30 @@ export function ResultView({
         </div>
       </section>
 
-      <Rivals result={result} />
+      <Fold id="ideas" phone={phone} title={t.inspoTitle} hint={t.foldShow}>
+        <Inspiration initial={topCategory} />
+      </Fold>
 
+      <Fold id="rivals" phone={phone} title={t.rivalsTitle} hint={t.foldShow}>
+        <Rivals result={result} />
+      </Fold>
 
-      <section>
-        <div className="section-head">
-          <h2>{t.mapTitle}</h2>
-          <p>{t.mapDek}</p>
-        </div>
-        {mapSites.length > 100 ? (
-          <MapView sites={mapSites} clusters={mapClusters} user={result.spot} lang={lang} />
-        ) : (
-          <p className="score-note">{t.loadingCatalog}</p>
-        )}
-        <p className="map-caption">
-          {t.mapHint} {t.zone}: {zoneName}.
-        </p>
-      </section>
+      <Fold id="map" phone={phone} title={t.mapTitle} hint={t.foldShow}>
+        <section>
+          <div className="section-head">
+            <h2>{t.mapTitle}</h2>
+            <p>{t.mapDek}</p>
+          </div>
+          {mapSites.length > 100 ? (
+            <MapView sites={mapSites} clusters={mapClusters} user={result.spot} lang={lang} />
+          ) : (
+            <p className="score-note">{t.loadingCatalog}</p>
+          )}
+          <p className="map-caption">
+            {t.mapHint} {t.zone}: {zoneName}.
+          </p>
+        </section>
+      </Fold>
       <SubscribeForm />
     </div>
   );

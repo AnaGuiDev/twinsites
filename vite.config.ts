@@ -14,11 +14,24 @@ function ortBuildHash(): string {
   return hash.digest("hex").slice(0, 12);
 }
 
-const headers = {
-  "Cross-Origin-Opener-Policy": "same-origin",
-  "Cross-Origin-Embedder-Policy": "require-corp",
-  "Cross-Origin-Resource-Policy": "same-origin",
-};
+/**
+ * The production security headers, read from the nginx snippet so preview and
+ * QA serve exactly the same policy. Preview always enforces the CSP (never
+ * Report-Only), and HSTS is dropped because preview is plain HTTP.
+ */
+function securityHeaders(): Record<string, string> {
+  const conf = readFileSync("ops/nginx/twinsites-security.conf", "utf8");
+  const headers: Record<string, string> = {};
+  for (const match of conf.matchAll(/^add_header\s+([\w-]+)\s+"([^"]*)"\s+always;/gm)) {
+    const [, name, value] = match;
+    if (name === "Strict-Transport-Security") continue;
+    headers[name === "Content-Security-Policy-Report-Only" ? "Content-Security-Policy" : name] = value;
+  }
+  if (!headers["Content-Security-Policy"]) throw new Error("ops/nginx/twinsites-security.conf has no CSP");
+  return headers;
+}
+
+const headers = securityHeaders();
 
 function dropBundledOrtWasm() {
   return {
@@ -54,7 +67,8 @@ export default defineConfig({
       },
     },
   },
-  server: { headers },
+  // Dev injects CSS as inline <style> for hot reload, so it gets everything but the CSP.
+  server: { headers: Object.fromEntries(Object.entries(headers).filter(([name]) => name !== "Content-Security-Policy")) },
   preview: { headers },
 });
 
@@ -79,6 +93,20 @@ function zoneStubs(): Plugin {
         `${explore.zones.length} zones of AI-built homepages.`,
         "https://twinsites.com/zones",
         "Zones",
+      );
+      const report = JSON.parse(readFileSync(path.resolve("public/data/report.json"), "utf8")) as {
+        total: number;
+        topFourShare: number;
+        twins: { top1Any: number };
+      };
+      const total = report.total.toLocaleString("en-GB");
+      writeStub(
+        html,
+        path.resolve("dist/report"),
+        `What ${total} AI-built homepages have in common — Twinsites`,
+        `Four layouts cover ${report.topFourShare}% of ${total} AI-built homepages, and ${report.twins.top1Any}% have a look-alike in the top 1% of all pairs. Layouts, colours, crowded categories and stock phrases, measured.`,
+        "https://twinsites.com/report",
+        `What ${total} AI-built homepages have in common`,
       );
     },
   };
