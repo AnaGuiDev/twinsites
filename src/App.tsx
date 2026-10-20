@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { DropZone } from "./components/DropZone";
+import { Mosaic } from "./components/Mosaic";
+import { ZoneIndex } from "./components/ZoneIndex";
 import { PrivacyView } from "./components/PrivacyView";
 import { ResultView } from "./components/ResultView";
 import { SearchBox } from "./components/SearchBox";
@@ -233,6 +235,13 @@ export function App() {
             go("/");
           }}
         >
+          <svg className="logo" viewBox="0 0 64 64" aria-hidden="true">
+            <rect width="64" height="64" rx="10" />
+            <rect x="9" y="12" width="21" height="17" className="lit" />
+            <rect x="34" y="12" width="21" height="17" className="lit" />
+            <rect x="9" y="35" width="21" height="17" className="plain" />
+            <rect x="34" y="35" width="21" height="17" className="plain" />
+          </svg>
           Twinsites
         </a>
         <nav>
@@ -255,45 +264,53 @@ export function App() {
         {route.name === "site" && !catalog && <p className="score-note">{catalogNote ?? t.loadingCatalog}</p>}
         {route.name === "home" && !homeResult && (
           <section className="hero">
-            <div>
-              <h1>{t.title}</h1>
-              <p className="lede">{t.lede}</p>
-              <p className="privacy">{t.privacy}</p>
-              <p className="privacy">{t.analyticsNote}</p>
-              <div className="hero-actions">
-                <button type="button" className="ticket" onClick={onExample}>
-                  {t.tryExample}
-                </button>
-                <RouteLink className="ticket ghost" href="/zones">
-                  {t.browseZones}
-                </RouteLink>
+            <Mosaic
+              slot={
+                <>
+                  <h1>{t.title}</h1>
+                  <p className="lede">{t.lede(catalogCount ?? 2003)}</p>
+                  <div className="actions">
+                    <DropZone
+                      inline
+                      onFile={onFile}
+                      onIntent={warm}
+                      progress={shown}
+                      progressLabel={t.progressLabel}
+                      stageLabel={stage ? stageCopy[stage] : null}
+                    />
+                    <UrlShot onFile={onFile} />
+                    <p className="example-row">
+                      <button type="button" className="text-link as-button" onClick={onExample}>
+                        {t.tryExample}
+                      </button>
+                    </p>
+                  </div>
+                  {error && (
+                    <p className="error" role="alert">
+                      {error}
+                    </p>
+                  )}
+                  <p className="privacy">
+                    {t.privacyShort} <RouteLink className="text-link" href="/privacy">{t.privacyMore}</RouteLink>
+                  </p>
+                </>
+              }
+            />
+            <div className="hero-more">
+              <div>
+                <h2>{t.findTitle}</h2>
+                <SearchBox
+                  onPick={(slug) => {
+                    track("explore");
+                    go(`/site/${slug}`);
+                  }}
+                />
               </div>
-              <SearchBox
-                onPick={(slug) => {
-                  track("explore");
-                  go(`/site/${slug}`);
-                }}
-              />
-              <p className="phone-note">{t.phoneInvite}</p>
-              <ul className="facts">
-                <li>{t.factModel}</li>
-                <li>{catalogCount ? t.factCatalog(catalogCount) : "…"}</li>
-                <li>{t.factNoUpload}</li>
-              </ul>
-            </div>
-            <div className="hero-drop">
-              <DropZone
-                onFile={onFile}
-                onIntent={warm}
-                progress={shown}
-                progressLabel={t.progressLabel}
-                stageLabel={stage ? stageCopy[stage] : null}
-              />
-              <UrlShot onFile={onFile} />
+              <ZoneIndex />
             </div>
           </section>
         )}
-        {error && (
+        {error && !(route.name === "home" && !homeResult) && (
           <p className="error" role="alert">
             {error}
           </p>
@@ -304,21 +321,26 @@ export function App() {
       </main>
 
       <footer>
-        <p>{t.footerPrivacy}</p>
-        <p>
-          <a className="removal" href={REMOVAL_URL} target="_blank" rel="noreferrer">
-            {t.removal}
-          </a>
-        </p>
-        <p>
-          <a href="https://github.com/JefferyLee/awesome-vibe-coded-apps">{t.footerCatalog}</a>
-        </p>
-        <p>
-          <a href="/privacy">{t.listPrivacy}</a>
-        </p>
-        <p>
-          {t.footerLicense} <a href="https://github.com/AnaGuiDev">Ana Gui</a>
-        </p>
+        <p className="footer-mark">Twinsites</p>
+        <ul>
+          <li>
+            {t.footerBy} <a href="https://github.com/AnaGuiDev">Ana Gui</a>
+          </li>
+          <li>
+            <a href="https://github.com/JefferyLee/awesome-vibe-coded-apps">{t.footerCatalog}</a>
+          </li>
+          <li>
+            <RouteLink href="/privacy">{t.listPrivacy}</RouteLink>
+          </li>
+          <li>
+            <a href={REMOVAL_URL} target="_blank" rel="noreferrer">
+              {t.removal}
+            </a>
+          </li>
+          <li>
+            <a href="https://github.com/AnaGuiDev/twinsites">{t.footerSource}</a>
+          </li>
+        </ul>
       </footer>
     </div>
   );

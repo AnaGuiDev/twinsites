@@ -5,6 +5,7 @@ export function DropZone({
   onFile,
   onIntent,
   compact = false,
+  inline = false,
   progress = null,
   progressLabel,
   stageLabel,
@@ -12,6 +13,7 @@ export function DropZone({
   onFile: (file: File) => void;
   onIntent?: () => void;
   compact?: boolean;
+  inline?: boolean;
   progress?: number | null;
   progressLabel?: string;
   stageLabel?: string | null;
@@ -51,7 +53,7 @@ export function DropZone({
 
   return (
     <div
-      className={`sleeve ${hot ? "hot" : ""} ${compact ? "compact" : ""}`}
+      className={`sleeve${hot ? " hot" : ""}${compact ? " compact" : ""}${inline ? " inline" : ""}`}
       onDragOver={(event) => {
         event.preventDefault();
         setHot(true);
@@ -61,36 +63,34 @@ export function DropZone({
       onDrop={onDrop}
       onPointerEnter={() => onIntent?.()}
     >
-      <span className="crop tl" />
-      <span className="crop tr" />
-      <span className="crop bl" />
-      <span className="crop br" />
-      <p className="sleeve-kicker">{compact ? t.another : t.dropTitle}</p>
-      {progress != null && progressLabel && (
-        <div className="bar-row">
-          <div
-            className="bar"
-            role="progressbar"
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-valuenow={progress}
-            aria-label={progressLabel}
-          >
-            <span style={{ width: `${progress}%` }} />
+      <div className="sleeve-text">
+        <p className="sleeve-kicker">{compact ? t.another : t.dropTitle}</p>
+        {progress != null && progressLabel && (
+          <div className="bar-row">
+            <div
+              className="bar"
+              role="progressbar"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={progress}
+              aria-label={progressLabel}
+            >
+              <span style={{ width: `${progress}%` }} />
+            </div>
+            <span className="bar-figure">{progress}%</span>
           </div>
-          <span className="bar-figure">{progress}%</span>
-        </div>
-      )}
-      {!compact && (
-        <p className="sleeve-hint" aria-live="polite">
-          {stageLabel ?? t.dropHint}
-        </p>
-      )}
-      {compact && stageLabel && (
-        <p className="sleeve-hint" aria-live="polite">
-          {stageLabel}
-        </p>
-      )}
+        )}
+        {!compact && (
+          <p className="sleeve-hint" aria-live="polite">
+            {stageLabel ?? t.dropHint}
+          </p>
+        )}
+        {compact && stageLabel && (
+          <p className="sleeve-hint" aria-live="polite">
+            {stageLabel}
+          </p>
+        )}
+      </div>
       <button
         type="button"
         className="ticket"

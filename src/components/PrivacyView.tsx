@@ -6,7 +6,6 @@ export function PrivacyView() {
   }, []);
   return (
     <article className="privacy-page">
-      <p className="kicker">Twinsites</p>
       <h1>Privacy</h1>
       <p>
         If you ask for the monthly report, Twinsites keeps the email address you type. That is the only thing this form collects.
@@ -19,6 +18,10 @@ export function PrivacyView() {
       <p>Every message has an unsubscribe link. Opening it deletes that record.</p>
       <p>
         A screenshot you upload never leaves your browser. A URL you paste is visited by the Cloudflare worker to take one screenshot, which is not stored.
+      </p>
+      <p>
+        There are no cookies. If a visit counter is on, it records only aggregate events: a visit, an example, an upload, a
+        result, a share, pointing at or opening a page on the wall.
       </p>
       <p>
         Questions: <a href="mailto:twinsites.dev@gmail.com">twinsites.dev@gmail.com</a>

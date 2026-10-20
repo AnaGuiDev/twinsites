@@ -86,7 +86,7 @@ export function MapView({
 
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, w, h);
-      ctx.fillStyle = "#14110e";
+      ctx.fillStyle = "#000000";
       ctx.fillRect(0, 0, w, h);
 
       const cam = cameraRef.current;
@@ -112,20 +112,20 @@ export function MapView({
             ctx.clip();
             ctx.drawImage(image, p.x - 27, p.y - 18, 54, 34);
             ctx.restore();
-            ctx.strokeStyle = "rgba(243,236,223,0.45)";
+            ctx.strokeStyle = "rgba(255,255,255,0.45)";
             ctx.strokeRect(p.x - 27, p.y - 18, 54, 34);
             continue;
           }
         }
         ctx.beginPath();
         ctx.arc(p.x, p.y, Math.max(2.2, 2.6 * Math.sqrt(cam.z)), 0, Math.PI * 2);
-        ctx.fillStyle = site.traits.dominant || "#f3ecdf";
+        ctx.fillStyle = site.traits.dominant || "#ffffff";
         ctx.globalAlpha = 0.92;
         ctx.fill();
         ctx.globalAlpha = 1;
       }
 
-      ctx.font = '500 12px "IBM Plex Mono", monospace';
+      ctx.font = '600 condensed 13px "Archivo Variable", sans-serif';
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       for (const cluster of clusters) {
@@ -141,20 +141,20 @@ export function MapView({
       if (pulse > 0.5) {
         ctx.beginPath();
         ctx.arc(you.x, you.y, 14 + pulse, 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(184,44,26,${0.55 * (1 - drop)})`;
+        ctx.strokeStyle = `rgba(255,226,74,${0.7 * (1 - drop)})`;
         ctx.lineWidth = 2;
         ctx.stroke();
       }
       ctx.beginPath();
       ctx.arc(you.x, you.y, 13, 0, Math.PI * 2);
-      ctx.fillStyle = "#f3ecdf";
+      ctx.fillStyle = "#ffffff";
       ctx.fill();
       ctx.beginPath();
       ctx.arc(you.x, you.y, 6, 0, Math.PI * 2);
-      ctx.fillStyle = "#b82c1a";
+      ctx.fillStyle = "#ffe24a";
       ctx.fill();
-      ctx.font = '600 11px "IBM Plex Mono", monospace';
-      ctx.fillStyle = "#f3ecdf";
+      ctx.font = '700 condensed 13px "Archivo Variable", sans-serif';
+      ctx.fillStyle = "#ffffff";
       ctx.textAlign = "left";
       ctx.fillText(t.you, you.x + 18, you.y - 10);
 
@@ -308,8 +308,8 @@ function paintWrapped(ctx: CanvasRenderingContext2D, label: string, x: number, y
   const lineHeight = 14;
   const start = y - ((lines.length - 1) * lineHeight) / 2;
   ctx.lineWidth = 4;
-  ctx.strokeStyle = "rgba(20,17,14,0.72)";
-  ctx.fillStyle = "rgba(243,236,223,0.92)";
+  ctx.strokeStyle = "rgba(0,0,0,0.8)";
+  ctx.fillStyle = "rgba(255,255,255,0.95)";
   for (let index = 0; index < lines.length; index++) {
     const yy = start + index * lineHeight;
     ctx.strokeText(lines[index], x, yy);
@@ -333,7 +333,7 @@ function thumbFor(
 
 function hexAlpha(hex: string, alpha: number): string {
   const raw = hex.replace("#", "");
-  if (raw.length !== 6) return `rgba(243,236,223,${alpha})`;
+  if (raw.length !== 6) return `rgba(255,255,255,${alpha})`;
   const r = parseInt(raw.slice(0, 2), 16);
   const g = parseInt(raw.slice(2, 4), 16);
   const b = parseInt(raw.slice(4, 6), 16);

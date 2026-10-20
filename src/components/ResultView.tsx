@@ -68,10 +68,14 @@ export function ResultView({
 
   useEffect(() => {
     let cancel = false;
-    const images =
-      showMine || result.source === "catalog"
-        ? [result.preview, thumb(result.twins[0]?.site.thumb ?? "")]
-        : [thumb(result.twins[0]?.site.thumb ?? "")];
+    const both = showMine || result.source === "catalog";
+    const images = both
+      ? [result.preview, thumb(result.twins[0]?.site.thumb ?? "")]
+      : [thumb(result.twins[0]?.site.thumb ?? "")];
+    const clip = (text: string) => (text.length > 34 ? `${text.slice(0, 33).trimEnd()}…` : text);
+    const labels = both
+      ? [result.source === "upload" ? t.cardYou : clip(result.subjectTitle), t.cardTwin]
+      : [t.cardTwin];
     void renderShareCard({
       lang,
       zone: zoneName,
@@ -79,6 +83,7 @@ export function ResultView({
       traits: traitLine(marks.map((mark) => mark.label)),
       pageUrl,
       images,
+      labels,
     })
       .then(async (canvas) => {
         const blob = await canvasToBlob(canvas);
@@ -94,7 +99,7 @@ export function ResultView({
     return () => {
       cancel = true;
     };
-  }, [includeMine, lang, result, zoneName, secondary, marks, pageUrl, showMine]);
+  }, [includeMine, lang, result, zoneName, secondary, marks, pageUrl, showMine, t]);
 
   const onShare = async () => {
     track("share");
@@ -113,18 +118,38 @@ export function ResultView({
 
   return (
     <div className="results">
-      <section className="reveal" aria-label={zoneName}>
+      <section className="result-head">
+        <div>
+          <h1 className="zone-title">{zoneName}</h1>
+          <p className="again-line">{secondary}</p>
+          <p className="score-note">{t.scoreNote}</p>
+          {result.cropped && <p className="score-note">{t.cropNote}</p>}
+          {result.portrait && <p className="score-note">{t.portraitNote}</p>}
+          <p className="score-note">
+            <RouteLink className="text-link" href={`/zone/${result.zone.slug}`}>
+              {t.zoneLink(zoneName)}
+            </RouteLink>
+          </p>
+        </div>
+        <DropZone onFile={onFile} onIntent={onIntent} compact progress={progress} progressLabel={t.progressLabel} stageLabel={stageLabel} />
+      </section>
+
+      <section className="reveal" aria-label={t.revealLabel}>
         <figure>
           <img src={result.preview} alt={result.source === "upload" ? t.you : result.subjectTitle} />
-          <figcaption>{result.source === "upload" ? t.you : result.subjectTitle}</figcaption>
+          <figcaption>
+            <strong>{result.source === "upload" ? t.you : result.subjectTitle}</strong>
+          </figcaption>
         </figure>
         {result.twins[0] && (
           <figure>
-            <img src={thumb(result.twins[0].site.thumb)} alt={result.twins[0].site.title} />
-            <figcaption>{result.twins[0].site.title}</figcaption>
+            <img className="developing" src={thumb(result.twins[0].site.thumb)} alt={result.twins[0].site.title} />
+            <figcaption>
+              {t.closest} <strong>{result.twins[0].site.title}</strong>
+            </figcaption>
           </figure>
         )}
-        <ul className="trait-row">
+        <ul className="trait-row" aria-label={t.traitsTitle}>
           {marks.map((mark) => (
             <li key={mark.label}>
               {mark.label}
@@ -134,19 +159,31 @@ export function ResultView({
         </ul>
       </section>
 
-      <section className="again">
-        <div>
-          <p className="kicker">{t.zone}</p>
-          <h1 className="zone-title">{zoneName}</h1>
-          <p className="again-line">{secondary}</p>
-          <p className="score-note">{t.scoreNote}</p>
-          {result.cropped && <p className="score-note">{t.cropNote}</p>}
-          {result.portrait && <p className="score-note">{t.portraitNote}</p>}
-          <p className="score-note">
-            <RouteLink href={`/zone/${result.zone.slug}`}>{zoneName}</RouteLink>
-          </p>
+      <section className="share">
+        <div className="share-card">
+          {cardUrl ? <img className="card-preview" src={cardUrl} alt={shareText} /> : <div className="card-preview is-loading" />}
         </div>
-        <DropZone onFile={onFile} onIntent={onIntent} compact progress={progress} progressLabel={t.progressLabel} stageLabel={stageLabel} />
+        <div className="share-side">
+          <h2>{t.shareTitle}</h2>
+          <p className="dek">{t.shareDek}</p>
+          {result.source === "upload" && (
+            <label className="include">
+              <input type="checkbox" checked={includeMine} onChange={(event) => setIncludeMine(event.target.checked)} />
+              {t.includeMine}
+            </label>
+          )}
+          <div className="share-actions">
+            <button type="button" className="ticket" onClick={() => void onShare()}>
+              {t.post}
+            </button>
+            {cardUrl && (
+              <a className="ticket ghost" href={cardUrl} download="twinsites-card.png" onClick={() => track("share")}>
+                {t.download}
+              </a>
+            )}
+          </div>
+          <p className="share-note">{t.shareNote}</p>
+        </div>
       </section>
 
       <section>
@@ -155,44 +192,27 @@ export function ResultView({
           <p>{t.twinsDek}</p>
         </div>
         <div className="twin-grid">
-          {result.twins.map((twin, index) => (
-            <article className="twin-card" key={twin.site.id} style={{ animationDelay: `${index * 70}ms` }}>
-              <img src={thumb(twin.site.thumb)} alt={twin.site.title} />
+          {result.twins.map((twin) => (
+            <article className="twin-card" key={twin.site.id}>
+              <RouteLink className="twin-shot" href={`/site/${twin.site.slug}`}>
+                <img src={thumb(twin.site.thumb)} alt={twin.site.title} loading="lazy" />
+              </RouteLink>
               <div className="twin-meta">
-                <div className="sim-row">
-                  <span className="sim">{formatPercentile(twin.percentile, lang)}</span>
-                  <span>{t.simLabel}</span>
-                </div>
-                <div className="meter" aria-hidden="true">
-                  <span style={{ width: `${Math.max(0, Math.min(100, twin.percentile))}%` }} />
-                </div>
-                <h3>{twin.site.title}</h3>
-                <p className="host">{hostOf(twin.site.url)}</p>
-                <a href={twin.site.url} target="_blank" rel="noreferrer">
-                  {t.openSite}
-                </a>
-                <RouteLink className="twin-more" href={`/site/${twin.site.slug}`}>
-                  {t.itsTwins}
-                </RouteLink>
+                <h3>
+                  <RouteLink href={`/site/${twin.site.slug}`}>{twin.site.title}</RouteLink>
+                </h3>
+                <span className="sim" title={t.simLabel}>
+                  {formatPercentile(twin.percentile, lang)}
+                </span>
+                <p className="host">
+                  <a href={twin.site.url} target="_blank" rel="noreferrer" aria-label={`${t.openSite}: ${hostOf(twin.site.url)}`}>
+                    {hostOf(twin.site.url)}
+                  </a>
+                </p>
               </div>
             </article>
           ))}
         </div>
-      </section>
-
-      <section>
-        <div className="section-head">
-          <h2>{t.mapTitle}</h2>
-          <p>{t.mapDek}</p>
-        </div>
-        {mapSites.length > 100 ? (
-          <MapView sites={mapSites} clusters={mapClusters} user={result.spot} lang={lang} />
-        ) : (
-          <p className="score-note">{t.loadingCatalog}</p>
-        )}
-        <p className="map-caption">
-          {t.mapHint} {t.zone}: {zoneName}.
-        </p>
       </section>
 
       <section className="report">
@@ -219,40 +239,29 @@ export function ResultView({
             <h2>{t.suggestTitle}</h2>
           </div>
           <p className="dek">{t.suggestDek}</p>
-          <ol className="suggestions">
-            {suggestions.map((item, index) => (
+          <ul className="suggestions">
+            {suggestions.map((item) => (
               <li key={item.id}>
-                <span>0{index + 1}</span>
                 <p>{t.suggestion(item)}</p>
               </li>
             ))}
-          </ol>
+          </ul>
         </div>
       </section>
 
-      <section className="share">
+      <section>
         <div className="section-head">
-          <h2>{t.shareTitle}</h2>
-          <p>{t.shareDek}</p>
+          <h2>{t.mapTitle}</h2>
+          <p>{t.mapDek}</p>
         </div>
-        {cardUrl && <img className="card-preview" src={cardUrl} alt={shareText} />}
-        {result.source === "upload" && (
-          <label className="include">
-            <input type="checkbox" checked={includeMine} onChange={(event) => setIncludeMine(event.target.checked)} />
-            {t.includeMine}
-          </label>
+        {mapSites.length > 100 ? (
+          <MapView sites={mapSites} clusters={mapClusters} user={result.spot} lang={lang} />
+        ) : (
+          <p className="score-note">{t.loadingCatalog}</p>
         )}
-        <div className="share-actions">
-          {cardUrl && (
-            <a className="ticket" href={cardUrl} download="twinsites-card.png" onClick={() => track("share")}>
-              {t.download}
-            </a>
-          )}
-          <button type="button" className="ticket ghost" onClick={() => void onShare()}>
-            {t.post}
-          </button>
-        </div>
-        <p className="share-note">{t.shareNote}</p>
+        <p className="map-caption">
+          {t.mapHint} {t.zone}: {zoneName}.
+        </p>
       </section>
       <SubscribeForm />
     </div>
