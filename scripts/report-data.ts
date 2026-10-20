@@ -14,26 +14,16 @@ const explore = JSON.parse(readFileSync("public/data/explore.json", "utf8")) as 
   bands: number[][];
 };
 const copy = JSON.parse(readFileSync("public/data/copy.json", "utf8")) as { total: number; withText: number; counts: Record<string, number> };
+/** Agreement of each detector with the blind labels (npm run reliability). */
+const reliability = JSON.parse(readFileSync("quality/reliability.json", "utf8")) as Record<
+  "ground" | "centered" | "gradient" | "density" | "bento",
+  { n: number; agree: number; precision?: number | null; humanShare?: number; humanShareLo?: number; humanShareHi?: number }
+>;
 
 const sites = catalog.sites;
 const total = sites.length;
 const share = (count: number) => Math.round((count / total) * 1000) / 10;
 const traits = sites.map((site) => site.traits);
-
-// Layout recipes: ground, density, centring, gradient.
-const recipeCounts = new Map<string, number>();
-for (const t of traits) {
-  const key = [t.mode, t.density, t.centered ? "centered" : "offset", t.gradient ? "gradient" : "flat"].join(" ");
-  recipeCounts.set(key, (recipeCounts.get(key) ?? 0) + 1);
-}
-const recipes = [...recipeCounts.entries()]
-  .sort((a, b) => b[1] - a[1])
-  .slice(0, 6)
-  .map(([key, count]) => {
-    const [mode, density, centring, wash] = key.split(" ");
-    return { mode, density, centered: centring === "centered", gradient: wash === "gradient", count, share: share(count) };
-  });
-const topFour = recipes.slice(0, 4).reduce((sum, recipe) => sum + recipe.count, 0);
 
 const count = (test: (t: (typeof traits)[number]) => boolean) => traits.filter(test).length;
 const colorCounts = new Map<string, number>();
@@ -67,16 +57,23 @@ const labels = new Map(CLICHES.map((cliche) => [cliche.id, cliche.label]));
 const report = {
   generated: catalog.generated,
   total,
-  recipes,
-  topFourShare: share(topFour),
-  traits: {
-    light: share(count((t) => t.mode === "light")),
-    dark: share(count((t) => t.mode === "dark")),
-    airy: share(count((t) => t.density === "airy")),
-    packed: share(count((t) => t.density === "packed")),
-    centered: share(count((t) => t.centered)),
-    gradient: share(count((t) => t.gradient)),
-    bento: share(count((t) => t.bento)),
+  // Only traits that held up against the labels. The ground detector agrees
+  // 99%, so the whole catalog is counted; centring is taken from the labelled
+  // sample itself, since the detector misses some centred pages.
+  ground: { light: share(count((t) => t.mode === "light")), dark: share(count((t) => t.mode === "dark")) },
+  centred: {
+    share: Math.round((reliability.centered.humanShare ?? 0) * 1000) / 10,
+    lo: Math.round((reliability.centered.humanShareLo ?? 0) * 100),
+    hi: Math.round((reliability.centered.humanShareHi ?? 0) * 100),
+    n: reliability.centered.n,
+  },
+  reliability: {
+    sample: 200,
+    ground: Math.round(reliability.ground.agree * 100),
+    centred: Math.round(reliability.centered.agree * 100),
+    centredPrecision: Math.round((reliability.centered.precision ?? 0) * 100),
+    density: Math.round(reliability.density.agree * 100),
+    gradientPrecision: Math.round((reliability.gradient.precision ?? 0) * 100),
   },
   colors: [...colorCounts.entries()]
     .sort((a, b) => b[1] - a[1])
@@ -105,5 +102,5 @@ const report = {
 
 writeFileSync("public/data/report.json", JSON.stringify(report));
 console.log(
-  `report: top 4 recipes ${report.topFourShare}%, top-1% twin ${report.twins.top1Any}%, ${report.zones.count} zones, phrases read on ${copy.withText}`,
+  `report: top-1% twin ${report.twins.top1Any}%, light ${report.ground.light}%, centred ~${report.centred.share}% (sample), ${report.zones.count} zones, phrases read on ${copy.withText}`,
 );

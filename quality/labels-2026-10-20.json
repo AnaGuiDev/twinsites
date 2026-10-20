@@ -1,0 +1,1614 @@
+{
+ "date": "2026-10-20",
+ "sample": "200 catalog sites drawn with random.Random(20261020).sample from catalog.json order",
+ "labeller": "Claude (AI), by eye from the 420px thumbnails, blind to the detector output; null = could not tell",
+ "definitions": {
+  "ground": "page background mostly light or dark",
+  "centered": "headline and main button horizontally centred",
+  "gradient": "a visible colour wash or gradient across the background (a photo is not a gradient)",
+  "density": "airy = lots of empty space, packed = busy and dense, balanced = in between",
+  "bento": "a grid of about five or more similar cards"
+ },
+ "labels": [
+  {
+   "slug": "8-156-88-61",
+   "ground": "light",
+   "centered": true,
+   "gradient": false,
+   "density": "airy",
+   "bento": false
+  },
+  {
+   "slug": "adapt-my-business-lovable",
+   "ground": "light",
+   "centered": false,
+   "gradient": null,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "agentceres",
+   "ground": "dark",
+   "centered": true,
+   "gradient": false,
+   "density": "airy",
+   "bento": false
+  },
+  {
+   "slug": "agentyap-x-grok-vercel",
+   "ground": "dark",
+   "centered": null,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "agricultureschool-lovable",
+   "ground": null,
+   "centered": true,
+   "gradient": false,
+   "density": "airy",
+   "bento": false
+  },
+  {
+   "slug": "ai-pulse-olive-tau-vercel",
+   "ground": "dark",
+   "centered": false,
+   "gradient": false,
+   "density": "packed",
+   "bento": false
+  },
+  {
+   "slug": "aihugvideo",
+   "ground": "light",
+   "centered": true,
+   "gradient": null,
+   "density": "airy",
+   "bento": false
+  },
+  {
+   "slug": "airtop",
+   "ground": "light",
+   "centered": true,
+   "gradient": true,
+   "density": "airy",
+   "bento": false
+  },
+  {
+   "slug": "all-in-one-buddy-47-lovable",
+   "ground": "light",
+   "centered": false,
+   "gradient": false,
+   "density": "packed",
+   "bento": true
+  },
+  {
+   "slug": "allspark-ie",
+   "ground": "light",
+   "centered": false,
+   "gradient": false,
+   "density": "packed",
+   "bento": false
+  },
+  {
+   "slug": "analyze-joyful-data-lovable",
+   "ground": "light",
+   "centered": true,
+   "gradient": false,
+   "density": "airy",
+   "bento": false
+  },
+  {
+   "slug": "anantrix-in",
+   "ground": "dark",
+   "centered": false,
+   "gradient": false,
+   "density": "airy",
+   "bento": false
+  },
+  {
+   "slug": "antiagent-site",
+   "ground": "light",
+   "centered": true,
+   "gradient": false,
+   "density": "airy",
+   "bento": false
+  },
+  {
+   "slug": "arcaira",
+   "ground": "dark",
+   "centered": false,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "arikhealth",
+   "ground": "light",
+   "centered": true,
+   "gradient": false,
+   "density": "airy",
+   "bento": false
+  },
+  {
+   "slug": "artisballs-shark-attack-lovable",
+   "ground": "light",
+   "centered": true,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "axiomers-vercel",
+   "ground": "light",
+   "centered": true,
+   "gradient": false,
+   "density": "airy",
+   "bento": false
+  },
+  {
+   "slug": "baffle-games",
+   "ground": "dark",
+   "centered": false,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "basket-breeze-shop-lovable",
+   "ground": "light",
+   "centered": false,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "baybay-baby",
+   "ground": "light",
+   "centered": false,
+   "gradient": null,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "bayfooty",
+   "ground": "light",
+   "centered": true,
+   "gradient": true,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "beaconapp",
+   "ground": "light",
+   "centered": true,
+   "gradient": true,
+   "density": "airy",
+   "bento": false
+  },
+  {
+   "slug": "beardstyle",
+   "ground": "dark",
+   "centered": false,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "beni-ai",
+   "ground": "dark",
+   "centered": true,
+   "gradient": null,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "bolsozen-app-lovable",
+   "ground": "light",
+   "centered": true,
+   "gradient": null,
+   "density": "airy",
+   "bento": false
+  },
+  {
+   "slug": "brainbubbles",
+   "ground": "light",
+   "centered": true,
+   "gradient": null,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "breadboardhub",
+   "ground": "light",
+   "centered": true,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "buy-charm-lovable",
+   "ground": "dark",
+   "centered": false,
+   "gradient": true,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "cancelshut",
+   "ground": "light",
+   "centered": true,
+   "gradient": false,
+   "density": "airy",
+   "bento": false
+  },
+  {
+   "slug": "canopy-8starlabs",
+   "ground": "light",
+   "centered": true,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "catdoes",
+   "ground": "light",
+   "centered": true,
+   "gradient": false,
+   "density": "airy",
+   "bento": false
+  },
+  {
+   "slug": "chaosbench",
+   "ground": "dark",
+   "centered": false,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "chats-llm",
+   "ground": "dark",
+   "centered": true,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "chuckle-chasm-collective-lovable",
+   "ground": "dark",
+   "centered": false,
+   "gradient": false,
+   "density": "packed",
+   "bento": false
+  },
+  {
+   "slug": "citania-mx",
+   "ground": "light",
+   "centered": true,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "claudecoupons",
+   "ground": "light",
+   "centered": false,
+   "gradient": false,
+   "density": "packed",
+   "bento": false
+  },
+  {
+   "slug": "cloutslot-space",
+   "ground": "light",
+   "centered": false,
+   "gradient": false,
+   "density": "packed",
+   "bento": false
+  },
+  {
+   "slug": "cochat",
+   "ground": "light",
+   "centered": true,
+   "gradient": null,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "colliepwa",
+   "ground": "light",
+   "centered": false,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "connect-crimson-cosmos-lovable",
+   "ground": "dark",
+   "centered": null,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "crackfit-lovable",
+   "ground": null,
+   "centered": null,
+   "gradient": true,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "craftvis",
+   "ground": "light",
+   "centered": true,
+   "gradient": false,
+   "density": "airy",
+   "bento": false
+  },
+  {
+   "slug": "creatr-buddy-lovable",
+   "ground": "dark",
+   "centered": null,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "cuts-come-to-you-lovable",
+   "ground": "dark",
+   "centered": null,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "dabbadoc-vercel",
+   "ground": "dark",
+   "centered": false,
+   "gradient": false,
+   "density": "packed",
+   "bento": true
+  },
+  {
+   "slug": "dailytracker-lol",
+   "ground": "light",
+   "centered": false,
+   "gradient": false,
+   "density": "airy",
+   "bento": false
+  },
+  {
+   "slug": "daoco",
+   "ground": "light",
+   "centered": false,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "debtescape",
+   "ground": "light",
+   "centered": false,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "dental-scope",
+   "ground": "light",
+   "centered": false,
+   "gradient": false,
+   "density": "packed",
+   "bento": false
+  },
+  {
+   "slug": "deployops-ai-polsia",
+   "ground": "light",
+   "centered": true,
+   "gradient": false,
+   "density": "airy",
+   "bento": false
+  },
+  {
+   "slug": "detector-de-ia",
+   "ground": "light",
+   "centered": true,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "dev-thebluemustard",
+   "ground": "light",
+   "centered": false,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "dickygames",
+   "ground": "dark",
+   "centered": true,
+   "gradient": false,
+   "density": "packed",
+   "bento": true
+  },
+  {
+   "slug": "digital-mine-guardians-lovable",
+   "ground": null,
+   "centered": null,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "dinoreach-cc",
+   "ground": "light",
+   "centered": true,
+   "gradient": true,
+   "density": "airy",
+   "bento": false
+  },
+  {
+   "slug": "discover-f8ware",
+   "ground": "dark",
+   "centered": false,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "duckling-dreams-come-true-lovable",
+   "ground": "light",
+   "centered": true,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "elentaria",
+   "ground": "dark",
+   "centered": false,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "evalyze",
+   "ground": "light",
+   "centered": true,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "faso-field-manager-lovable",
+   "ground": "dark",
+   "centered": true,
+   "gradient": false,
+   "density": "airy",
+   "bento": false
+  },
+  {
+   "slug": "fencepost-life",
+   "ground": "light",
+   "centered": false,
+   "gradient": false,
+   "density": "airy",
+   "bento": false
+  },
+  {
+   "slug": "fit-at-your-best-lovable",
+   "ground": "light",
+   "centered": false,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "flip-your-feelings-lovable",
+   "ground": "light",
+   "centered": null,
+   "gradient": null,
+   "density": "airy",
+   "bento": false
+  },
+  {
+   "slug": "flux-forge-pulse-lovable",
+   "ground": "dark",
+   "centered": false,
+   "gradient": false,
+   "density": "packed",
+   "bento": false
+  },
+  {
+   "slug": "footymonitor",
+   "ground": "light",
+   "centered": false,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "gamescout-one-vercel",
+   "ground": "dark",
+   "centered": false,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "getaligne",
+   "ground": "light",
+   "centered": false,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "getclarion-in",
+   "ground": "dark",
+   "centered": true,
+   "gradient": true,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "getpumppilot",
+   "ground": "dark",
+   "centered": true,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "getrolino",
+   "ground": "light",
+   "centered": false,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "gexina-lovable",
+   "ground": "dark",
+   "centered": false,
+   "gradient": false,
+   "density": "packed",
+   "bento": true
+  },
+  {
+   "slug": "glowguide-ai-beauty-lovable",
+   "ground": "light",
+   "centered": false,
+   "gradient": null,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "goal-whisperer-60-lovable",
+   "ground": "light",
+   "centered": true,
+   "gradient": false,
+   "density": "airy",
+   "bento": false
+  },
+  {
+   "slug": "guess-buddy-web-lovable",
+   "ground": "dark",
+   "centered": true,
+   "gradient": true,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "hcl-pro-arena-lovable",
+   "ground": "dark",
+   "centered": true,
+   "gradient": null,
+   "density": "airy",
+   "bento": false
+  },
+  {
+   "slug": "highrise-lol",
+   "ground": "light",
+   "centered": false,
+   "gradient": false,
+   "density": "packed",
+   "bento": false
+  },
+  {
+   "slug": "hindi-shabd-khel-lovable",
+   "ground": "light",
+   "centered": true,
+   "gradient": true,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "humanpanel",
+   "ground": "light",
+   "centered": false,
+   "gradient": null,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "huntlo",
+   "ground": "light",
+   "centered": true,
+   "gradient": null,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "iaamalia",
+   "ground": "light",
+   "centered": null,
+   "gradient": false,
+   "density": "packed",
+   "bento": false
+  },
+  {
+   "slug": "image-waseverin",
+   "ground": "light",
+   "centered": true,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "imagetexteditor",
+   "ground": "light",
+   "centered": false,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "imagination-atlas-lovable",
+   "ground": "light",
+   "centered": true,
+   "gradient": true,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "indiemakercrew",
+   "ground": "dark",
+   "centered": false,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "insightfulhealthsystem-lovable",
+   "ground": "light",
+   "centered": false,
+   "gradient": false,
+   "density": "packed",
+   "bento": null
+  },
+  {
+   "slug": "intentic",
+   "ground": "light",
+   "centered": true,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "invoicr-online",
+   "ground": "light",
+   "centered": false,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "jeda-cypher-lovable",
+   "ground": "light",
+   "centered": false,
+   "gradient": false,
+   "density": "airy",
+   "bento": false
+  },
+  {
+   "slug": "jungroom",
+   "ground": "dark",
+   "centered": false,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "kapa",
+   "ground": "light",
+   "centered": true,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "kiril6-github",
+   "ground": "dark",
+   "centered": false,
+   "gradient": true,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "kometrics",
+   "ground": "light",
+   "centered": true,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "la-jaula-lovable",
+   "ground": "dark",
+   "centered": false,
+   "gradient": false,
+   "density": "airy",
+   "bento": false
+  },
+  {
+   "slug": "layover-hub-panama-lovable",
+   "ground": "dark",
+   "centered": false,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "leadfication",
+   "ground": "light",
+   "centered": false,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "leavely",
+   "ground": "dark",
+   "centered": true,
+   "gradient": null,
+   "density": "airy",
+   "bento": false
+  },
+  {
+   "slug": "lemonade-stand-lovable",
+   "ground": "light",
+   "centered": null,
+   "gradient": null,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "lextiff",
+   "ground": "light",
+   "centered": true,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "liftwellapp",
+   "ground": "light",
+   "centered": false,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "linkova-club",
+   "ground": "light",
+   "centered": true,
+   "gradient": null,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "local-file-converter-localfile-workers",
+   "ground": "light",
+   "centered": true,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "loerei-github",
+   "ground": "dark",
+   "centered": true,
+   "gradient": false,
+   "density": "airy",
+   "bento": false
+  },
+  {
+   "slug": "lyricsgenerator",
+   "ground": "light",
+   "centered": true,
+   "gradient": null,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "maevesocial",
+   "ground": "light",
+   "centered": true,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "makeqrcode-grok",
+   "ground": "light",
+   "centered": false,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "malayalam-film-chronicle-lovable",
+   "ground": "dark",
+   "centered": false,
+   "gradient": null,
+   "density": "packed",
+   "bento": false
+  },
+  {
+   "slug": "marka-social",
+   "ground": "light",
+   "centered": false,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "marquill",
+   "ground": "dark",
+   "centered": true,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "measureonphoto-online",
+   "ground": "light",
+   "centered": false,
+   "gradient": false,
+   "density": "packed",
+   "bento": false
+  },
+  {
+   "slug": "medows",
+   "ground": "light",
+   "centered": false,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "mellingo-vercel",
+   "ground": "dark",
+   "centered": true,
+   "gradient": null,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "middleman-orbit-d7e6-vercel",
+   "ground": "light",
+   "centered": true,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "mindbolt",
+   "ground": "light",
+   "centered": false,
+   "gradient": false,
+   "density": "packed",
+   "bento": true
+  },
+  {
+   "slug": "mindsesh",
+   "ground": "dark",
+   "centered": false,
+   "gradient": false,
+   "density": "packed",
+   "bento": false
+  },
+  {
+   "slug": "minimax3",
+   "ground": "dark",
+   "centered": true,
+   "gradient": false,
+   "density": "packed",
+   "bento": false
+  },
+  {
+   "slug": "moover-lovable",
+   "ground": "light",
+   "centered": false,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "multivrs-space",
+   "ground": "dark",
+   "centered": false,
+   "gradient": null,
+   "density": "airy",
+   "bento": false
+  },
+  {
+   "slug": "muse-wonder-net",
+   "ground": "light",
+   "centered": true,
+   "gradient": false,
+   "density": "airy",
+   "bento": false
+  },
+  {
+   "slug": "mybets",
+   "ground": "light",
+   "centered": true,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "narasi",
+   "ground": "light",
+   "centered": false,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "narco-watch-be-lovable",
+   "ground": "dark",
+   "centered": false,
+   "gradient": false,
+   "density": "packed",
+   "bento": null
+  },
+  {
+   "slug": "nexa-wise-companion-lovable",
+   "ground": "light",
+   "centered": true,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "nirnexai",
+   "ground": "dark",
+   "centered": true,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "nocode-day",
+   "ground": "dark",
+   "centered": true,
+   "gradient": false,
+   "density": "airy",
+   "bento": false
+  },
+  {
+   "slug": "notionanalytics",
+   "ground": "light",
+   "centered": true,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "obsidyn-ai-lovable",
+   "ground": "dark",
+   "centered": true,
+   "gradient": false,
+   "density": "airy",
+   "bento": false
+  },
+  {
+   "slug": "onebattle-win",
+   "ground": "dark",
+   "centered": null,
+   "gradient": false,
+   "density": "airy",
+   "bento": false
+  },
+  {
+   "slug": "onewayinterview",
+   "ground": "light",
+   "centered": false,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "oscarmedinathebarber-lovable",
+   "ground": "light",
+   "centered": null,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "ouridea",
+   "ground": "light",
+   "centered": true,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "ovante",
+   "ground": "light",
+   "centered": true,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "palm-reading",
+   "ground": null,
+   "centered": true,
+   "gradient": true,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "pet-nutrition-ai-vercel",
+   "ground": null,
+   "centered": true,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "pilotcite",
+   "ground": "light",
+   "centered": true,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "pitchpilote",
+   "ground": "dark",
+   "centered": true,
+   "gradient": null,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "playember",
+   "ground": "dark",
+   "centered": false,
+   "gradient": false,
+   "density": "packed",
+   "bento": false
+  },
+  {
+   "slug": "playpatches-today",
+   "ground": "light",
+   "centered": true,
+   "gradient": null,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "pocket-concert-app-lovable",
+   "ground": "dark",
+   "centered": true,
+   "gradient": false,
+   "density": "airy",
+   "bento": false
+  },
+  {
+   "slug": "poketactics",
+   "ground": null,
+   "centered": null,
+   "gradient": false,
+   "density": "packed",
+   "bento": false
+  },
+  {
+   "slug": "polamreddyajaykumar38-lovable",
+   "ground": "light",
+   "centered": true,
+   "gradient": true,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "political-sentiment-streamautomation",
+   "ground": "dark",
+   "centered": false,
+   "gradient": false,
+   "density": "packed",
+   "bento": false
+  },
+  {
+   "slug": "price-pal-pro-02-lovable",
+   "ground": null,
+   "centered": true,
+   "gradient": false,
+   "density": "packed",
+   "bento": false
+  },
+  {
+   "slug": "pricelet-polsia",
+   "ground": null,
+   "centered": true,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "privacypulse4u",
+   "ground": "light",
+   "centered": false,
+   "gradient": null,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "qazerolabs",
+   "ground": "light",
+   "centered": false,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "qtnest",
+   "ground": "light",
+   "centered": true,
+   "gradient": false,
+   "density": "packed",
+   "bento": true
+  },
+  {
+   "slug": "quantum-fortress-arena-lovable",
+   "ground": "dark",
+   "centered": false,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "qubit-pwa-vercel",
+   "ground": "light",
+   "centered": true,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "qwq32",
+   "ground": "dark",
+   "centered": false,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "raahulfirm",
+   "ground": "dark",
+   "centered": true,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "rawdog-one-vercel",
+   "ground": "dark",
+   "centered": false,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "rdc-send-compare-lovable",
+   "ground": "light",
+   "centered": null,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "ref-viktor",
+   "ground": "light",
+   "centered": false,
+   "gradient": null,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "reference2video-com",
+   "ground": "dark",
+   "centered": true,
+   "gradient": false,
+   "density": "packed",
+   "bento": null
+  },
+  {
+   "slug": "resumely-live",
+   "ground": "light",
+   "centered": false,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "routebook",
+   "ground": "light",
+   "centered": null,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "saintsal",
+   "ground": "dark",
+   "centered": true,
+   "gradient": null,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "samagama",
+   "ground": "light",
+   "centered": false,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "sayaclip",
+   "ground": "dark",
+   "centered": true,
+   "gradient": false,
+   "density": "airy",
+   "bento": false
+  },
+  {
+   "slug": "seedance-2-5",
+   "ground": "dark",
+   "centered": true,
+   "gradient": false,
+   "density": "packed",
+   "bento": false
+  },
+  {
+   "slug": "seedanceai",
+   "ground": "dark",
+   "centered": false,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "sendio",
+   "ground": "light",
+   "centered": true,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "sesshu",
+   "ground": "dark",
+   "centered": true,
+   "gradient": null,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "seven-slumber-steps-lovable",
+   "ground": "dark",
+   "centered": true,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "smashpdf-online",
+   "ground": "light",
+   "centered": true,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "snapvid",
+   "ground": "dark",
+   "centered": true,
+   "gradient": false,
+   "density": "airy",
+   "bento": false
+  },
+  {
+   "slug": "snapyo",
+   "ground": "dark",
+   "centered": true,
+   "gradient": false,
+   "density": "airy",
+   "bento": false
+  },
+  {
+   "slug": "snoofy-pet",
+   "ground": "light",
+   "centered": false,
+   "gradient": null,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "sobercount",
+   "ground": "light",
+   "centered": true,
+   "gradient": true,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "soulmatechart",
+   "ground": "light",
+   "centered": true,
+   "gradient": null,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "sovereignairegistry",
+   "ground": "light",
+   "centered": true,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "speakbette-lovable",
+   "ground": "light",
+   "centered": false,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "spenco",
+   "ground": "light",
+   "centered": false,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "spotlit-lol",
+   "ground": "light",
+   "centered": true,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "stembl",
+   "ground": "dark",
+   "centered": true,
+   "gradient": null,
+   "density": "airy",
+   "bento": false
+  },
+  {
+   "slug": "style-suite-nigeria-lovable",
+   "ground": "light",
+   "centered": false,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "super-ds",
+   "ground": "light",
+   "centered": true,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "talorr",
+   "ground": "light",
+   "centered": false,
+   "gradient": null,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "theravel",
+   "ground": "light",
+   "centered": false,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "trade-lock-netlify",
+   "ground": "dark",
+   "centered": true,
+   "gradient": false,
+   "density": "airy",
+   "bento": false
+  },
+  {
+   "slug": "trade-wind",
+   "ground": "light",
+   "centered": false,
+   "gradient": null,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "tripmin",
+   "ground": "dark",
+   "centered": true,
+   "gradient": false,
+   "density": "airy",
+   "bento": false
+  },
+  {
+   "slug": "tripnest-your-travel-haven-lovable",
+   "ground": null,
+   "centered": false,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "tryparaph",
+   "ground": "light",
+   "centered": false,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "turn-text-into-photorealistic-product-photos-portraits-and-a",
+   "ground": "dark",
+   "centered": true,
+   "gradient": false,
+   "density": "packed",
+   "bento": false
+  },
+  {
+   "slug": "twiflux",
+   "ground": "light",
+   "centered": true,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "unimusic",
+   "ground": "dark",
+   "centered": true,
+   "gradient": false,
+   "density": "packed",
+   "bento": false
+  },
+  {
+   "slug": "veinote",
+   "ground": "light",
+   "centered": null,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "veo3ai",
+   "ground": "dark",
+   "centered": true,
+   "gradient": null,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "vetted-handy-finder-lovable",
+   "ground": "light",
+   "centered": false,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "vodata-networks-edu-lovable",
+   "ground": "light",
+   "centered": false,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "voice-lingua-buddy-lovable",
+   "ground": "light",
+   "centered": true,
+   "gradient": false,
+   "density": "airy",
+   "bento": false
+  },
+  {
+   "slug": "vote-watchers-hub-lovable",
+   "ground": "light",
+   "centered": false,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "web-to-app-magic-01-lovable",
+   "ground": "dark",
+   "centered": false,
+   "gradient": false,
+   "density": "packed",
+   "bento": false
+  },
+  {
+   "slug": "whoiz-space",
+   "ground": "dark",
+   "centered": true,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "wolfscentvideo",
+   "ground": "dark",
+   "centered": true,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "yabdechewata-lovable",
+   "ground": "dark",
+   "centered": true,
+   "gradient": null,
+   "density": "packed",
+   "bento": null
+  },
+  {
+   "slug": "yesornot",
+   "ground": "light",
+   "centered": true,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "yiboardgame",
+   "ground": "light",
+   "centered": false,
+   "gradient": false,
+   "density": "balanced",
+   "bento": false
+  },
+  {
+   "slug": "zedvirtualpivatenetwork-lovable",
+   "ground": "light",
+   "centered": false,
+   "gradient": false,
+   "density": "packed",
+   "bento": false
+  }
+ ]
+}
