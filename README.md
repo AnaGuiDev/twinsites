@@ -147,7 +147,15 @@ Keep thumbnails small. The projection step re-encodes them to 420px WebP. Prefer
 
 `.github/workflows/deploy.yml` runs only on a push to `main`: `npm ci && npm run build`, then `rsync` of `dist/` to the web root. It does not start a process on the VPS, and it does not deploy the Worker in `/worker`. Pull requests do not deploy. Optional Actions variables (`VITE_SHOT_ENDPOINT`, `VITE_TURNSTILE_SITEKEY`, `VITE_ANALYTICS_SRC`, `VITE_ANALYTICS_DOMAIN`) are passed into the build and stay empty when unset. The workflow expects an ed25519 key in the `VPS_SSH_KEY` secret and a pinned `known_hosts` line in `VPS_KNOWN_HOSTS`. If that second secret is empty, the job warns and falls back to `ssh-keyscan`, so a push to `main` still deploys. The server already speaks HTTP with SPA fallback, long-lived caching for `/assets/`, and the COOP/COEP/CORP headers.
 
-On a local preview, the drop zone is usable in about 0.1 s on desktop and 0.4 s on an emulated phone. That phone's first load, before any intent, transfers about 149 KB: the document, the script, the stylesheet, the two used font files, a tiny catalog count, and the favicon. The vision runtime, the embeddings, and the catalog index are not in that load. Desktop, with no throttle and the cache off, returns the first twins in about 2.2 s. A cold fast-4G phone (375 px, 40 ms latency, 9 Mbit/s down, 1.5 Mbit/s up, 4× CPU, cache off) does not download the runtime or the embeddings until there is intent. Focusing the file button starts that download, about 31 s, and the first twins then come back in about 3.4 s. Choosing a file the instant the page appears, which is itself the intent, takes about 34 s.
+### Weight and speed
+
+`npm run weight` measures what a phone downloads before its first result: a cold cache, fast 4G (9 Mbit/s down, 1.5 up, 40 ms), the CPU slowed 4×, a 390px screen, and a screenshot chosen the moment the page appears. On 2026-10-20 it read **21.6 s and 13.6 MB** (gzip). It was 47.6 s and 40.7 MB before three changes:
+
+- **The CPU-only runtime.** The app imports `onnxruntime-web/wasm` (an alias in `vite.config.ts`) and ships `ort-wasm-simd-threaded.wasm`: 11.1 MB, 2.9 MB gzipped, against 21.6 MB for the WebGPU (JSEP) build, whose extra layer was never used. Embeddings from both runtimes are bit-identical.
+- **Precompressed files.** The build writes a `.gz` next to every compressible file in `dist/`; nginx sends them with `gzip_static on;`, and `vite preview` does the same so measurements match production. The progress bars count against the stored sizes (`WASM_BYTES`, `VISION_BYTES`, `__DATA_BYTES__`), because with gzip `content-length` is the compressed size.
+- **Half-precision vectors for the browser.** `scripts/embeddings-f16.ts` writes `embeddings.f16.bin` (1.9 MB gzipped instead of 3.8 MB). A cosine moves by under 1e-4; on eight test images the twelve twins were identical and one band count in 48 differed by one site at a band edge. `embeddings.bin` (float32) stays the source for every script.
+
+What is left is mostly the vision model (7.7 MB gzipped) and the phone's CPU. On desktop without a throttle, the first result is a few seconds.
 
 ## Next
 
