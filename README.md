@@ -67,6 +67,16 @@ The worked example on the home page is real: `public/example/acme-before.html` a
 
 Layout traits read against each page's own background, so dark pages are judged like light ones. `npm run dataset:layout` recomputes `centered` and `gradient` for the catalog from the thumbnails with the same function the browser runs; zone names stay as they are.
 
+### How a result reads
+
+A result is one page in three steps, in plain words. On top, the answer as a sentence ("Your page looks a lot like 14 AI-built sites"), a three-level meter (a little, somewhat, a lot) and a "What does it mean?" note with the percentile behind it. Then:
+
+1. **See your twins.** The page and its closest twin in one frame, with a divider to slide between them (it sweeps once on first view, not with reduced motion) or side by side. Thumbnails are 420px wide, so the frame stays near 760px on desktop with the other twins beside it.
+2. **Why they look alike.** The traits shared with the twins, marked on the screenshot, each with "Not right?" to correct it.
+3. **How to set it apart.** The moves, the prompt, and a "Changed it already?" block that takes the new screenshot and shows the before and after.
+
+Everything else (words, competitors, ideas, the map and zone, sharing) sits folded under "More" and loads only when opened. On the map a tap pins a card with a link; dragging or scrolling across it never opens a site.
+
 ### More in a result
 
 - **One sentence first:** why the page looks like its twins and the change with the most effect.
@@ -81,7 +91,21 @@ Layout traits read against each page's own background, so dark pages are judged 
 
 ### Report
 
-`/report` is the catalog in numbers: how many pages share four layouts, how many have a look-alike in the top 1%, colours, the most crowded categories, stock phrases (a lower bound, from thumbnails) and the largest zones, with the method and its limits. `scripts/report-data.ts` writes `public/data/report.json` from the files already in `public/data` and runs as part of `npm run build`. The build also writes `dist/report/index.html` with its own title and description for crawlers and link previews.
+`/report` is the catalog in numbers: how many pages have a look-alike in the top 1% and how many have eight or more in the top 5%, light versus dark backgrounds, how often the headline is centred (from the hand-checked sample), colours, the most crowded categories, stock phrases (a lower bound, from thumbnails) and the largest zones, with the method and its limits. `scripts/report-data.ts` writes `public/data/report.json` from the files already in `public/data` and runs as part of `npm run build`. The build also writes `dist/report/index.html` with its own title and description for crawlers and link previews.
+
+### How reliable the layout rules are
+
+`quality/labels-2026-10-20.json` holds 200 random catalog pages labelled one by one by eye, blind to the detector (by Claude, the AI that built the check, not a panel of designers). `npm run reliability` scores the stored traits against them and writes `quality/reliability.json`, which the report reads. On 2026-10-20:
+
+| Trait | Agreement | Note |
+| --- | ---: | --- |
+| Light or dark background | 99% | |
+| Centred headline and button | 88% | reads only the headline band (14–55% of the height); thresholds set on the even-numbered labels, 89% on the odd ones (the earlier whole-band rule: 77%) |
+| Spacing (airy, balanced, packed) | 30% | counts only near-white pixels as empty, so dark and cream pages read as packed; background-relative versions and higher resolutions did not reach a useful level either |
+| Gradient wash | 88% | but a detected gradient was real 3 times in 10 |
+| Box grid | 95% | 0 of 6 grids found; the high agreement is just their rarity |
+
+So the diagnosis, the zone sentences and the report only name the background, the accent colour and centring. The other traits are still computed and stored, never claimed. Rerun the script after any detector change, and add labels to the file rather than tuning on it.
 
 ### What counts as a twin
 

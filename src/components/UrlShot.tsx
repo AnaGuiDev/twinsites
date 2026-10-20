@@ -32,6 +32,8 @@ export function UrlShot({ onFile }: { onFile: (file: File) => void }) {
   const [token, setToken] = useState("");
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<ShotNotice | null>(null);
+  // The check script did not load (often an ad blocker): say so only once someone tries.
+  const [blocked, setBlocked] = useState(false);
 
   const clearToken = () => setToken("");
 
@@ -60,7 +62,7 @@ export function UrlShot({ onFile }: { onFile: (file: File) => void }) {
       script.async = true;
       script.dataset.turnstile = "1";
       script.onload = mount;
-      script.onerror = () => setNotice("generic");
+      script.onerror = () => setBlocked(true);
       document.head.appendChild(script);
     }
     return () => {
@@ -129,7 +131,8 @@ export function UrlShot({ onFile }: { onFile: (file: File) => void }) {
         </button>
       </div>
       {siteKey && <div ref={box} className="turnstile" />}
-      {waiting && !notice && <p className="shot-wait">{t.shotVerifying}</p>}
+      {waiting && !notice && !blocked && <p className="shot-wait">{t.shotVerifying}</p>}
+      {blocked && url.trim().length >= 8 && <p className="score-note">{t.errorCaptcha}</p>}
       {notice === "verify" && <p className="score-note">{t.errorVerify}</p>}
       {notice === "busy" && <p className="score-note">{t.errorBusy}</p>}
       {notice === "generic" && <p className="score-note">{t.errorShot}</p>}

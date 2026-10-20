@@ -297,7 +297,11 @@ export function App() {
             <Mosaic
               slot={
                 <>
-                  <h1>{t.title}</h1>
+                  <h1>
+                    {t.title
+                      .split(/(AI-built)/)
+                      .map((part, index) => (part === "AI-built" ? <span key={index} className="nowrap">{part}</span> : part))}
+                  </h1>
                   <p className="lede">{t.lede(catalogCount ?? 2003)}</p>
                   <div className="actions">
                     <DropZone
@@ -309,11 +313,16 @@ export function App() {
                       stageLabel={stage ? stageCopy[stage] : null}
                     />
                     <UrlShot onFile={onFile} />
-                    <p className="example-row">
-                      <button type="button" className="text-link as-button" onClick={onExample}>
-                        {t.tryExample}
-                      </button>
-                    </p>
+                    <button type="button" className="example-teaser" onClick={onExample}>
+                      <span className="teaser-pair" aria-hidden="true">
+                        <img src="/example/acme-before-thumb.webp" alt="" width={120} height={75} />
+                        <span className="teaser-num">14 → 0</span>
+                        <img src="/example/acme-after-thumb.webp" alt="" width={120} height={75} />
+                      </span>
+                      <span className="teaser-text">
+                        {t.exampleTeaser} <span className="text-link">{t.exampleSee}</span>
+                      </span>
+                    </button>
                   </div>
                   {error && (
                     <p className="error" role="alert">

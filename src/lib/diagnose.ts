@@ -29,7 +29,15 @@ export interface Diagnosis {
   catalogTotal: number;
 }
 
-const KEYS: TraitKey[] = ["mode", "color", "density", "gradient", "bento", "centered"];
+/**
+ * The traits a diagnosis may name. Checked on 200 random catalog pages
+ * labelled by eye, blind to the detector (quality/, npm run reliability): the ground (light
+ * or dark) agreed 99% of the time, centring 88% (89% on the half not used to
+ * tune it).
+ * Density, the gradient wash and box grids did not hold up (30%, 3 in 10 and
+ * 0 of 6), so they are still measured but never claimed. See /faq.
+ */
+const KEYS: TraitKey[] = ["mode", "color", "centered"];
 
 function same(key: TraitKey, a: Traits, b: Traits): boolean {
   switch (key) {
@@ -79,9 +87,7 @@ export function diagnose(user: Traits, twins: Traits[], catalog: Traits[]): Diag
   const prevalence = (key: TraitKey) =>
     catalog.length ? catalog.filter((site) => same(key, user, site)).length / catalog.length : 0;
 
-  // An absence ("no box grid") is not part of a look, so it never makes the recipe.
-  const keys = KEYS.filter((key) => !(key === "bento" && !user.bento));
-  const ranked = keys.map((key) => ({ key, twins: count(key), catalog: prevalence(key) })).sort(
+  const ranked = KEYS.map((key) => ({ key, twins: count(key), catalog: prevalence(key) })).sort(
     (a, b) => b.twins - a.twins || b.catalog - a.catalog,
   );
   let recipe = ranked.filter((part) => part.twins >= Math.ceil(twins.length * 0.58)).slice(0, 4);
@@ -120,7 +126,7 @@ export function diagnose(user: Traits, twins: Traits[], catalog: Traits[]): Diag
     }
   };
   const candidates = suggest(user, twins)
-    .filter(fits)
+    .filter((item) => fits(item) && KEYS.includes(keyOf(item)))
     .map((item) => ({ item, twins: count(keyOf(item)) }));
   const strong = candidates.filter((move) => move.twins >= Math.ceil(twins.length / 2));
   const moves = strong.length ? strong : candidates.slice(0, 1);

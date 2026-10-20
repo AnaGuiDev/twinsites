@@ -40,11 +40,8 @@ export function zoneSentence(zone: ZoneRecord, lang: Lang): string {
   if (zone.dark >= 0.62) looks.push(es ? "oscuras" : "dark");
   else if (zone.dark <= 0.38) looks.push(es ? "claras" : "light");
   if (zone.centered >= 0.58) looks.push(es ? "centradas" : "centered");
-  if (zone.packed >= 0.48) looks.push(es ? "densas" : "dense");
-  else if (zone.airy >= 0.48) looks.push(es ? "aireadas" : "open");
+  // Density, gradient and box grids are not said: by hand they did not hold up (see /faq).
   const extra: string[] = [];
-  if (zone.gradient >= 0.45) extra.push(es ? "muchas llevan un degradado" : "many use a gradient");
-  if (zone.bento >= 0.4) extra.push(es ? "abundan las retículas de cajas" : "box grids are common");
   const lookText = looks.length ? (es ? `Suelen ser ${join(looks, es)}` : `The pages tend to be ${join(looks, es)}`) : "";
   const colorText = es ? `El acento que más aparece es el ${color}` : `${cap(color)} is the accent that shows up most`;
   const tail = [lookText, colorText, extra.length ? extra.join(es ? " y " : ", and ") : ""].filter(Boolean).join(". ");

@@ -7,6 +7,7 @@ import { CorrectionReport, type Fix } from "./CorrectionReport";
 import { SubscribeForm } from "./SubscribeForm";
 import { Fold, jumpTo } from "./Fold";
 import { Badge } from "./Badge";
+import { TwinCompare } from "./TwinCompare";
 import { MapView } from "./MapView";
 import { RouteLink } from "../router";
 import { useI18n } from "../i18n";
@@ -35,7 +36,6 @@ export function ResultView({
   stageLabel: string | null;
 }) {
   const { lang, t } = useI18n();
-  const phone = useMemo(() => window.matchMedia("(max-width: 720px)").matches, []);
   const [includeMine, setIncludeMine] = useState(false);
   const [cardUrl, setCardUrl] = useState<string | null>(null);
   const cardBlob = useRef<Blob | null>(null);
@@ -65,12 +65,19 @@ export function ResultView({
   // The preview on screen now: a reading started for an earlier result is dropped.
   const shown = useRef(result.preview);
   shown.current = result.preview;
-  useEffect(
-    () => () => {
+  useEffect(() => {
+    // Leaving the page aborts the reader's downloads: that is not a failure to report.
+    const leave = () => {
       shown.current = "";
-    },
-    [],
-  );
+    };
+    window.addEventListener("pagehide", leave);
+    window.addEventListener("beforeunload", leave);
+    return () => {
+      leave();
+      window.removeEventListener("pagehide", leave);
+      window.removeEventListener("beforeunload", leave);
+    };
+  }, []);
   const readWords = useCallback(async () => {
     const preview = result.preview;
     setWords({ status: "reading", lines: [], found: [] });
@@ -289,24 +296,84 @@ export function ResultView({
     window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`, "_blank", "noopener,noreferrer");
   };
 
+  const own = result.source === "upload";
+  const none = result.verdict.mode === "none";
+  const level = none ? 0 : result.verdict.mode === "neighborhood" || result.verdict.top <= 5 ? 2 : 1;
+  const levelWord = t.meterLevels[level];
+  const closest = result.twins[0];
+  const [allTwins, setAllTwins] = useState(false);
+  const youLabel = own ? t.compareYou : clipTitle(result.subjectTitle);
+  const marked = (
+    <div className="marked">
+      <img src={result.preview} alt={own ? t.you : result.subjectTitle} />
+      {showMarks && regions && (
+        <svg className="marks-layer" viewBox="0 0 160 100" preserveAspectRatio="none" aria-hidden="true">
+          {markKeys.has("color") &&
+            regions.accent.map((cell) => (
+              <rect key={`${cell.x},${cell.y}`} x={cell.x * 160} y={cell.y * 100} width={160 / 48} height={100 / 30} fill="#ffe24a" opacity="0.7" />
+            ))}
+          {markKeys.has("centered") && regions.centre && (
+            <>
+              <line x1="80" x2="80" y1="0" y2="100" stroke="#fff" strokeWidth="1.6" />
+              <line x1="80" x2="80" y1="0" y2="100" stroke="#000" strokeWidth="0.6" strokeDasharray="2 1.5" />
+              <rect
+                x={regions.centre.x0 * 160}
+                y={regions.centre.y0 * 100}
+                width={(regions.centre.x1 - regions.centre.x0) * 160}
+                height={(regions.centre.y1 - regions.centre.y0) * 100}
+                fill="none"
+                stroke="#fff"
+                strokeWidth="2.2"
+              />
+              <rect
+                x={regions.centre.x0 * 160}
+                y={regions.centre.y0 * 100}
+                width={(regions.centre.x1 - regions.centre.x0) * 160}
+                height={(regions.centre.y1 - regions.centre.y0) * 100}
+                fill="none"
+                stroke="#000"
+                strokeWidth="1"
+              />
+            </>
+          )}
+        </svg>
+      )}
+    </div>
+  );
+
   return (
-    <div className="results">
-      <section className="result-head">
-        <div>
-          <h1 className="zone-title">{zoneName}</h1>
-          <p className="again-line">{secondary}</p>
-          <p className="summary">{t.summary({ diagnosis, traits: traits, verdict: result.verdict })}</p>
-          <p className="score-note">{t.scoreNote}</p>
+    <div className="results guided">
+      <section className="verdict-head" aria-labelledby="verdict-title">
+        <div className="verdict-main">
+          <p className="kicker">{own ? t.yourResult : t.siteResult(result.subjectTitle)}</p>
+          <h1 id="verdict-title" className="verdict-title">
+            {t.plainVerdict(result.verdict, result.catalogCount, own)}
+          </h1>
+          <p className="verdict-dek">{t.verdictDek(none)}</p>
           {result.cropped && <p className="score-note">{t.cropNote}</p>}
           {result.portrait && <p className="score-note">{t.portraitNote}</p>}
           {result.small && !result.portrait && <p className="score-note">{t.smallNote}</p>}
-          <p className="score-note">
-            <RouteLink className="text-link" href={`/zone/${result.zone.slug}`}>
-              {t.zoneLink(zoneName)}
-            </RouteLink>
-          </p>
         </div>
-        <DropZone onFile={onFile} onIntent={onIntent} compact progress={progress} progressLabel={t.progressLabel} stageLabel={stageLabel} />
+        <div className="verdict-side">
+          <div className="meter" role="img" aria-label={`${t.meterLabel}: ${levelWord}`}>
+            <div className="meter-labels" aria-hidden="true">
+              {t.meterLevels.map((word, index) => (
+                <span key={word} className={index === level ? "is-on" : undefined}>
+                  {word}
+                </span>
+              ))}
+            </div>
+            <div className="meter-bar" aria-hidden="true">
+              {[0, 1, 2].map((index) => (
+                <i key={index} className={index <= level ? "is-on" : undefined} />
+              ))}
+            </div>
+          </div>
+          <details className="what-is">
+            <summary>{t.whatIsTitle(levelWord)}</summary>
+            <p>{t.whatIsBody(result.verdict, result.catalogCount)}</p>
+          </details>
+        </div>
       </section>
 
       {delta && previous && compare !== false && (
@@ -371,190 +438,197 @@ export function ResultView({
       )}
       {forgotten && <p className="score-note">{t.forgottenCheck}</p>}
 
-      <nav className="result-nav" aria-label={t.navLabel}>
+      <nav className="steps-nav" aria-label={t.stepsLabel}>
         {(
           [
-            ["fix", t.navFix],
-            ...(result.source === "upload" ? ([["words", t.navWords]] as const) : []),
-            ["share", t.navShare],
-            ["twins", t.navTwins],
-            ["ideas", t.navIdeas],
-            ["rivals", t.navRivals],
-            ["map", t.navMap],
+            ["step-twins", none ? t.stepTwinsNone : t.stepTwins],
+            ["step-why", t.stepWhy],
+            ["step-fix", t.stepFix],
           ] as const
-        ).map(([id, label]) => (
-          <button key={id} type="button" className="chip" onClick={() => jumpTo(id)}>
+        ).map(([id, label], index) => (
+          <button key={id} type="button" onClick={() => jumpTo(id)}>
+            <span className="step-num">{index + 1}</span>
             {label}
           </button>
         ))}
       </nav>
 
-      <section className="reveal" aria-label={t.revealLabel}>
-        <figure>
-          <div className="marked">
-            <img src={result.preview} alt={result.source === "upload" ? t.you : result.subjectTitle} />
-            {showMarks && regions && (
-              <svg className="marks-layer" viewBox="0 0 160 100" preserveAspectRatio="none" aria-hidden="true">
-                <defs>
-                  <pattern id="hatch" width="3" height="3" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-                    <rect width="1.4" height="3" fill="#ffe24a" />
-                  </pattern>
-                </defs>
-                {markKeys.has("density") &&
-                  regions.empty.map((band) => (
-                    <rect key={band.y0} x="0" y={band.y0 * 100} width="160" height={(band.y1 - band.y0) * 100} fill="url(#hatch)" opacity="0.75" />
-                  ))}
-                {markKeys.has("gradient") && (
-                  <>
-                    <rect x="0" y="12" width="11.2" height="88" fill="url(#hatch)" opacity="0.85" />
-                    <rect x="148.8" y="12" width="11.2" height="88" fill="url(#hatch)" opacity="0.85" />
-                  </>
-                )}
-                {markKeys.has("color") &&
-                  regions.accent.map((cell) => (
-                    <rect key={`${cell.x},${cell.y}`} x={cell.x * 160} y={cell.y * 100} width={160 / 48} height={100 / 30} fill="#ffe24a" opacity="0.7" />
-                  ))}
-                {markKeys.has("centered") && regions.centre && (
-                  <>
-                    <line x1="80" x2="80" y1="0" y2="100" stroke="#fff" strokeWidth="1.6" />
-                    <line x1="80" x2="80" y1="0" y2="100" stroke="#000" strokeWidth="0.6" strokeDasharray="2 1.5" />
-                    <rect
-                      x={regions.centre.x0 * 160}
-                      y={regions.centre.y0 * 100}
-                      width={(regions.centre.x1 - regions.centre.x0) * 160}
-                      height={(regions.centre.y1 - regions.centre.y0) * 100}
-                      fill="none"
-                      stroke="#fff"
-                      strokeWidth="2.2"
-                    />
-                    <rect
-                      x={regions.centre.x0 * 160}
-                      y={regions.centre.y0 * 100}
-                      width={(regions.centre.x1 - regions.centre.x0) * 160}
-                      height={(regions.centre.y1 - regions.centre.y0) * 100}
-                      fill="none"
-                      stroke="#000"
-                      strokeWidth="1"
-                    />
-                  </>
-                )}
-              </svg>
-            )}
-          </div>
-          <figcaption>
-            <strong>{result.source === "upload" ? t.you : result.subjectTitle}</strong>
-          </figcaption>
-          {legend.length > 0 && (
-            <div className="legend">
-              {showMarks && (
-                <ul>
-                  {legend.map((item) => (
-                    <li key={item.key}>
-                      <i className={`key key-${item.style}`} aria-hidden="true" />
-                      {item.label}
-                    </li>
-                  ))}
-                </ul>
-              )}
-              <button type="button" className="text-link as-button" onClick={() => setShowMarks((value) => !value)}>
-                {showMarks ? t.marksHide : t.marksShow}
-              </button>
+      <section className="step" id="step-twins" aria-labelledby="step-twins-title">
+        <h2 id="step-twins-title" className="step-title">
+          <span className="step-num">1</span>
+          {none ? t.stepTwinsNone : t.stepTwins}
+        </h2>
+        <div className="twins-layout">
+          {closest && (
+            <div className="twins-main">
+              <TwinCompare you={result.preview} twin={thumb(closest.site.thumb)} youLabel={youLabel} twinLabel={t.compareTwin} />
             </div>
           )}
-        </figure>
-        {result.twins[0] && (
-          <figure>
-            <img className="developing" src={thumb(result.twins[0].site.thumb)} alt={result.twins[0].site.title} />
-            <figcaption>
-              {t.closest} <strong>{result.twins[0].site.title}</strong>
-            </figcaption>
-          </figure>
-        )}
-      </section>
-
-      <section className="diagnosis" id="fix">
-        <div className="section-head">
-          <h2>{t.diagnosisTitle}</h2>
-          <p>
-            {t.diagnosisLine(diagnosis)}{" "}
-            <span className="caveat">
-              {t.diagnosisCaveat}{" "}
-              <RouteLink className="text-link" href="/faq">
-                {t.reliability}
-              </RouteLink>
-            </span>
-          </p>
+          <div className="twins-aside">
+            {closest && (
+              <p className="closest-line">
+                <strong>{t.closestCaption}</strong>{" "}
+                <RouteLink href={`/site/${closest.site.slug}`}>{closest.site.title}</RouteLink>
+                {" · "}
+                <a href={closest.site.url} target="_blank" rel="noreferrer">
+                  {hostOf(closest.site.url)}
+                </a>
+              </p>
+            )}
+            {!allTwins && (
+              <div className="twin-strip">
+                {result.twins.slice(1, 4).map((twin) => (
+                  <RouteLink key={twin.site.id} className="twin-shot" href={`/site/${twin.site.slug}`}>
+                    <img src={thumb(twin.site.thumb)} alt={twin.site.title} loading="lazy" />
+                  </RouteLink>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
-        <ul className="recipe">
-          {diagnosis.recipe.map((part) => (
-            <li key={part.key}>
-              <button
-                type="button"
-                className={editing === part.key ? "recipe-chip is-open" : "recipe-chip"}
-                aria-expanded={editing === part.key}
-                title={t.correctHint}
-                onClick={() => setEditing((current) => (current === part.key ? null : part.key))}
-              >
-                {part.key === "color" && <i className="swatch" style={{ background: traits.dominant }} />}
-                <strong>{t.traitLabel(part.key, traits)}</strong>
-                <span>{t.moveEvidence(part.twins, diagnosis.twinTotal)}</span>
-              </button>
-            </li>
-          ))}
-        </ul>
-        {editing && (
-          <div className="correct-box">
-            <p>{t.correctAsk(t.traitLabel(editing, traits))}</p>
-            <div className="share-actions">
-              {alternativesFor(editing, traits).map((value) => (
-                <button
-                  key={value}
-                  type="button"
-                  className="ticket ghost"
-                  onClick={() => {
-                    const detected = valueOf(editing, result.traits);
-                    setFixes((current) => [
-                      ...current.filter((fix) => fix.trait !== editing),
-                      ...(value === detected ? [] : [{ trait: editing, detected, corrected: value }]),
-                    ]);
-                    setEditing(null);
-                  }}
-                >
-                  {t.traitLabel(editing, { ...traits, ...patchFor(editing, value) })}
-                </button>
-              ))}
-              <button type="button" className="text-link as-button" onClick={() => setEditing(null)}>
-                {t.correctCancel}
-              </button>
-            </div>
+        {allTwins && (
+          <div className="twin-grid">
+            {result.twins.map((twin) => (
+              <article className="twin-card" key={twin.site.id}>
+                <RouteLink className="twin-shot" href={`/site/${twin.site.slug}`}>
+                  <img src={thumb(twin.site.thumb)} alt={twin.site.title} loading="lazy" />
+                </RouteLink>
+                <div className="twin-meta">
+                  <h3>
+                    <RouteLink href={`/site/${twin.site.slug}`}>{twin.site.title}</RouteLink>
+                  </h3>
+                  <span className="sim" title={t.simLabel}>
+                    {formatPercentile(twin.percentile, lang)}
+                  </span>
+                  <p className="host">
+                    <a href={twin.site.url} target="_blank" rel="noreferrer" aria-label={`${t.openSite}: ${hostOf(twin.site.url)}`}>
+                      {hostOf(twin.site.url)}
+                    </a>
+                  </p>
+                </div>
+              </article>
+            ))}
           </div>
         )}
-        {!editing && fixes.length === 0 && <p className="score-note">{t.correctHint}</p>}
-        {fixes.length > 0 && (
-          <div className="fixes">
-            <ul>
-              {fixes.map((fix) => (
-                <li key={fix.trait}>
-                  {t.correctedLine(
-                    t.traitLabel(fix.trait, { ...result.traits, ...patchFor(fix.trait, fix.detected) }),
-                    t.traitLabel(fix.trait, { ...result.traits, ...patchFor(fix.trait, fix.corrected) }),
-                  )}{" "}
+        <button type="button" className="text-link as-button see-all" onClick={() => setAllTwins((value) => !value)} aria-expanded={allTwins}>
+          {allTwins ? t.hideTwins : t.seeAllTwins(result.twins.length)}
+        </button>
+      </section>
+
+      <section className="step diagnosis" id="step-why" aria-labelledby="step-why-title">
+        <h2 id="step-why-title" className="step-title">
+          <span className="step-num">2</span>
+          {t.stepWhy}
+        </h2>
+        <div className="why-grid">
+          <figure className="why-shot">
+            {marked}
+            {legend.length > 0 && (
+              <div className="legend">
+                {showMarks && (
+                  <ul>
+                    {legend.map((item) => (
+                      <li key={item.key}>
+                        <i className={`key key-${item.style}`} aria-hidden="true" />
+                        {item.label}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <button type="button" className="text-link as-button" onClick={() => setShowMarks((value) => !value)}>
+                  {showMarks ? t.marksHide : t.marksShow}
+                </button>
+              </div>
+            )}
+          </figure>
+          <div className="why-side">
+            <p className="step-dek">{t.whyDek(diagnosis.recipe.length)}</p>
+            <ul className="recipe trait-rows">
+              {diagnosis.recipe.map((part) => (
+                <li key={part.key}>
+                  <span className="trait-text">
+                    <strong>
+                      {part.key === "color" && <i className="swatch" style={{ background: traits.dominant }} />}
+                      {t.traitLabel(part.key, traits)}
+                    </strong>
+                    <span>{t.traitLike(part.twins, diagnosis.twinTotal)}</span>
+                  </span>
                   <button
                     type="button"
-                    className="text-link as-button"
-                    onClick={() => setFixes((current) => current.filter((item) => item.trait !== fix.trait))}
+                    className={editing === part.key ? "recipe-chip is-open" : "recipe-chip"}
+                    aria-expanded={editing === part.key}
+                    onClick={() => setEditing((current) => (current === part.key ? null : part.key))}
                   >
-                    {t.correctUndo}
+                    {t.notRight}
                   </button>
+                  {editing === part.key && (
+                    <div className="correct-box">
+                      <p>{t.correctAsk(t.traitLabel(part.key, traits))}</p>
+                      <div className="share-actions">
+                        {alternativesFor(part.key, traits).map((value) => (
+                          <button
+                            key={value}
+                            type="button"
+                            className="ticket ghost"
+                            onClick={() => {
+                              const detected = valueOf(part.key, result.traits);
+                              setFixes((current) => [
+                                ...current.filter((fix) => fix.trait !== part.key),
+                                ...(value === detected ? [] : [{ trait: part.key, detected, corrected: value }]),
+                              ]);
+                              setEditing(null);
+                            }}
+                          >
+                            {t.traitLabel(part.key, { ...traits, ...patchFor(part.key, value) })}
+                          </button>
+                        ))}
+                        <button type="button" className="text-link as-button" onClick={() => setEditing(null)}>
+                          {t.correctCancel}
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </li>
               ))}
             </ul>
-            <CorrectionReport fixes={fixes} traits={result.traits} />
+            {fixes.length > 0 && (
+              <div className="fixes">
+                <ul>
+                  {fixes.map((fix) => (
+                    <li key={fix.trait}>
+                      {t.correctedLine(
+                        t.traitLabel(fix.trait, { ...result.traits, ...patchFor(fix.trait, fix.detected) }),
+                        t.traitLabel(fix.trait, { ...result.traits, ...patchFor(fix.trait, fix.corrected) }),
+                      )}{" "}
+                      <button
+                        type="button"
+                        className="text-link as-button"
+                        onClick={() => setFixes((current) => current.filter((item) => item.trait !== fix.trait))}
+                      >
+                        {t.correctUndo}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+                <CorrectionReport fixes={fixes} traits={result.traits} />
+              </div>
+            )}
+            <p className="score-note">
+              <RouteLink className="text-link" href="/faq">
+                {t.reliabilityLink}
+              </RouteLink>
+            </p>
           </div>
-        )}
-        <div className="fix">
-          <div>
-            <h3 className="fix-title">{t.movesTitle}</h3>
+        </div>
+      </section>
+
+      <section className="step" id="step-fix" aria-labelledby="step-fix-title">
+        <h2 id="step-fix-title" className="step-title">
+          <span className="step-num">3</span>
+          {t.stepFix}
+        </h2>
+        <div className="fix-grid">
+          <div className="fix-main">
             <ol className="moves">
               {diagnosis.moves.map((move) => (
                 <li key={move.item.id}>
@@ -563,122 +637,123 @@ export function ResultView({
                 </li>
               ))}
             </ol>
+            <div className="prompt-box">
+              <h3 className="fix-title">{t.promptTitle}</h3>
+              <p className="dek">{t.promptDek}</p>
+              <pre className="prompt-text" tabIndex={0}>
+                {promptText}
+              </pre>
+              <button type="button" className="ticket" onClick={() => void copyPrompt()}>
+                {copied ? t.copiedPrompt : t.copyPrompt}
+              </button>
+              <p className="score-note">{t.promptCaveat}</p>
+            </div>
           </div>
-          <div className="prompt-box">
-            <h3 className="fix-title">{t.promptTitle}</h3>
-            <p className="dek">
-              {t.promptDek} {t.promptCaveat}
-            </p>
-            <pre className="prompt-text" tabIndex={0}>
-              {promptText}
-            </pre>
-            <button type="button" className="ticket" onClick={() => void copyPrompt()}>
-              {copied ? t.copiedPrompt : t.copyPrompt}
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {result.source === "upload" && (
-        <div id="words">
-          <CopyCheck words={words} counts={copyCounts} total={copyTotal} onRead={() => void readWords()} />
-        </div>
-      )}
-
-      <section className="share" id="share">
-        <div className="share-card">
-          {cardUrl ? <img className="card-preview" src={cardUrl} alt={shareText} /> : <div className="card-preview is-loading" />}
-        </div>
-        <div className="share-side">
-          <h2>{showProgress ? t.shareProgressTitle : t.shareTitle}</h2>
-          <p className="dek">{showProgress ? t.shareProgressDek : t.shareDek}</p>
-          {showProgress ? (
-            <label className="include">
-              <input type="checkbox" checked={includeBoth} onChange={(event) => setIncludeBoth(event.target.checked)} />
-              {t.includeBoth}
-            </label>
-          ) : (
-            result.source === "upload" && (
-              <label className="include">
-                <input type="checkbox" checked={includeMine} onChange={(event) => setIncludeMine(event.target.checked)} />
-                {t.includeMine}
-              </label>
-            )
-          )}
-          <div className="share-actions">
-            <button type="button" className="ticket" onClick={() => void onShare()}>
-              {t.post}
-            </button>
-            {cardUrl && (
-              <a className="ticket ghost" href={cardUrl} download="twinsites-card.png" onClick={() => track("share")}>
-                {t.download}
-              </a>
-            )}
-          </div>
-          <p className="share-note">{t.shareNote}</p>
-        </div>
-      </section>
-
-      {result.source === "upload" && !result.small && result.bands?.[95] === 0 && <Badge total={result.catalogCount} />}
-
-      <section id="twins">
-        <div className="section-head">
-          <h2>{t.twinsTitle}</h2>
-          <p>{t.twinsDek}</p>
-        </div>
-        <div className="twin-grid">
-          {result.twins.map((twin) => (
-            <article className="twin-card" key={twin.site.id}>
-              <RouteLink className="twin-shot" href={`/site/${twin.site.slug}`}>
-                <img src={thumb(twin.site.thumb)} alt={twin.site.title} loading="lazy" />
-              </RouteLink>
-              <div className="twin-meta">
-                <h3>
-                  <RouteLink href={`/site/${twin.site.slug}`}>{twin.site.title}</RouteLink>
-                </h3>
-                <span className="sim" title={t.simLabel}>
-                  {formatPercentile(twin.percentile, lang)}
-                </span>
-                <p className="host">
-                  <a href={twin.site.url} target="_blank" rel="noreferrer" aria-label={`${t.openSite}: ${hostOf(twin.site.url)}`}>
-                    {hostOf(twin.site.url)}
-                  </a>
-                </p>
+          <div className="loop-box">
+            <h3>{own ? t.loopTitle : t.loopOther}</h3>
+            <p>{own ? t.loopDek : t.loopOtherDek}</p>
+            {own && (
+              <div className="loop-pair">
+                <figure>
+                  <img src={result.preview} alt="" />
+                  <figcaption>{t.loopBefore(result.bands?.[95] ?? result.verdict.count)}</figcaption>
+                </figure>
+                <figure className="loop-next">
+                  <span>{t.loopAfter}</span>
+                </figure>
               </div>
-            </article>
-          ))}
+            )}
+            <DropZone
+              onFile={onFile}
+              onIntent={onIntent}
+              compact
+              label={own ? t.loopUpload : undefined}
+              progress={progress}
+              progressLabel={t.progressLabel}
+              stageLabel={stageLabel}
+            />
+          </div>
         </div>
       </section>
 
-      <Fold id="ideas" phone={phone} title={t.inspoTitle} hint={t.foldShow}>
-        <Inspiration initial={topCategory} />
-      </Fold>
+      {own && !result.small && result.bands?.[95] === 0 && <Badge total={result.catalogCount} />}
 
-      <Fold id="rivals" phone={phone} title={t.rivalsTitle} hint={t.foldShow}>
-        <Rivals result={result} />
-      </Fold>
-
-      <Fold id="map" phone={phone} title={t.mapTitle} hint={t.foldShow}>
-        <section>
-          <div className="section-head">
-            <h2>{t.mapTitle}</h2>
-            <p>{t.mapDek}</p>
-          </div>
-          {mapSites.length > 100 ? (
-            <MapView sites={mapSites} clusters={mapClusters} user={result.spot} lang={lang} />
-          ) : (
-            <p className="score-note">{t.loadingCatalog}</p>
-          )}
-          <p className="map-caption">
-            {t.mapHint} {t.zone}: {zoneName}.
-          </p>
-        </section>
-      </Fold>
+      <section className="more" aria-labelledby="more-title">
+        <h2 id="more-title">{t.moreTitle}</h2>
+        {own && (
+          <Fold id="words" title={t.moreWords} dek={t.moreWordsDek} hint={t.foldShow}>
+            <CopyCheck words={words} counts={copyCounts} total={copyTotal} onRead={() => void readWords()} />
+          </Fold>
+        )}
+        <Fold id="rivals" title={t.moreRivals} dek={t.moreRivalsDek} hint={t.foldShow}>
+          <Rivals result={result} />
+        </Fold>
+        <Fold id="ideas" title={t.moreIdeas} dek={t.moreIdeasDek} hint={t.foldShow}>
+          <Inspiration initial={topCategory} />
+        </Fold>
+        <Fold id="map" title={t.moreMap} dek={t.moreMapDek(zoneName)} hint={t.foldShow}>
+          <section>
+            <div className="section-head">
+              <h2>{t.mapTitle}</h2>
+              <p>{t.mapDek}</p>
+            </div>
+            {mapSites.length > 100 ? (
+              <MapView sites={mapSites} clusters={mapClusters} user={result.spot} lang={lang} />
+            ) : (
+              <p className="score-note">{t.loadingCatalog}</p>
+            )}
+            <p className="map-caption">
+              {t.mapHint}{" "}
+              <RouteLink className="text-link" href={`/zone/${result.zone.slug}`}>
+                {t.zoneLink(zoneName)}
+              </RouteLink>
+            </p>
+          </section>
+        </Fold>
+        <Fold id="share" title={t.moreShare} dek={t.moreShareDek} hint={t.foldShow}>
+          <section className="share">
+            <div className="share-card">
+              {cardUrl ? <img className="card-preview" src={cardUrl} alt={shareText} /> : <div className="card-preview is-loading" />}
+            </div>
+            <div className="share-side">
+              <h2>{showProgress ? t.shareProgressTitle : t.shareTitle}</h2>
+              <p className="dek">{showProgress ? t.shareProgressDek : t.shareDek}</p>
+              {showProgress ? (
+                <label className="include">
+                  <input type="checkbox" checked={includeBoth} onChange={(event) => setIncludeBoth(event.target.checked)} />
+                  {t.includeBoth}
+                </label>
+              ) : (
+                own && (
+                  <label className="include">
+                    <input type="checkbox" checked={includeMine} onChange={(event) => setIncludeMine(event.target.checked)} />
+                    {t.includeMine}
+                  </label>
+                )
+              )}
+              <div className="share-actions">
+                <button type="button" className="ticket" onClick={() => void onShare()}>
+                  {t.post}
+                </button>
+                {cardUrl && (
+                  <a className="ticket ghost" href={cardUrl} download="twinsites-card.png" onClick={() => track("share")}>
+                    {t.download}
+                  </a>
+                )}
+              </div>
+              <p className="share-note">{t.shareNote}</p>
+            </div>
+          </section>
+        </Fold>
+      </section>
       <SubscribeForm />
     </div>
   );
 }
 
+function clipTitle(text: string): string {
+  return text.length > 28 ? `${text.slice(0, 27).trimEnd()}…` : text;
+}
 
 const COLORS = ["red", "orange", "amber", "yellow", "lime", "green", "teal", "cyan", "blue", "indigo", "purple", "magenta", "pink", "neutral"] as const;
 

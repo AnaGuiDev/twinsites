@@ -18,7 +18,7 @@ export interface Fix {
 }
 
 /** Bumped when the trait rules change, so old and new corrections stay apart. */
-const RULES_VERSION = "layout-2026-10";
+const RULES_VERSION = "layout-2026-10-20";
 
 function endpoint(): string | null {
   const shot = import.meta.env.VITE_SHOT_ENDPOINT;
