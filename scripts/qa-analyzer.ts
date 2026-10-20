@@ -34,6 +34,14 @@ function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
 }
 
+/** Static HTML must not carry a style or script that style-src/script-src 'self' would block. */
+function assertNoInline(html: string, label: string): void {
+  assert(!/<style[\s>]/i.test(html), `${label} has a style element`);
+  assert(!/\sstyle\s*=/i.test(html), `${label} has a style attribute`);
+  const inline = [...html.matchAll(/<script\b([^>]*)>/gi)].filter((match) => !/\ssrc\s*=/i.test(match[1] ?? ""));
+  assert(inline.length === 0, `${label} has an inline script`);
+}
+
 async function waitForServer(): Promise<void> {
   const deadline = Date.now() + 30_000;
   while (Date.now() < deadline) {
@@ -323,6 +331,28 @@ try {
     const html = await (await fetch(`${BASE}/report/index.html`)).text();
     assert(/<title>What [\d,]+ AI-built homepages have in common/.test(html), "static title missing");
     assert(/Four layouts cover [\d.]+%/.test(html), "static description missing");
+    assertNoInline(html, "/report/index.html");
+  });
+
+  await check("static pages: no inline style or script, privacy CSS applies", async () => {
+    for (const file of [
+      "/privacy/index.html",
+      "/example/acme-before.html",
+      "/example/acme-after.html",
+      "/zones/index.html",
+      "/zone/warm-paper-atoll/index.html",
+      "/index.html",
+    ]) {
+      assertNoInline(await (await fetch(`${BASE}${file}`)).text(), file);
+    }
+    await page.goto(`${BASE}/privacy/`, { waitUntil: "networkidle" });
+    await page.locator("p.kicker").waitFor();
+    const background = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+    assert(background === "rgb(230, 222, 206)", `privacy background ${background}`);
+    for (const file of ["/example/acme-before.html", "/example/acme-after.html"]) {
+      await page.goto(`${BASE}${file}`, { waitUntil: "networkidle" });
+      await page.locator("h1").waitFor();
+    }
   });
 
   const phone = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
