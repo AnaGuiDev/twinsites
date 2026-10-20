@@ -65,12 +65,19 @@ export function ResultView({
   // The preview on screen now: a reading started for an earlier result is dropped.
   const shown = useRef(result.preview);
   shown.current = result.preview;
-  useEffect(
-    () => () => {
+  useEffect(() => {
+    // Leaving the page aborts the reader's downloads: that is not a failure to report.
+    const leave = () => {
       shown.current = "";
-    },
-    [],
-  );
+    };
+    window.addEventListener("pagehide", leave);
+    window.addEventListener("beforeunload", leave);
+    return () => {
+      leave();
+      window.removeEventListener("pagehide", leave);
+      window.removeEventListener("beforeunload", leave);
+    };
+  }, []);
   const readWords = useCallback(async () => {
     const preview = result.preview;
     setWords({ status: "reading", lines: [], found: [] });

@@ -68,8 +68,11 @@ type Pixel = (x: number, y: number) => readonly [number, number, number];
 /**
  * Composition read against the page's own background rather than absolute
  * brightness, so dark pages are judged the same way as light ones.
- *  - centered: the main band (below the nav, above the fold line) is laid out
- *    symmetrically around the vertical axis.
+ *  - centered: the headline band (below the nav, the upper half of the hero) is
+ *    laid out symmetrically around the vertical axis. The lower half is left
+ *    out: a wide screenshot or illustration under a centred headline used to
+ *    hide it. Tuned on half of quality/labels-2026-10-20.json and checked on
+ *    the other half: 89% agreement (77% for the earlier whole-band rule).
  *  - gradient: the background colour drifts gradually down the side margins,
  *    where text, cards and screenshots rarely reach.
  */
@@ -92,7 +95,7 @@ function layoutOf(at: Pixel, width: number, height: number): { centered: boolean
     Math.max(Math.abs(r - bg[0]), Math.abs(g - bg[1]), Math.abs(b - bg[2])) / 255 > 0.14;
 
   const y0 = Math.floor(height * 0.14);
-  const y1 = Math.floor(height * 0.82);
+  const y1 = Math.floor(height * 0.55);
   const cols = new Array<number>(width).fill(0);
   let total = 0;
   for (let y = y0; y < y1; y++) {
@@ -113,7 +116,7 @@ function layoutOf(at: Pixel, width: number, height: number): { centered: boolean
   const symmetry = total ? 1 - mirror / (2 * total) : 1;
   centroid = total ? centroid / total / width : 0.5;
   const busy = total / Math.max(1, (y1 - y0) * width);
-  const centered = busy > 0.015 && symmetry > 0.74 && Math.abs(centroid - 0.5) < 0.05;
+  const centered = busy > 0.01 && symmetry > 0.7 && Math.abs(centroid - 0.5) < 0.12;
 
   // Background drift, read in the side margins where content rarely sits:
   // median colour of six segments down each margin.

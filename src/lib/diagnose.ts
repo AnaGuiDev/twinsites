@@ -32,7 +32,8 @@ export interface Diagnosis {
 /**
  * The traits a diagnosis may name. Checked on 200 random catalog pages
  * labelled by eye, blind to the detector (quality/, npm run reliability): the ground (light
- * or dark) agreed 99% of the time, centring 80% (90% when it says centred).
+ * or dark) agreed 99% of the time, centring 88% (89% on the half not used to
+ * tune it).
  * Density, the gradient wash and box grids did not hold up (30%, 3 in 10 and
  * 0 of 6), so they are still measured but never claimed. See /faq.
  */
