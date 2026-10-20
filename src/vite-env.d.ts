@@ -12,3 +12,5 @@ interface ImportMeta {
 }
 
 declare const __ORT_BUILD__: string;
+/** Stored bytes of catalog.json, embeddings.f16.bin and calibration.json, for the progress bar. */
+declare const __DATA_BYTES__: [number, number, number];

@@ -8,7 +8,7 @@ import {
 const MODEL_ID = "Xenova/mobileclip_s0";
 
 /** Shipped byte sizes. The progress bar is bytes received over these, not a timer. */
-export const WASM_BYTES = 21_596_019;
+export const WASM_BYTES = 11_133_407;
 export const VISION_BYTES = 11_846_843;
 
 type Processor = Awaited<ReturnType<typeof AutoProcessor.from_pretrained>>;
@@ -59,8 +59,8 @@ export function configureRuntime(): void {
     // Same-origin factory. The library's default is a CDN, which COEP would block.
     // Explicit file URLs: a string prefix drops ?v= when ONNX joins the filename.
     wasm.wasmPaths = {
-      mjs: ortRuntimeUrl("ort-wasm-simd-threaded.jsep.mjs"),
-      wasm: ortRuntimeUrl("ort-wasm-simd-threaded.jsep.wasm"),
+      mjs: ortRuntimeUrl("ort-wasm-simd-threaded.mjs"),
+      wasm: ortRuntimeUrl("ort-wasm-simd-threaded.wasm"),
     };
     // The q8 vision graph is not stable with the threaded WASM runtime: the same
     // screenshot alternates between two embeddings. The catalog was encoded with
@@ -72,9 +72,10 @@ export function configureRuntime(): void {
 async function fetchWasm(): Promise<ArrayBuffer> {
   if (wasmPromise) return wasmPromise;
   wasmPromise = (async () => {
-    const response = await fetch(ortRuntimeUrl("ort-wasm-simd-threaded.jsep.wasm"));
+    const response = await fetch(ortRuntimeUrl("ort-wasm-simd-threaded.wasm"));
     if (!response.ok) throw new Error("wasm");
-    const total = Number(response.headers.get("content-length")) || WASM_BYTES;
+    // The stream yields decompressed bytes; with gzip, content-length is the compressed size.
+    const total = WASM_BYTES;
     const reader = response.body?.getReader();
     if (!reader) {
       const buffer = await response.arrayBuffer();
@@ -111,9 +112,12 @@ async function fetchWasm(): Promise<ArrayBuffer> {
 function noteModel(info: ProgressInfo): void {
   if (!info.file) return;
   if (info.status !== "progress" && info.status !== "done") return;
-  const total = info.total && info.total > 0 ? info.total : null;
+  // The library takes content-length as the total, which is the compressed size
+  // when the server sends gzip, and counts decompressed bytes: use the real size.
+  const reported = info.total && info.total > 0 ? info.total : null;
+  const total = info.file.endsWith(".onnx") ? VISION_BYTES : reported;
   if (info.status === "progress" && total && typeof info.loaded === "number") {
-    modelFiles.set(info.file, { loaded: info.loaded, total });
+    modelFiles.set(info.file, { loaded: Math.min(info.loaded, total), total });
   } else if (info.status === "done") {
     const prev = modelFiles.get(info.file);
     if (prev) modelFiles.set(info.file, { loaded: prev.total, total: prev.total });
