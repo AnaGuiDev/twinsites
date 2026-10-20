@@ -63,6 +63,103 @@ function densityOf(whitespace: number, edge: number): Density {
   return "balanced";
 }
 
+type Pixel = (x: number, y: number) => readonly [number, number, number];
+
+/**
+ * Composition read against the page's own background rather than absolute
+ * brightness, so dark pages are judged the same way as light ones.
+ *  - centered: the main band (below the nav, above the fold line) is laid out
+ *    symmetrically around the vertical axis.
+ *  - gradient: the background colour drifts gradually down the side margins,
+ *    where text, cards and screenshots rarely reach.
+ */
+function layoutOf(at: Pixel, width: number, height: number): { centered: boolean; gradient: boolean } {
+  // Background: mean colour of the most common luminance bin.
+  const bins = Array.from({ length: 24 }, () => ({ n: 0, r: 0, g: 0, b: 0 }));
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const [r, g, b] = at(x, y);
+      const bin = bins[Math.min(23, Math.floor(luminance(r, g, b) * 24))];
+      bin.n++;
+      bin.r += r;
+      bin.g += g;
+      bin.b += b;
+    }
+  }
+  const top = bins.reduce((best, bin) => (bin.n > best.n ? bin : best));
+  const bg = [top.r / top.n, top.g / top.n, top.b / top.n];
+  const far = (r: number, g: number, b: number) =>
+    Math.max(Math.abs(r - bg[0]), Math.abs(g - bg[1]), Math.abs(b - bg[2])) / 255 > 0.14;
+
+  const y0 = Math.floor(height * 0.14);
+  const y1 = Math.floor(height * 0.82);
+  const cols = new Array<number>(width).fill(0);
+  let total = 0;
+  for (let y = y0; y < y1; y++) {
+    for (let x = 0; x < width; x++) {
+      const [r, g, b] = at(x, y);
+      if (far(r, g, b)) {
+        cols[x]++;
+        total++;
+      }
+    }
+  }
+  let mirror = 0;
+  let centroid = 0;
+  for (let x = 0; x < width; x++) {
+    mirror += Math.abs(cols[x] - cols[width - 1 - x]);
+    centroid += (x + 0.5) * cols[x];
+  }
+  const symmetry = total ? 1 - mirror / (2 * total) : 1;
+  centroid = total ? centroid / total / width : 0.5;
+  const busy = total / Math.max(1, (y1 - y0) * width);
+  const centered = busy > 0.015 && symmetry > 0.74 && Math.abs(centroid - 0.5) < 0.05;
+
+  // Background drift, read in the side margins where content rarely sits:
+  // median colour of six segments down each margin.
+  const strip = Math.max(2, Math.round(width * 0.07));
+  const segments = 6;
+  const medians: number[][] = [];
+  let texture = 0;
+  for (const [xa, xb] of [
+    [0, strip],
+    [width - strip, width],
+  ]) {
+    for (let k = 0; k < segments; k++) {
+      const ya = Math.floor(height * 0.12 + ((height * 0.88) / segments) * k);
+      const yb = Math.floor(height * 0.12 + ((height * 0.88) / segments) * (k + 1));
+      const rs: number[] = [];
+      const gs: number[] = [];
+      const bs: number[] = [];
+      for (let y = ya; y < yb; y++) {
+        for (let x = xa; x < xb; x++) {
+          const [r, g, b] = at(x, y);
+          rs.push(r);
+          gs.push(g);
+          bs.push(b);
+        }
+      }
+      const mid = (list: number[]) => list.sort((p, q) => p - q)[list.length >> 1] / 255;
+      medians.push([mid(rs), mid(gs), mid(bs)]);
+      // Texture inside the segment: a photo is busy, a wash is smooth.
+      const lums = rs.map((r, i) => luminance(r, gs[i], bs[i]));
+      const mean = lums.reduce((sum, v) => sum + v, 0) / Math.max(1, lums.length);
+      texture += Math.sqrt(lums.reduce((sum, v) => sum + (v - mean) ** 2, 0) / Math.max(1, lums.length));
+    }
+  }
+  texture /= segments * 2;
+  const dist = (p: number[], q: number[]) => Math.hypot(p[0] - q[0], p[1] - q[1], p[2] - q[2]);
+  let range = 0;
+  for (let i = 0; i < medians.length; i++) for (let j = i + 1; j < medians.length; j++) range = Math.max(range, dist(medians[i], medians[j]));
+  let step = 0;
+  for (let side = 0; side < 2; side++) {
+    for (let k = 0; k + 1 < segments; k++) step = Math.max(step, dist(medians[side * segments + k], medians[side * segments + k + 1]));
+  }
+  // A wash: the margins drift, gradually rather than in one jump between bands.
+  const gradient = range > 0.04 && step / range < 0.55 && texture < 0.035;
+  return { centered, gradient };
+}
+
 /**
  * Visual traits from tightly downscaled pixels. `channels` is 3 (RGB) or 4 (RGBA).
  * The same function runs in the dataset pipeline and in the browser.
@@ -233,11 +330,12 @@ export function analyzePixels(
   const edge = edgeChecks ? edges / edgeChecks : 0;
   const saturation = satSum / n;
   const mode: Mode = globalLum < 0.45 ? "dark" : "light";
-  const gradient = blockStd > 0.1 && edge < 0.09;
+  const layout = layoutOf(at, width, height);
+  const gradient = layout.gradient && edge < 0.13;
   const bento =
     cards.length >= 5 && cardStd < 0.11 && edge > 0.035 && edge < 0.2 && whitespace > 0.05 && whitespace < 0.5;
   const centerShare = centerContent / (centerContent + sideContent + 1e-6);
-  const centered = centerShare > 0.7;
+  const centered = layout.centered;
 
   const ranked = [...bins.entries()].sort((a, b) => b[1].n - a[1].n);
   const top = ranked[0];

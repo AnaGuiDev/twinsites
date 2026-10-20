@@ -7,7 +7,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsx scripts/precompute-explore.ts && tsc --noEmit && vite build",
+    "build": "tsx scripts/precompute-explore.ts && tsx scripts/report-data.ts && tsc --noEmit && vite build",
     "preview": "vite preview --host 127.0.0.1 --port 4173",
     "test:worker": "tsx --test worker/test/*.test.ts",
     "dataset": "tsx scripts/build-dataset.ts",
@@ -16,7 +16,12 @@
     "dataset:project": "tsx scripts/project.ts",
     "dataset:calibrate": "tsx scripts/refresh-meta.ts",
     "dataset:mosaic": "tsx scripts/mosaic.ts",
-    "typecheck": "tsc --noEmit"
+    "dataset:layout": "tsx scripts/refresh-layout.ts",
+    "dataset:distinct": "tsx scripts/distinct.ts",
+    "dataset:copy": "tsx scripts/catalog-copy.ts",
+    "typecheck": "tsc --noEmit",
+    "qa": "VITE_SHOT_ENDPOINT=https://twinsites-shot.twinsites.workers.dev VITE_TURNSTILE_SITEKEY=1x00000000000000000000AA npm run build && tsx scripts/qa-analyzer.ts",
+    "dataset:report": "tsx scripts/report-data.ts"
   },
   "engines": {
     "node": ">=20"
@@ -27,9 +32,12 @@
     "@fontsource/ibm-plex-mono": "^5.2.6",
     "@huggingface/transformers": "3.8.1",
     "react": "^19.1.1",
-    "react-dom": "^19.1.1"
+    "react-dom": "^19.1.1",
+    "tesseract.js": "^7.0.0"
   },
   "devDependencies": {
+    "@tesseract.js-data/eng": "^1.0.0",
+    "@tesseract.js-data/spa": "^1.0.0",
     "@types/react": "^19.1.13",
     "@types/react-dom": "^19.1.9",
     "@vitejs/plugin-react": "^5.0.2",

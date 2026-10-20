@@ -136,6 +136,70 @@ export async function renderShareCard(input: CardInput): Promise<HTMLCanvasEleme
   return canvas;
 }
 
+export interface ProgressCardInput {
+  before: number;
+  after: number;
+  /** The unit line under the numbers, e.g. "twins in the top 3%". */
+  unit: string;
+  /** Who they were compared with, e.g. "of 2,003 AI-built sites". */
+  among: string;
+  pageUrl: string;
+  /** Before and after screenshots; empty strings to leave them off. */
+  images: [string, string];
+  labels: [string, string];
+}
+
+/** The card worth posting: the drop in twins, with the page before and after. */
+export async function renderProgressCard(input: ProgressCardInput): Promise<HTMLCanvasElement> {
+  await Promise.all([
+    document.fonts.load(`820 extra-condensed 200px ${FAMILY}`),
+    document.fonts.load(`650 semi-condensed 34px ${FAMILY}`),
+    document.fonts.load(`600 20px ${FAMILY}`),
+  ]);
+  const canvas = document.createElement("canvas");
+  canvas.width = 1200;
+  canvas.height = 630;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("canvas");
+  const [beforeImage, afterImage] = await Promise.all(input.images.map((src) => (src ? loadImage(src) : Promise.resolve(null))));
+  const withImages = Boolean(beforeImage && afterImage);
+
+  ctx.fillStyle = "#ffe24a";
+  ctx.fillRect(0, 0, 1200, 630);
+  ctx.fillStyle = "#000000";
+  mark(ctx, 56, 44);
+  ctx.font = `800 24px ${FAMILY}`;
+  ctx.fillText("Twinsites", 96, 66);
+  ctx.font = `600 20px ${FAMILY}`;
+  const url = input.pageUrl.replace(/^https:\/\//, "");
+  ctx.fillText(url, 1144 - ctx.measureText(url).width, 66);
+
+  const textWidth = withImages ? 560 : 1088;
+  const numbers = `${input.before} → ${input.after}`;
+  const size = fitText(ctx, numbers, textWidth, withImages ? 210 : 260, `820 extra-condensed SIZEpx ${FAMILY}`);
+  ctx.font = `820 extra-condensed ${size}px ${FAMILY}`;
+  const numbersY = 130 + size * 0.8;
+  ctx.fillText(numbers, 52, numbersY);
+  ctx.font = `650 semi-condensed 34px ${FAMILY}`;
+  const unitLines = wrap(ctx, input.unit, textWidth, 2);
+  unitLines.forEach((line, index) => ctx.fillText(line, 56, numbersY + 58 + index * 40));
+  ctx.font = `500 24px ${FAMILY}`;
+  ctx.fillStyle = "#3a3a3a";
+  wrap(ctx, input.among, textWidth, 2).forEach((line, index) =>
+    ctx.fillText(line, 56, numbersY + 58 + unitLines.length * 40 + 8 + index * 30),
+  );
+
+  if (withImages && beforeImage && afterImage) {
+    const w = 468;
+    const h = 250;
+    cover(ctx, beforeImage, 676, 100, w, h - 8);
+    cover(ctx, afterImage, 676, 100 + h + 8, w, h - 8);
+    tag(ctx, input.labels[0], 688, 100 + h - 22);
+    tag(ctx, input.labels[1], 688, 100 + 2 * h - 14, true);
+  }
+  return canvas;
+}
+
 /** The Twinsites mark: four tiles, the top two lit. */
 function mark(ctx: CanvasRenderingContext2D, x: number, y: number) {
   ctx.save();

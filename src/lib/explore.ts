@@ -1,5 +1,6 @@
 import { KIN_BANDS, judgeKin, type KinVerdict } from "./calibrate";
 import type { ZoneRecord } from "./zones";
+import type { Check } from "./history";
 import type { Cluster, ColorName, Density, Mode, Site, Traits } from "../types";
 
 export interface ZoneRef {
@@ -25,6 +26,8 @@ export interface ExploreSite {
   dominant: string;
   dominantName: ColorName;
   hue: number | null;
+  /** Catalog category, e.g. "productivity". */
+  cat?: string;
 }
 
 export interface ExploreFile {
@@ -52,6 +55,10 @@ export interface ResultData {
   preview: string;
   subjectTitle: string;
   subjectUrl?: string;
+  /** Catalog slug of the page, for catalog results. */
+  subjectSlug?: string;
+  /** The page's embedding, for uploads (used to compare with competitors). */
+  vector?: Float32Array;
   traits: Traits;
   twins: ShownTwin[];
   verdict: KinVerdict;
@@ -61,7 +68,13 @@ export interface ResultData {
   clusters: Cluster[];
   portrait: boolean;
   cropped: boolean;
+  /** Narrower than 1000px: likeness reads less reliably on small or blurry captures. */
+  small?: boolean;
   catalogCount: number;
+  /** Sites clearing each kin band (uploads only), for before/after comparison. */
+  bands?: Record<number, number>;
+  /** The check before this one in this browser, if any (uploads only). */
+  previous?: Check | null;
 }
 
 const base = () => import.meta.env.BASE_URL;
@@ -123,7 +136,7 @@ export function toSite(site: ExploreSite): Site {
     slug: site.slug,
     title: site.title,
     url: site.url,
-    category: "other",
+    category: site.cat ?? "other",
     blurb: "",
     x: site.x,
     y: site.y,
@@ -160,6 +173,7 @@ export function exampleResult(file: ExampleFile): ResultData {
     preview: `${base()}data/${file.subject.thumb}`,
     subjectTitle: file.subject.title,
     subjectUrl: file.subject.url,
+    subjectSlug: file.slug,
     traits: subject.traits,
     twins: file.twins.map((twin) => ({ site: toSite(twin.site), percentile: twin.percentile })),
     verdict: file.verdict,
@@ -188,6 +202,7 @@ export async function siteResult(slug: string): Promise<ResultData> {
     preview: `${base()}data/${subject.thumb}`,
     subjectTitle: subject.title,
     subjectUrl: subject.url,
+    subjectSlug: subject.slug,
     traits: toTraits(subject),
     twins: file.neighbors[index].map(([twinIndex, tenths]) => ({
       site: toSite(file.sites[twinIndex]),

@@ -55,6 +55,34 @@ A visitor's image is cropped to the top 16:10 before the traits and the embeddin
 
 MobileCLIP resizes the short side to 256 and then center-crops a square. On a 16:10 frame that drops about 19% on each side, often the logo and the button. Letterboxing both the catalog shots and the upload into a square would keep that margin, but it changes every stored vector, the map, and the percentile curve. The raw shots are already on disk under `data/raw` (gitignored, 2,003 files). Re-encoding them in headless Chrome and refitting the map is a dataset rebuild, so this release leaves the stored embeddings as they are. After the 16:10 crop, an upload and a catalog shot still go through the same center crop.
 
+### From diagnosis to fix
+
+A result does three things after naming the twins:
+
+1. **Why you look like them.** The recipe is the set of traits (ground, accent, density, gradient, grid, centring) that most of your twelve twins share with you, with how common that exact recipe is across the catalog.
+2. **What to change.** Moves that fit your page and stand on at least half of the twins, strongest first, and a redesign prompt built from them to paste into Lovable, v0, Bolt or Cursor.
+3. **Before and after.** Your last screenshot check (scores and a small preview) stays in this browser's local storage. Check a new version and Twinsites compares both on the same band, then draws a card with the drop (for example 14 → 0 twins in the top 5%). There is a link to forget it.
+
+The worked example on the home page is real: `public/example/acme-before.html` and `acme-after.html` are a made-up page and its redesign following the prompt; the card shows what Twinsites measured for both.
+
+Layout traits read against each page's own background, so dark pages are judged like light ones. `npm run dataset:layout` recomputes `centered` and `gradient` for the catalog from the thumbnails with the same function the browser runs; zone names stay as they are.
+
+### More in a result
+
+- **One sentence first:** why the page looks like its twins and the change with the most effect.
+- **Marks on the screenshot:** the centred block, empty bands, the accent and gradient margins the diagnosis found.
+- **Correct the detector:** tap a trait that was read wrong; the diagnosis and prompt update. Only with a ticked box, the correction is sent anonymously to the worker's `/feedback` (trait, both values, six rounded measurements, day; no image, URL or IP). Needs `npx wrangler secret put FEEDBACK_SALT` and a redeploy of `worker/`; until then corrections stay local.
+- **What the words say:** Tesseract reads the large text in the browser (files in `public/ocr`, about 7 MB, loaded after the result; on phones only on request) and flags stock phrases from `src/lib/cliches.ts`. `npm run dataset:copy` reads the catalog thumbnails to count how many homepages use each phrase (`public/data/copy.json`, a lower bound).
+- **Pages that look like nobody:** per category, the catalog pages with the fewest twins (`npm run dataset:distinct`). Different, not certified better.
+- **Next to your competitors:** up to three competitor screenshots measured against the page on the twins' percentile scale, in the browser.
+- **Small screenshots:** under 1000px wide, the result warns that likeness reads less reliably.
+- **A badge for pages that stand apart:** with no catalog page in the top 5%, the result offers a badge to put on the site. It is self-contained HTML with an inline SVG that links to twinsites.com: it loads nothing from this server and tracks nobody.
+- **On a phone:** a section index sits under the verdict, and ideas, competitors and the map start folded; their content only loads when opened.
+
+### Report
+
+`/report` is the catalog in numbers: how many pages share four layouts, how many have a look-alike in the top 1%, colours, the most crowded categories, stock phrases (a lower bound, from thumbnails) and the largest zones, with the method and its limits. `scripts/report-data.ts` writes `public/data/report.json` from the files already in `public/data` and runs as part of `npm run build`. The build also writes `dist/report/index.html` with its own title and description for crawlers and link previews.
+
 ### What counts as a twin
 
 A single global cut does not work. On the 2,003-site pair curve (400,000 seeded pairs), the median cosine is about 0.32 and the 80th percentile is about 0.62. Measured against that curve in Chrome:
@@ -88,7 +116,7 @@ npm ci
 npm run dev
 ```
 
-`npm run build` writes `dist/`. `npm run preview` serves that build with the same isolation headers as dev.
+`npm run build` writes `dist/`. `npm run qa` builds and checks the whole site end to end in headless Chromium (wall, example, FAQ, upload, before/after, other pages, phone layout); it starts and stops its own preview server. Set `CHROME_PATH` if Chromium is not where Playwright expects it. `npm run preview` serves that build with the same isolation headers as dev.
 
 ## Regenerate or extend the dataset
 
@@ -111,6 +139,10 @@ npm run dataset:project
 
 Keep thumbnails small. The projection step re-encodes them to 420px WebP. Prefer that over Git LFS.
 
+## Security headers
+
+`ops/nginx/twinsites-security.conf` is the one copy of the security headers and the Content-Security-Policy. `vite preview` and `npm run qa` serve it (the CSP always enforced, HSTS dropped on plain HTTP), and production includes the same file in the twinsites nginx server block. `npm run qa` builds with the worker endpoint and Cloudflare's test Turnstile key, stands in for Turnstile and the worker, and fails on any CSP violation or console error, so a change that needs a new origin fails before it reaches production. Change the policy in that file, then copy it to the server.
+
 ## Deploy
 
 `.github/workflows/deploy.yml` runs only on a push to `main`: `npm ci && npm run build`, then `rsync` of `dist/` to the web root. It does not start a process on the VPS, and it does not deploy the Worker in `/worker`. Pull requests do not deploy. Optional Actions variables (`VITE_SHOT_ENDPOINT`, `VITE_TURNSTILE_SITEKEY`, `VITE_ANALYTICS_SRC`, `VITE_ANALYTICS_DOMAIN`) are passed into the build and stay empty when unset. The workflow expects an ed25519 key in the `VPS_SSH_KEY` secret and a pinned `known_hosts` line in `VPS_KNOWN_HOSTS`. If that second secret is empty, the job warns and falls back to `ssh-keyscan`, so a push to `main` still deploys. The server already speaks HTTP with SPA fallback, long-lived caching for `/assets/`, and the COOP/COEP/CORP headers.
@@ -118,6 +150,8 @@ Keep thumbnails small. The projection step re-encodes them to 420px WebP. Prefer
 On a local preview, the drop zone is usable in about 0.1 s on desktop and 0.4 s on an emulated phone. That phone's first load, before any intent, transfers about 149 KB: the document, the script, the stylesheet, the two used font files, a tiny catalog count, and the favicon. The vision runtime, the embeddings, and the catalog index are not in that load. Desktop, with no throttle and the cache off, returns the first twins in about 2.2 s. A cold fast-4G phone (375 px, 40 ms latency, 9 Mbit/s down, 1.5 Mbit/s up, 4× CPU, cache off) does not download the runtime or the embeddings until there is intent. Focusing the file button starts that download, about 31 s, and the first twins then come back in about 3.4 s. Choosing a file the instant the page appears, which is itself the intent, takes about 34 s.
 
 ## Next
+
+- Compare competitors by pasting their URLs, through the screenshot worker. Planned as a paid feature.
 
 The suggestions are rules read off shared marks. A later version can go further: one concrete move per trait (type, image, grid, motion), and a redesign prompt you can paste into Cursor or v0. The square letterbox described above is the dataset half of that pass.
 
