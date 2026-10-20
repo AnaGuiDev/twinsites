@@ -16,8 +16,8 @@ function ortBuildHash(): string {
 
 /**
  * The production security headers, read from the nginx snippet so preview and
- * QA serve exactly the same policy. Preview always enforces the CSP (never
- * Report-Only), and HSTS is dropped because preview is plain HTTP.
+ * QA serve exactly the same policy. A Report-Only header name is still served
+ * here as Content-Security-Policy, and HSTS is dropped because preview is plain HTTP.
  */
 function securityHeaders(): Record<string, string> {
   const conf = readFileSync("ops/nginx/twinsites-security.conf", "utf8");
