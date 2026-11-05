@@ -3,6 +3,8 @@
 interface ImportMetaEnv {
   readonly VITE_ANALYTICS_SRC?: string;
   readonly VITE_ANALYTICS_DOMAIN?: string;
+  readonly VITE_FEEDBACK_X_HANDLE?: string;
+  readonly VITE_SERVICES_ENDPOINT?: string;
   readonly VITE_SHOT_ENDPOINT?: string;
   readonly VITE_TURNSTILE_SITEKEY?: string;
 }

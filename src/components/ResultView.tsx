@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { SlopPanel } from "./SlopPanel";
 import { DropZone } from "./DropZone";
 import { Inspiration } from "./Inspiration";
 import { Rivals } from "./Rivals";
@@ -375,6 +376,8 @@ export function ResultView({
           </details>
         </div>
       </section>
+
+      <SlopPanel key={result.preview} traits={traits} nearest={nearest} cliches={words.status === "done" ? words.found.length : undefined} readWords={() => void readWords()} />
 
       {delta && previous && compare !== false && (
         <section className="progress" aria-live="polite">

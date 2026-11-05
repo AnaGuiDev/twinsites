@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { GuidePage, OrderPage, ServiceLadder, ServicesPage, TropeCatalog } from "./components/Services";
 import { DropZone } from "./components/DropZone";
 import { Faq } from "./components/Faq";
 import { Mosaic } from "./components/Mosaic";
@@ -41,6 +42,7 @@ export function App() {
   const [upload, setUpload] = useState<ResultData | null>(null);
   const [catalog, setCatalog] = useState<ResultData | null>(null);
   const [catalogNote, setCatalogNote] = useState<string | null>(null);
+  const uploadRun = useRef(0);
   const parts = useRef({ read: 0, engine: 0, data: 0, match: 0 });
 
   const publish = useCallback(() => {
@@ -48,6 +50,11 @@ export function App() {
     const value = current.read * 0.04 + current.engine * 0.78 + current.data * 0.16 + current.match * 0.02;
     setProgress(Math.max(0, Math.min(1, value)));
   }, []);
+
+  useEffect(() => {
+    if (route.name === "home") document.title = "Twinsites — Slop Score & visual twins";
+    if (route.name === "site") document.title = `${catalog?.subjectTitle || "Visual twins"} — Twinsites`;
+  }, [route.name, catalog?.subjectTitle]);
 
   useEffect(() => {
     track("visit");
@@ -117,6 +124,8 @@ export function App() {
 
   const onFile = useCallback(
     async (file: File) => {
+      const run = ++uploadRun.current;
+      const current = () => run === uploadRun.current;
       setError(null);
       go("/");
       setUpload((current) => {
@@ -134,6 +143,7 @@ export function App() {
       track("upload");
       const order: Stage[] = ["read", "model", "data", "match"];
       const advance = (next: Stage) => {
+        if (!current()) return;
         setStage((current) => {
           if (!current) return next;
           return order.indexOf(next) > order.indexOf(current) ? next : current;
@@ -147,24 +157,29 @@ export function App() {
       let preview: string | null = null;
       try {
         const frame = await cropHero(file);
+        if (!current()) { frame.bitmap.close(); return; }
         preview = URL.createObjectURL(frame.blob);
         const frameWidth = frame.bitmap.width;
         const traits = await analyzeImageSource(frame.bitmap, frame.bitmap.width, frame.bitmap.height);
         frame.bitmap.close();
+        if (!current()) { URL.revokeObjectURL(preview); return; }
         parts.current.read = 1;
         publish();
         advance("model");
         const [modelMod, dataMod] = await Promise.all([import("./lib/model"), import("./lib/dataset")]);
         unsubEngine = modelMod.subscribeEngine((fraction) => {
+          if (!current()) return;
           parts.current.engine = fraction;
           publish();
         });
         unsubData = dataMod.subscribeData((fraction) => {
+          if (!current()) return;
           parts.current.data = fraction;
           if (fraction > 0) advance("data");
           publish();
         });
         const [vector, dataset] = await Promise.all([modelMod.embedBlob(frame.blob), dataMod.loadDataset()]);
+        if (!current()) { URL.revokeObjectURL(preview); return; }
         advance("match");
         const twins = nearest(vector, dataset, 12);
         const bandCounts = countBands(vector, dataset);
@@ -179,6 +194,7 @@ export function App() {
         const nearestPercentile = twins[0] ? percentileOf(twins[0].similarity, dataset.calibration.knots) : 0;
         const previous = loadCheck();
         const small = await smallPreview(frame.blob).catch(() => "");
+        if (!current()) { URL.revokeObjectURL(preview); return; }
         saveCheck({
           at: Date.now(),
           verdict,
@@ -220,6 +236,7 @@ export function App() {
         setProgress(null);
       } catch (err) {
         if (preview) URL.revokeObjectURL(preview);
+        if (!current()) return;
         const message = err instanceof Error ? err.message : "";
         if (message.includes("catalog")) setError(t.errorCatalog);
         else if (err instanceof DOMException || /image|decode|bitmap/i.test(message)) setError(t.errorImage);
@@ -267,6 +284,7 @@ export function App() {
           Twinsites
         </a>
         <nav>
+          <RouteLink className="nav-link" href="/services">{lang === "es" ? "Auditoría y rediseño" : "Audit & redesign"}</RouteLink>
           <RouteLink className="nav-link" href="/report">
             {t.navReport}
           </RouteLink>
@@ -283,6 +301,10 @@ export function App() {
       </header>
 
       <main>
+        {route.name === "services" && <ServicesPage />}
+        {route.name === "guide" && <GuidePage />}
+        {route.name === "sample-audit" && <GuidePage sample />}
+        {route.name === "order" && <OrderPage />}
         {route.name === "privacy" && <PrivacyView />}
         {route.name === "faq" && <Faq page />}
         {route.name === "report" && <ReportView />}
@@ -297,12 +319,13 @@ export function App() {
             <Mosaic
               slot={
                 <>
+                  <p className="kicker">SLOP SCORE + VISUAL TWINS</p>
                   <h1>
                     {t.title
                       .split(/(AI-built)/)
                       .map((part, index) => (part === "AI-built" ? <span key={index} className="nowrap">{part}</span> : part))}
                   </h1>
-                  <p className="lede">{t.lede(catalogCount ?? 2003)}</p>
+                  <p className="lede">{lang === "es" ? `Compara tu portada con ${(catalogCount ?? 2003).toLocaleString("es-ES")} webs: encuentra sus gemelas, revisa su Slop Score y llévate un prompt por arreglo. Si quieres criterio humano, pide una auditoría.` : `Compare your homepage with ${(catalogCount ?? 2003).toLocaleString("en-GB")} sites: find its twins, review its Slop Score and get a prompt per fix. Get a human audit when you want a second pair of eyes.`}</p>
                   <div className="actions">
                     <DropZone
                       inline
@@ -365,6 +388,8 @@ export function App() {
                 loading="lazy"
               />
             </section>
+            <TropeCatalog />
+            <ServiceLadder />
             <div className="hero-more">
               <div>
                 <h2>{t.findTitle}</h2>

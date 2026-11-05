@@ -7,10 +7,17 @@ export type Route =
   | { name: "site"; slug: string }
   | { name: "privacy" }
   | { name: "faq" }
-  | { name: "report" };
+  | { name: "report" }
+  | { name: "services" | "guide" | "sample-audit" | "order" };
 
 export function parseRoute(pathname: string): Route {
-  const path = decodeURIComponent(pathname).replace(/\/+$/, "") || "/";
+  let decoded: string;
+  try { decoded = decodeURIComponent(pathname); } catch { return { name: "home" }; }
+  const path = decoded.replace(/\/+$/, "") || "/";
+  if (path === "/services") return { name: "services" };
+  if (path === "/guide") return { name: "guide" };
+  if (path === "/sample-audit") return { name: "sample-audit" };
+  if (path === "/order") return { name: "order" };
   if (path === "/zones") return { name: "zones" };
   if (path === "/privacy") return { name: "privacy" };
   if (path === "/faq") return { name: "faq" };

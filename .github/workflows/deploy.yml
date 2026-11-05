@@ -27,11 +27,13 @@ jobs:
 
       - name: Install and build
         env:
+          VITE_SERVICES_ENDPOINT: ${{ vars.VITE_SERVICES_ENDPOINT }}
+          VITE_FEEDBACK_X_HANDLE: ${{ vars.VITE_FEEDBACK_X_HANDLE }}
           VITE_SHOT_ENDPOINT: ${{ vars.VITE_SHOT_ENDPOINT }}
           VITE_TURNSTILE_SITEKEY: ${{ vars.VITE_TURNSTILE_SITEKEY }}
           VITE_ANALYTICS_SRC: ${{ vars.VITE_ANALYTICS_SRC }}
           VITE_ANALYTICS_DOMAIN: ${{ vars.VITE_ANALYTICS_DOMAIN }}
-        run: npm ci && npm run build
+        run: npm ci && npm ci --prefix worker && npm run test:product && npm run test:worker && npm run typecheck:worker && npm run build
 
       - name: Prepare SSH
         env:

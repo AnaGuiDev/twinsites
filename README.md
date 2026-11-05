@@ -1,6 +1,8 @@
 # Twinsites
 
-Your AI-built landing page has twins. Meet them.
+Your landing page has twins. Find them, understand the patterns, and give it its own direction.
+
+The free check now combines visual twins with an explainable Slop Score, signals by category and individual fix prompts. The optional Studio offers human video audits and custom redesigns. Booking is closed until configured. See [Studio setup and operations](docs/studio.md).
 
 Slop detectors give you a score. Twinsites names the relatives, and runs entirely in your browser.
 
@@ -23,7 +25,7 @@ Drop a screenshot, try a catalog example, or search any of the 2,003 sites by na
 
 ## Privacy
 
-Your screenshot never leaves the browser. There is no account and no API key in the site itself. The model, the thumbnails, and the embeddings are files on this site. Comparison is a cosine similarity on your device.
+Your screenshot never leaves the browser. There is no account and no API key in the site itself. Optional human service orders send only the email, public URLs and brief you explicitly submit; their payment/email providers and retention are described in `/privacy` and `docs/studio.md`. The model, the thumbnails, and the embeddings are files on this site. Comparison is a cosine similarity on your device.
 
 If you paste a URL, that path is off unless the build was given `VITE_SHOT_ENDPOINT`. When it is on, a separate Cloudflare Worker (not this VPS) visits the public page, returns a PNG, and does not store it. Setup is in [worker/README.md](worker/README.md). The VPS still serves only static files.
 
@@ -169,7 +171,7 @@ Keep thumbnails small. The projection step re-encodes them to 420px WebP. Prefer
 
 ## Deploy
 
-`.github/workflows/deploy.yml` runs only on a push to `main`: `npm ci && npm run build`, then `rsync` of `dist/` to the web root. It does not start a process on the VPS, and it does not deploy the Worker in `/worker`. Pull requests do not deploy. Optional Actions variables (`VITE_SHOT_ENDPOINT`, `VITE_TURNSTILE_SITEKEY`, `VITE_ANALYTICS_SRC`, `VITE_ANALYTICS_DOMAIN`) are passed into the build and stay empty when unset. The workflow expects an ed25519 key in the `VPS_SSH_KEY` secret and a pinned `known_hosts` line in `VPS_KNOWN_HOSTS`. If that second secret is empty, the job warns and falls back to `ssh-keyscan`, so a push to `main` still deploys. The server already speaks HTTP with SPA fallback, long-lived caching for `/assets/`, and the COOP/COEP/CORP headers.
+`.github/workflows/deploy.yml` runs only on a push to `main`: `npm ci && npm run build`, then `rsync` of `dist/` to the web root. It does not start a process on the VPS, and it does not deploy the Worker in `/worker`. Pull requests do not deploy. Optional Actions variables (`VITE_SHOT_ENDPOINT`, `VITE_TURNSTILE_SITEKEY`, `VITE_ANALYTICS_SRC`, `VITE_ANALYTICS_DOMAIN`) are passed into the build and stay empty when unset. The workflow expects an ed25519 key in the `VPS_SSH_KEY` secret and a pinned `known_hosts` line in `VPS_KNOWN_HOSTS`. If that second secret is empty, the job fails closed; it never trusts an unverified host key. The server already speaks HTTP with SPA fallback, long-lived caching for `/assets/`, and the COOP/COEP/CORP headers.
 
 ### Weight and speed
 

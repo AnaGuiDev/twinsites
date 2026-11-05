@@ -1,3 +1,5 @@
+import { handleServices, type ServiceEnv } from "./services";
+export { AuditService } from "./services";
 import { decideLimit, dayKey, hourKey } from "./limit";
 import {
   CONSENT_VERSION,
@@ -16,7 +18,7 @@ const TURNSTILE_HOST = "challenges.cloudflare.com";
 const DNS_HOST = "cloudflare-dns.com";
 const API_HOST = "api.screenshotone.com";
 
-export interface Env {
+export interface Env extends ServiceEnv {
   SHOTS: {
     get(key: string): Promise<string | null>;
     put(key: string, value: string, options?: { expirationTtl?: number }): Promise<void>;
@@ -49,6 +51,7 @@ export default {
 
 export async function handle(request: Request, env: Env): Promise<Response> {
   const url = new URL(request.url);
+  if (url.pathname.startsWith("/services/")) return handleServices(request, env);
   if (url.pathname === "/unsubscribe") {
     if (request.method !== "GET") return json({ error: "method" }, 405);
     return handleUnsubscribe(url, env);
@@ -74,7 +77,7 @@ export async function handle(request: Request, env: Env): Promise<Response> {
   } catch {
     return json({ error: "invalid" }, 400);
   }
-  if (typeof payload.url !== "string") return json({ error: "invalid" }, 400);
+  if (!payload || typeof payload !== "object" || typeof payload.url !== "string") return json({ error: "invalid" }, 400);
   const checked = validatePublicUrl(payload.url);
   if (!checked.ok) {
     log(`reject-${checked.reason}`);
@@ -121,7 +124,7 @@ export async function handle(request: Request, env: Env): Promise<Response> {
       return json({ error: "unavailable" }, 502);
     }
     log("ok", checked.host);
-    return new Response(shot.bytes, { status: 200, headers: cors({ "content-type": shot.type }) });
+    return new Response(new Uint8Array(shot.bytes).buffer, { status: 200, headers: cors({ "content-type": shot.type }) });
   } catch (err) {
     const failure = describeShotError(err);
     log("fail", checked.host, failure);
@@ -150,6 +153,7 @@ async function handleSubscribe(request: Request, env: Env): Promise<Response> {
   } catch {
     return json({ error: "invalid" }, 400);
   }
+  if (!payload || typeof payload !== "object") return json({ error: "invalid" }, 400);
   const email = normalizeEmail(payload.email);
   if (!email) {
     log("subscribe-invalid");
@@ -204,8 +208,9 @@ async function handleFeedback(request: Request, env: Env): Promise<Response> {
   } catch {
     return json({ error: "invalid" }, 400);
   }
-  const correction = parseCorrection(payload);
-  if (!correction) {
+  const rawCorrections = payload && Array.isArray(payload.corrections) ? payload.corrections : [payload];
+  const corrections = rawCorrections.map(parseCorrection);
+  if (!corrections.length || corrections.length > 6 || corrections.some(item => !item)) {
     log("feedback-invalid");
     return json({ error: "invalid" }, 400);
   }
@@ -227,9 +232,9 @@ async function handleFeedback(request: Request, env: Env): Promise<Response> {
     return json({ error: "blocked" }, 403);
   }
 
-  await env.SHOTS.put(feedbackKey(now, crypto.randomUUID()), feedbackRecord(correction, now), {
-    expirationTtl: 400 * 24 * 60 * 60,
-  });
+  for (const correction of corrections) {
+    await env.SHOTS.put(feedbackKey(now, crypto.randomUUID()), feedbackRecord(correction!, now), { expirationTtl: 400 * 24 * 60 * 60 });
+  }
   log("feedback-ok");
   return json({ ok: true }, 200);
 }

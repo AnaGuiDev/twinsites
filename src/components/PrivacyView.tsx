@@ -7,6 +7,11 @@ export function PrivacyView() {
   return (
     <article className="privacy-page">
       <h1>Privacy</h1>
+      <h2>Human audits and redesign requests</h2>
+      <p>Only when you submit a service order, we store your email, public page URLs, brief, accepted terms, price, payment references, delivery links and dates in a Cloudflare Durable Object for up to 400 days. Screenshots used by the free check remain in your browser; submitting an order does not upload them.</p>
+      <p>Stripe processes payment details on its hosted checkout. Resend delivers order emails. Payment and email providers retain their own records under their policies. Order emails are transactional, not a marketing subscription. A human reviewer visits the public URLs you provide. Do not submit passwords, confidential information or pages behind a login.</p>
+      <p>The private order link contains an access token. Anyone with that link can read the order status and delivery links. Keep it private. Reply to an order email to request access, correction, deletion or a guarantee refund. Payment records may have separate retention obligations.</p>
+      <h2>Free check and newsletter</h2>
       <p>
         If you ask for the monthly report, Twinsites keeps the email address you type. That is the only thing this form collects.
       </p>
