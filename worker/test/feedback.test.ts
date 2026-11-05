@@ -54,6 +54,7 @@ describe("parseCorrection", () => {
   it("rejects unknown traits, same values, odd versions and out-of-range measures", () => {
     for (const bad of [
       { ...GOOD, trait: "url" },
+      { ...GOOD, trait: "constructor" },
       { ...GOOD, corrected: "true" },
       { ...GOOD, detected: "maybe" },
       { ...GOOD, version: "<script>" },
@@ -67,6 +68,18 @@ describe("parseCorrection", () => {
 });
 
 describe("/feedback", () => {
+  it("validates one single-use token for the entire correction batch", async () => {
+    const shots = memory();
+    const previous = globalThis.fetch; let checks = 0;
+    globalThis.fetch = async () => Response.json({ success: ++checks === 1 });
+    try {
+      const response = await handle(send({ corrections: [GOOD, { ...GOOD, trait: "gradient" }], token: "single-use" }), env(shots));
+      assert.equal(response.status, 200); assert.equal(checks, 1);
+      assert.equal([...shots.dump().keys()].filter(key => key.startsWith("fb:")).length, 2);
+      assert.equal((await handle(send({ corrections: [], token: "t" }), env(shots))).status, 400);
+      assert.equal((await handle(send({ corrections: Array(7).fill(GOOD), token: "t" }), env(shots))).status, 400);
+    } finally { globalThis.fetch = previous; }
+  });
   it("stores only the correction, the measures and the day", async () => {
     const shots = memory();
     const response = await withTurnstile(true, () => handle(send({ ...GOOD, token: "t", url: "https://secret.example", email: "a@b.co" }), env(shots)));

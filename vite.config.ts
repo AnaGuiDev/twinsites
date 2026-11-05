@@ -142,7 +142,7 @@ export default defineConfig({
     },
   },
   // Dev injects CSS as inline <style> for hot reload, so it gets everything but the CSP.
-  server: { headers: Object.fromEntries(Object.entries(headers).filter(([name]) => name !== "Content-Security-Policy")) },
+  server: { allowedHosts: ["terminal.local"], headers: Object.fromEntries(Object.entries(headers).filter(([name]) => name !== "Content-Security-Policy")) },
   preview: { headers },
 });
 
@@ -168,6 +168,11 @@ function zoneStubs(): Plugin {
         "https://twinsites.com/zones",
         "Zones",
       );
+      for (const [slug, title, description] of [
+        ["services", "Human audit & redesign", "Visual twins and a free explainable Slop Score, followed by a human video audit, actionable prompts and a 30-day recheck."],
+        ["guide", "What is web slop?", "An evidence-first guide to repeated landing-page conventions, with what screenshots can and cannot tell."],
+        ["sample-audit", "Sample human audit", "An illustrative report for a fictional landing page: five prioritized fixes with implementation prompts."],
+      ]) writeStub(html, path.resolve("dist", slug), `${title} — Twinsites`, description, `https://twinsites.com/${slug}`, title);
       const report = JSON.parse(readFileSync(path.resolve("public/data/report.json"), "utf8")) as {
         total: number;
         twins: { top1Any: number; top5Crowd: number };

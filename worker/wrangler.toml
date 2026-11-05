@@ -24,3 +24,14 @@ id = "c849f0f6f5ca4813967cefa8b19c5600"
 SHOT_KILL = "0"
 SHOT_DAILY_CAP = "40"
 SHOT_PROVIDER = "browser"
+SERVICES_ENABLED = "0"
+SERVICES_DYNAMIC_PRICE = "0"
+
+# Service orders are optional and stay closed until all credentials are configured.
+[[durable_objects.bindings]]
+name = "AUDITS"
+class_name = "AuditService"
+
+[[migrations]]
+tag = "v1-audit-service"
+new_sqlite_classes = ["AuditService"]
