@@ -1,4 +1,4 @@
-export const SERVICE_TERMS = "twinsites-services-v1";
+export const SERVICE_TERMS = "twinsites-services-v2";
 export interface Offer {
   enabled: boolean;
   base: number;
@@ -11,13 +11,17 @@ export interface Offer {
   redesignMin: number;
   redesignMax: number;
   contact: string;
+  available?: number;
+  weeklyCapacity?: number;
+  legalReady?: boolean;
+  seller?: { name: string; taxId: string; address: string; email: string; country: string };
 }
 export function serviceEndpoint(path: string): string | null {
   const endpoint = import.meta.env.VITE_SERVICES_ENDPOINT || import.meta.env.VITE_SHOT_ENDPOINT;
   if (!endpoint) return null;
   try { const url = new URL(endpoint); url.pathname = path; url.search = ""; url.hash = ""; return url.toString(); } catch { return null; }
 }
-export const money = (value: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(value);
+export const money = (value: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(value);
 
 /** Secure random UUID, also available on plain-HTTP local previews. */
 export function newRequestId(): string {

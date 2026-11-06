@@ -183,6 +183,10 @@ Keep thumbnails small. The projection step re-encodes them to 420px WebP. Prefer
 
 What is left is mostly the vision model (7.7 MB gzipped) and the phone's CPU. On desktop without a throttle, the first result is a few seconds.
 
+## Launch
+
+The launch follow-up separates visual resemblance from editorial diagnosis, suppresses an overall score below 80% coverage, and adds a paid human review independent of the model. Proposed defaults are €89 for one page and €29 for each extra page (up to three), five weekdays from the chosen start, and a 30-day human follow-up. Sales require approved seller identity, real Stripe/Resend/Cloudflare setup and tests. See [the maintained Studio setup](docs/studio.md). No beta-only launch is required; configuration opens the actual service.
+
 ## Next
 
 - Compare competitors by pasting their URLs, through the screenshot worker. Planned as a paid feature.
