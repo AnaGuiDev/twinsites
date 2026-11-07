@@ -127,7 +127,7 @@ async function assertBadgeContract(page: Page): Promise<string> {
   });
   assert(top5 !== null, "no top-5% count stored");
   const badges = await page.locator(".badge-box").count();
-  const expectBadge = top5 === 0;
+  const expectBadge = false; // Originality badges withheld pending independent validation.
   assert(badges === (expectBadge ? 1 : 0), `badge ${badges}, top 5% count ${top5}`);
   if (!expectBadge) return `top 5% count ${top5}, no badge`;
   const code = await page.locator(".badge-code").innerText();

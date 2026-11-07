@@ -1,3 +1,4 @@
+import { distinctCaptures, duplicateCaptureCount } from "../lib/catalog-duplicates";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ModelNotice } from "./ModelNotice";
 import { SlopPanel } from "./SlopPanel";
@@ -8,7 +9,7 @@ import { CopyCheck, type WordsState } from "./CopyCheck";
 import { CorrectionReport, type Fix } from "./CorrectionReport";
 import { SubscribeForm } from "./SubscribeForm";
 import { Fold, jumpTo } from "./Fold";
-import { Badge } from "./Badge";
+
 import { TwinCompare } from "./TwinCompare";
 import { MapView } from "./MapView";
 import { RouteLink } from "../router";
@@ -44,6 +45,7 @@ export function ResultView({
   const [mapSites, setMapSites] = useState<Site[]>(result.sites);
   const [mapClusters, setMapClusters] = useState<Cluster[]>(result.clusters);
   const zoneName = lang === "es" ? result.zone.labelEs : result.zone.labelEn;
+  const visibleTwins = useMemo(() => distinctCaptures(result.twins), [result.twins]);
   const nearest = result.twins[0]?.percentile ?? 0;
   const secondary = t.resultLine(result.verdict, nearest);
   const twinTraits = useMemo(() => result.twins.map((twin) => twin.site.traits), [result]);
@@ -463,6 +465,8 @@ export function ResultView({
           <span className="step-num">1</span>
           {none ? t.stepTwinsNone : t.stepTwins}
         </h2>
+        <p className="score-note">{lang === 'es' ? 'Los percentiles indican posición respecto a parejas del catálogo, no un porcentaje de parecido ni una probabilidad de acierto. Los recuentos cuentan entradas, no diseños únicos.' : 'Percentiles describe position relative to catalog pairs, not a similarity percentage or probability of correctness. Counts refer to entries, not unique designs.'}</p>
+        {visibleTwins.length < result.twins.length && <p className="score-note">{lang === 'es' ? 'Hemos agrupado capturas idénticas para evitar mostrar el mismo diseño varias veces.' : 'Identical captures are grouped to avoid showing the same design repeatedly.'}</p>}
         <div className="twins-layout">
           {closest && (
             <div className="twins-main">
@@ -472,7 +476,8 @@ export function ResultView({
           <div className="twins-aside">
             {closest && (
               <p className="closest-line">
-                <strong>{t.closestCaption}</strong>{" "}
+                <strong>{t.closestCaption}</strong>
+                {duplicateCaptureCount(closest.site.slug)>1 && <small>{lang === 'es' ? ` Captura compartida por ${duplicateCaptureCount(closest.site.slug)} entradas del catálogo. ` : ` Capture shared by ${duplicateCaptureCount(closest.site.slug)} catalog entries. `}</small>}{" "}
                 <RouteLink href={`/site/${closest.site.slug}`}>{closest.site.title}</RouteLink>
                 {" · "}
                 <a href={closest.site.url} target="_blank" rel="noreferrer">
@@ -482,7 +487,7 @@ export function ResultView({
             )}
             {!allTwins && (
               <div className="twin-strip">
-                {result.twins.slice(1, 4).map((twin) => (
+                {visibleTwins.slice(1, 4).map((twin) => (
                   <RouteLink key={twin.site.id} className="twin-shot" href={`/site/${twin.site.slug}`}>
                     <img src={thumb(twin.site.thumb)} alt={twin.site.title} loading="lazy" />
                   </RouteLink>
@@ -493,7 +498,7 @@ export function ResultView({
         </div>
         {allTwins && (
           <div className="twin-grid">
-            {result.twins.map((twin) => (
+            {visibleTwins.map((twin) => (
               <article className="twin-card" key={twin.site.id}>
                 <RouteLink className="twin-shot" href={`/site/${twin.site.slug}`}>
                   <img src={thumb(twin.site.thumb)} alt={twin.site.title} loading="lazy" />
@@ -516,7 +521,7 @@ export function ResultView({
           </div>
         )}
         <button type="button" className="text-link as-button see-all" onClick={() => setAllTwins((value) => !value)} aria-expanded={allTwins}>
-          {allTwins ? t.hideTwins : t.seeAllTwins(result.twins.length)}
+          {allTwins ? t.hideTwins : t.seeAllTwins(visibleTwins.length)}
         </button>
       </section>
 
@@ -681,7 +686,7 @@ export function ResultView({
         </div>
       </section>
 
-      {own && !result.small && result.bands?.[95] === 0 && <Badge total={result.catalogCount} />}
+
 
       <section className="more" aria-labelledby="more-title">
         <h2 id="more-title">{t.moreTitle}</h2>

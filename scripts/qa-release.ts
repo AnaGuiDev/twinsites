@@ -102,6 +102,8 @@ try {
     // The catalog route exercises diagnosis/action-plan editing without OCR downloads.
     const catalog = JSON.parse(await readFile("public/data/catalog.json", "utf8"));
     await page.goto(`${base}/site/${catalog.sites[0].slug}`);
+    assert.match(await page.locator('.verdict-title').innerText(), /entradas|candidatos/);
+    assert.equal(await page.locator('.badge-box').count(),0);
     await page.locator(".audit-checklist summary").click();
     await page.locator(".signal-row select").first().selectOption("true");
     await page.locator(".action-plan textarea").first().fill("Producto de prueba para docentes");

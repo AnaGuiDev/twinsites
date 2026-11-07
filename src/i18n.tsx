@@ -104,16 +104,16 @@ const copy = {
     progressAsk: "Is this a new version of the page you checked before?",
     progressYes: "Yes, compare them",
     progressNo: "No, it's a different page",
-    progressLine: (p: Progress) => `${p.before} → ${p.after} twins in the top ${p.top}%`,
+    progressLine: (p: Progress) => `${p.before} → ${p.after} entries in the top ${p.top}%`,
     progressNearest: (p: Progress) => `Closest twin: ${p.nearestBefore.toFixed(1)} → ${p.nearestAfter.toFixed(1)} percentile.`,
-    progressWorse: "More twins than before. Check the moves above and try another version.",
-    progressBetter: "Fewer twins than before. This is the one worth sharing.",
-    progressSame: "Same number of twins. The moves above go further.",
+    progressWorse: "More entries above this threshold. Review the images before interpreting the change.",
+    progressBetter: "Fewer entries above this threshold. This does not establish better design.",
+    progressSame: "Same count. Check whether the changes help the page achieve its goal.",
     forgetCheck: "Forget my last check",
     forgottenCheck: "Forgotten. Your last check only lived in this browser.",
     progressPost: (p: Progress, total: number) =>
-      `My homepage went from ${p.before} to ${p.after} twins in the top ${p.top}% of ${grouped(total, "en")} AI-built sites.`,
-    progressUnit: (top: number) => `twins in the top ${top}%`,
+      `Indicative comparison: ${p.before} → ${p.after} entries in the top ${p.top}% of a ${grouped(total, "en")}-site catalog. This does not measure design quality.`,
+    progressUnit: (top: number) => `entries in the top ${top}%`,
     progressAmong: (total: number) => `among ${grouped(total, "en")} AI-built homepages`,
     shareProgressTitle: "Share your progress",
     shareProgressDek: "The card is drawn in this tab. The post links to Twinsites so others can check theirs.",
@@ -198,15 +198,11 @@ const copy = {
     errorCaptcha: "The verification could not load, often because of an ad blocker. Upload a screenshot instead.",
     yourResult: "Your result",
     siteResult: (title: string): string => `Result for ${title}`,
-    plainVerdict: (verdict: KinVerdict, total: number, own: boolean): string => {
-      const subject = own ? "Your page" : "This page";
-      if (verdict.mode === "none") return `${subject} looks like none of the ${grouped(total, "en")} AI-built sites.`;
-      if (verdict.mode === "neighborhood") return `${subject} looks a lot like dozens of AI-built sites.`;
-      const amount = verdict.top <= 5 ? "a lot like" : "somewhat like";
-      return `${subject} looks ${amount} ${verdict.count} AI-built ${verdict.count === 1 ? "site" : "sites"}.`;
+    plainVerdict: (verdict: KinVerdict, _total: number, _own: boolean): string => {
+      if (verdict.mode === "none") return "No candidates above the selected comparison threshold.";
+      return `${verdict.count} catalog entries to compare visually.`;
     },
-    verdictDek: (none: boolean): string =>
-      none ? "Below: the closest ones anyway, and what you share with them." : "Below: which ones, what makes them alike, and how to set yours apart.",
+    verdictDek: (none: boolean): string => none ? "This does not prove originality. You can still inspect the nearest candidates below." : "Review the screenshots: these are model suggestions, not confirmed twins or evidence of copying.",
     meterLabel: "Resemblance",
     meterLevels: ["A little", "Somewhat", "A lot"] as string[],
     whatIsTitle: (level: string): string => `What does “${level.toLowerCase()}” mean?`,
@@ -418,16 +414,16 @@ const copy = {
     progressAsk: "¿Es una nueva versión de la página que comprobaste antes?",
     progressYes: "Sí, compáralas",
     progressNo: "No, es otra página",
-    progressLine: (p: Progress) => `${p.before} → ${p.after} gemelas en el ${p.top} % superior`,
+    progressLine: (p: Progress) => `${p.before} → ${p.after} entradas en el ${p.top} % superior`,
     progressNearest: (p: Progress) => `Gemela más cercana: percentil ${p.nearestBefore.toFixed(1).replace(".", ",")} → ${p.nearestAfter.toFixed(1).replace(".", ",")}.`,
-    progressWorse: "Más gemelas que antes. Revisa los cambios de arriba y prueba otra versión.",
-    progressBetter: "Menos gemelas que antes. Esta es la que merece compartirse.",
-    progressSame: "Las mismas gemelas. Los cambios de arriba llegan más lejos.",
+    progressWorse: "Más entradas por encima del umbral. Revisa las imágenes antes de interpretar el cambio.",
+    progressBetter: "Menos entradas por encima del umbral. Esto no demuestra una mejora de diseño.",
+    progressSame: "Mismo recuento. Comprueba si los cambios ayudan al objetivo de la página.",
     forgetCheck: "Olvidar mi última comprobación",
     forgottenCheck: "Olvidada. Tu última comprobación solo vivía en este navegador.",
     progressPost: (p: Progress, total: number) =>
-      `Mi web ha pasado de ${p.before} a ${p.after} gemelas en el ${p.top} % superior de ${grouped(total, "es")} webs hechas con IA.`,
-    progressUnit: (top: number) => `gemelas en el ${top} % superior`,
+      `Comparación orientativa: ${p.before} → ${p.after} entradas en el ${p.top} % superior de un catálogo de ${grouped(total, "es")} webs. No mide calidad de diseño.`,
+    progressUnit: (top: number) => `entradas en el ${top} % superior`,
     progressAmong: (total: number) => `entre ${grouped(total, "es")} portadas hechas con IA`,
     shareProgressTitle: "Comparte tu progreso",
     shareProgressDek: "La tarjeta se dibuja en esta pestaña. La publicación enlaza a Twinsites para que otros comprueben la suya.",
@@ -512,15 +508,11 @@ const copy = {
     errorCaptcha: "La verificación no ha cargado, a menudo por un bloqueador de anuncios. Sube una captura en su lugar.",
     yourResult: "Tu resultado",
     siteResult: (title: string): string => `Resultado de ${title}`,
-    plainVerdict: (verdict: KinVerdict, total: number, own: boolean): string => {
-      const subject = own ? "Tu web" : "Esta web";
-      if (verdict.mode === "none") return `${subject} no se parece a ninguna de las ${grouped(total, "es")} webs hechas con IA.`;
-      if (verdict.mode === "neighborhood") return `${subject} se parece mucho a decenas de webs hechas con IA.`;
-      const amount = verdict.top <= 5 ? "mucho" : "bastante";
-      return `${subject} se parece ${amount} a ${verdict.count} ${verdict.count === 1 ? "web hecha" : "webs hechas"} con IA.`;
+    plainVerdict: (verdict: KinVerdict, _total: number, _own: boolean): string => {
+      if (verdict.mode === "none") return "Sin candidatos por encima del umbral de comparación.";
+      return `${verdict.count} entradas del catálogo para comparar visualmente.`;
     },
-    verdictDek: (none: boolean): string =>
-      none ? "Abajo ves las más cercanas de todos modos, y qué compartes con ellas." : "Abajo ves cuáles son, qué las hace iguales y cómo diferenciar la tuya.",
+    verdictDek: (none: boolean): string => none ? "Esto no demuestra originalidad. Puedes revisar las capturas más cercanas a continuación." : "Revisa las capturas: son propuestas del modelo, no gemelas confirmadas ni pruebas de copia.",
     meterLabel: "Parecido",
     meterLevels: ["Poco", "Algo", "Mucho"] as string[],
     whatIsTitle: (level: string): string => `¿Qué significa «${level.toLowerCase()}»?`,
@@ -792,16 +784,16 @@ function summarySentence(lang: Lang, input: SummaryInput): string {
   const d = input.diagnosis;
   if (input.verdict.mode === "none") {
     return es
-      ? "Tu página no se parece a ninguna del catálogo. Lo que la hace distinta merece quedarse."
-      : "Your page doesn't look like anything in the catalog. Whatever makes it different is worth keeping.";
+      ? "No hay entradas por encima del umbral seleccionado. Esto no demuestra originalidad ni calidad."
+      : "No entries exceed the selected threshold. This does not establish originality or quality.";
   }
   const recipe = listOf(d.recipe.map((part) => traitPhrase(lang, part.key, input.traits)), es);
   const first = d.moves[0];
   const why = es
-    ? `Te pareces a tus gemelas sobre todo por ${recipe}.`
-    : `You look like your twins mostly because of ${recipe}.`;
+    ? `Señales estimadas para revisar en las capturas: ${recipe}.`
+    : `Estimated signals to review in the screenshots: ${recipe}.`;
   if (!first) return why;
-  return es ? `${why} El cambio con más efecto: ${moveShort(lang, first.item)}.` : `${why} The change with the most effect: ${moveShort(lang, first.item)}.`;
+  return es ? `${why} Una hipótesis para probar según tu objetivo: ${moveShort(lang, first.item)}.` : `${why} One hypothesis to test against your goal: ${moveShort(lang, first.item)}.`;
 }
 
 function grouped(n: number, lang: Lang): string {
@@ -827,37 +819,15 @@ function demoSentence(lang: Lang, verdict: KinVerdict, zone: string): string {
 }
 
 function resultSentence(lang: Lang, verdict: KinVerdict, percentile: number): string {
-  const shown = formatPercentile(percentile, lang);
-  if (verdict.mode === "none") {
-    return lang === "es"
-      ? `Ninguna gemela en el ${verdict.top} % superior. La más cercana está en el percentil ${shown}.`
-      : `No twin in the top ${verdict.top}%. Nearest is percentile ${shown}.`;
-  }
-  if (verdict.mode === "neighborhood") {
-    return lang === "es"
-      ? `${verdict.count} webs en el ${verdict.top} % superior.`
-      : `${verdict.count} sites in the top ${verdict.top}%.`;
-  }
-  if (lang === "es") {
-    return verdict.count === 1
-      ? `1 gemela en el ${verdict.top} % superior.`
-      : `${verdict.count} gemelas en el ${verdict.top} % superior.`;
-  }
-  return verdict.count === 1 ? `1 twin in the top ${verdict.top}%.` : `${verdict.count} twins in the top ${verdict.top}%.`;
+  return lang === 'es'
+    ? `${verdict.count} entradas sobre el umbral elegido. Percentil del primer candidato: ${formatPercentile(percentile,lang)}; no es un porcentaje de parecido.`
+    : `${verdict.count} entries above the selected threshold. First candidate percentile: ${formatPercentile(percentile,lang)}; not a similarity percentage.`;
 }
 
-function cardSentence(lang: Lang, verdict: KinVerdict, zone: string, total: number): string {
-  const among = lang === "es" ? `entre ${grouped(total, "es")} webs hechas con IA` : `among ${grouped(total, "en")} AI-built sites`;
-  if (verdict.mode === "none") {
-    return lang === "es" ? `${zone}. Ninguna gemela ${among}` : `${zone}. No twin ${among}`;
-  }
-  if (verdict.mode === "neighborhood") {
-    return lang === "es"
-      ? `${zone}. ${verdict.count} webs en el ${verdict.top} % superior ${among}`
-      : `${zone}. ${verdict.count} sites in the top ${verdict.top}% ${among}`;
-  }
-  const noun = lang === "es" ? (verdict.count === 1 ? "gemela" : "gemelas") : verdict.count === 1 ? "twin" : "twins";
-  return `${zone}. ${verdict.count} ${noun} ${among}`;
+function cardSentence(lang: Lang, verdict: KinVerdict, _zone: string, total: number): string {
+  return lang === 'es'
+    ? `Comparación orientativa: ${verdict.count} entradas sobre el umbral en un catálogo de ${grouped(total, 'es')}. No certifica originalidad ni calidad.`
+    : `Indicative comparison: ${verdict.count} entries above the threshold in a catalog of ${grouped(total, 'en')}. Not a certificate of originality or quality.`;
 }
 
 function suggestionEn(item: Suggestion): string {

@@ -34,7 +34,8 @@
     "prebuild": "npm run model:prepare",
     "quality:catalog": "node --import tsx scripts/audit-catalog.ts",
     "quality:robustness": "npm run model:prepare && node --import tsx scripts/benchmark-robustness.ts",
-    "quality:models": "npm run model:prepare && node scripts/prepare-model-comparison.mjs && node --import tsx scripts/compare-vision-models.ts"
+    "quality:models": "npm run model:prepare && node scripts/prepare-model-comparison.mjs && node --import tsx scripts/compare-vision-models.ts",
+    "quality:dinov2-pairs": "node scripts/prepare-model-comparison.mjs && node --import tsx scripts/evaluate-dinov2-pairs.ts"
   },
   "engines": {
     "node": ">=20"
