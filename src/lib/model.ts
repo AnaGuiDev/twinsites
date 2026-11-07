@@ -9,7 +9,7 @@ const MODEL_ID = "Xenova/mobileclip_s0";
 
 /** Shipped byte sizes. The progress bar is bytes received over these, not a timer. */
 export const WASM_BYTES = 11_133_407;
-export const VISION_BYTES = 11_846_843;
+export const VISION_BYTES = 22_876_479;
 
 type Processor = Awaited<ReturnType<typeof AutoProcessor.from_pretrained>>;
 type Vision = Awaited<ReturnType<typeof CLIPVisionModelWithProjection.from_pretrained>>;
@@ -62,9 +62,8 @@ export function configureRuntime(): void {
       mjs: ortRuntimeUrl("ort-wasm-simd-threaded.mjs"),
       wasm: ortRuntimeUrl("ort-wasm-simd-threaded.wasm"),
     };
-    // The q8 vision graph is not stable with the threaded WASM runtime: the same
-    // screenshot alternates between two embeddings. The catalog was encoded with
-    // one thread, so the browser must do the same or twins will not match.
+    // Keep the same single-thread runtime used to encode the FP16 catalog.
+    // Cross-device / threaded equivalence is not established by the stability check.
     wasm.numThreads = 1;
   }
 }
@@ -145,7 +144,7 @@ async function loadPair(): Promise<void> {
     progress_callback: noteModel,
   });
   vision = await CLIPVisionModelWithProjection.from_pretrained(MODEL_ID, {
-    dtype: "q8",
+    dtype: "fp16",
     device: "wasm",
     progress_callback: noteModel,
   });
@@ -172,19 +171,24 @@ export async function ensureModel(): Promise<void> {
 }
 
 export function preloadEngine(): void {
-  void ensureModel();
+  void ensureModel().catch(() => undefined);
 }
 
 export async function embedBlob(file: Blob): Promise<Float32Array> {
   await ensureModel();
   if (!processor || !vision) throw new Error("model");
   const image = await RawImage.fromBlob(file);
-  const inputs = await processor(image);
+  // Two overlapping square views retain both lateral edges of the desktop hero.
+  const side = Math.min(image.width, image.height);
+  const left = await image.crop([0, 0, side - 1, side - 1]);
+  const right = await image.crop([image.width - side, 0, image.width - 1, side - 1]);
+  const inputs = await processor([left, right]);
   const output = await vision(inputs);
   const embeds = output.image_embeds;
   const normalized = embeds.normalize();
   const listed = normalized.tolist() as number[] | number[][];
-  const row = Array.isArray(listed[0]) ? (listed as number[][])[0] : (listed as number[]);
+  const rows = Array.isArray(listed[0]) ? listed as number[][] : [listed as number[]];
+  const row = rows[0].map((_, index) => rows.reduce((sum, values) => sum + values[index], 0) / rows.length);
   let norm = 0;
   for (const value of row) norm += value * value;
   norm = Math.sqrt(norm) || 1;

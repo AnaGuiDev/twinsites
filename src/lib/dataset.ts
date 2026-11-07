@@ -1,3 +1,4 @@
+import { MODEL_VERSION } from "./model-version";
 import type { Calibration, Catalog, Dataset } from "../types";
 
 const MAGIC = "TWEM";
@@ -70,6 +71,7 @@ async function fetchDataset(): Promise<Dataset> {
   fraction = 1;
   emit();
   const catalog = JSON.parse(new TextDecoder().decode(buffers[0])) as Catalog;
+  if ((catalog as Catalog & { recipe?: string }).recipe !== MODEL_VERSION) throw new Error("catalog-model-mismatch");
   const calibration = JSON.parse(new TextDecoder().decode(buffers[2])) as Calibration;
   const buffer = buffers[1];
   const view = new DataView(buffer);

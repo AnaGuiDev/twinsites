@@ -1,3 +1,5 @@
+import { MethodPage } from "./components/MethodPage";
+import { AuditReport } from "./components/AuditReport";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { GuidePage, OrderPage, ServiceLadder, ServicesPage, TropeCatalog } from "./components/Services";
 import { DropZone } from "./components/DropZone";
@@ -303,11 +305,13 @@ export function App() {
       </header>
 
       <main>
+        {stage && <div className="analysis-controls" role="status"><span>{stageCopy[stage]} · {shown}%</span><button type="button" className="text-link" onClick={()=>{uploadRun.current++;setStage(null);setProgress(null);}}>{lang === "es" ? "Cancelar esta comparación" : "Cancel this comparison"}</button></div>}
         {(route.name === "legal" || route.name === "terms" || route.name === "withdrawal") && <LegalPage page={route.name} />}
+        {route.name === "method" && <MethodPage />}
         {route.name === "studio" && <StudioConsole />}
         {route.name === "services" && <ServicesPage />}
         {route.name === "guide" && <GuidePage />}
-        {route.name === "sample-audit" && <GuidePage sample />}
+        {route.name === "sample-audit" && <AuditReport />}
         {route.name === "order" && <OrderPage />}
         {route.name === "privacy" && <PrivacyView />}
         {route.name === "faq" && <Faq page />}
@@ -395,6 +399,7 @@ export function App() {
           <li>
             <a href="https://github.com/JefferyLee/awesome-vibe-coded-apps">{t.footerCatalog}</a>
           </li>
+          <li><RouteLink href="/method">{lang === "es" ? "Método y evidencia" : "Method & evidence"}</RouteLink></li>
           <li><RouteLink href="/legal">{lang === "es" ? "Aviso legal" : "Legal notice"}</RouteLink></li>
           <li><RouteLink href="/terms">{lang === "es" ? "Condiciones" : "Terms"}</RouteLink></li>
           <li><RouteLink href="/withdrawal">{lang === "es" ? "Cancelaciones" : "Cancellations"}</RouteLink></li>
