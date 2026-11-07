@@ -68,7 +68,7 @@ The outbox uses Resend idempotency keys and ten hourly attempts, then remains vi
 
 ## Research and legal basis
 
-Anti Web Slop could not be directly retrieved during this implementation; its current checkout, design and legal documents were **not verified**. The free-tool → human-review → implementation pattern comes from the user's supplied description, not a claim that its contracts or prices were independently audited. No competitor text or visual assets were imported. Distinctive offer, identity and truthful evidence matter more than copying its headline price.
+The browser review on 7 November 2026 reached Anti Web Slop's home, legal page, sample report and first audit form step after text retrieval failed. No form was submitted or payment tested. Findings and verified page URLs are recorded in [the direct competitor review](anti-web-slop-review.md). The review found additional automated products in the legal page; these are not evidence that Twinsites should sell an insufficiently covered automated score. No competitor copy or visual assets were imported.
 
 Primary references used to design the interfaces (not a legal opinion):
 
