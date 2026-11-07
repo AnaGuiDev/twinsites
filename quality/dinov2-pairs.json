@@ -1,0 +1,538 @@
+{
+  "schema": 1,
+  "model": "onnx-community/dinov2-small",
+  "dtype": "fp16",
+  "runtime": "Node CPU; CLS token; normalized mean of two overlapping square crops",
+  "labelsSha256": "2d891dd110e8f2a3e0fea51db3a35ee287b34cdcecc8fd2c3f26a3fab342c1f7",
+  "protocol": "Same 60 previously AI-labeled pairs and same development/test split; threshold maximizes development balanced accuracy, ties choose larger. Exploratory reused test, not independent human validation. MobileCLIP comparison uses committed browser-encoded catalog scores; DINOv2 uses CPU inference.",
+  "humanLabelsVerified": false,
+  "uniqueImages": 99,
+  "dinov2": {
+    "threshold": 0.616165268526122,
+    "development": {
+      "count": 30,
+      "tp": 6,
+      "fp": 14,
+      "tn": 10,
+      "fn": 0,
+      "precision": 0.3,
+      "recall": 1,
+      "balancedAccuracy": 0.7083333333333334
+    },
+    "test": {
+      "count": 30,
+      "tp": 4,
+      "fp": 11,
+      "tn": 15,
+      "fn": 0,
+      "precision": 0.26666666666666666,
+      "recall": 1,
+      "balancedAccuracy": 0.7884615384615384
+    }
+  },
+  "mobileclip": {
+    "threshold": 0.5792259739440262,
+    "development": {
+      "count": 30,
+      "tp": 5,
+      "fp": 5,
+      "tn": 19,
+      "fn": 1,
+      "precision": 0.5,
+      "recall": 0.8333333333333334,
+      "balancedAccuracy": 0.8125
+    },
+    "test": {
+      "count": 30,
+      "tp": 2,
+      "fp": 1,
+      "tn": 25,
+      "fn": 2,
+      "precision": 0.6666666666666666,
+      "recall": 0.5,
+      "balancedAccuracy": 0.7307692307692308
+    }
+  },
+  "pairs": [
+    {
+      "id": "P01",
+      "a": "formchat-lovable",
+      "b": "popjam",
+      "cosine": 0.616165268526122,
+      "label": 2,
+      "split": "development"
+    },
+    {
+      "id": "P02",
+      "a": "ruanzhu",
+      "b": "lacoparentalite-fr",
+      "cosine": 0.710826088227223,
+      "label": 2,
+      "split": "development"
+    },
+    {
+      "id": "P03",
+      "a": "crispforms",
+      "b": "roumy",
+      "cosine": 0.874309897064842,
+      "label": 2,
+      "split": "development"
+    },
+    {
+      "id": "P04",
+      "a": "docs",
+      "b": "prmptree",
+      "cosine": 0.7746102560072443,
+      "label": 2,
+      "split": "development"
+    },
+    {
+      "id": "P05",
+      "a": "offer-genius-bot-lovable",
+      "b": "izeo",
+      "cosine": 0.8368028220825735,
+      "label": 1,
+      "split": "development"
+    },
+    {
+      "id": "P06",
+      "a": "rankparse",
+      "b": "qwen-image-edit",
+      "cosine": 0.9196564558417549,
+      "label": 1,
+      "split": "development"
+    },
+    {
+      "id": "P07",
+      "a": "crispforms",
+      "b": "cliffcheck",
+      "cosine": 0.6841004063151107,
+      "label": 0,
+      "split": "development"
+    },
+    {
+      "id": "P08",
+      "a": "docs",
+      "b": "wmhub",
+      "cosine": 0.5902663332671413,
+      "label": 1,
+      "split": "development"
+    },
+    {
+      "id": "P09",
+      "a": "exact-capture-screen-83-lovable",
+      "b": "supplementdex",
+      "cosine": 0.6338520580066517,
+      "label": 0,
+      "split": "development"
+    },
+    {
+      "id": "P10",
+      "a": "formchat-lovable",
+      "b": "ruanzhu",
+      "cosine": 0.8554944823389763,
+      "label": 2,
+      "split": "development"
+    },
+    {
+      "id": "P11",
+      "a": "getquality-md",
+      "b": "fundingcompass-hub-lovable",
+      "cosine": 0.8406079420499369,
+      "label": 1,
+      "split": "development"
+    },
+    {
+      "id": "P12",
+      "a": "gutsafe-educhange",
+      "b": "chats-llm",
+      "cosine": 0.8505132988892286,
+      "label": 1,
+      "split": "development"
+    },
+    {
+      "id": "P13",
+      "a": "hustlnaija-lovable",
+      "b": "moover-lovable",
+      "cosine": 0.5704721486944325,
+      "label": 0,
+      "split": "development"
+    },
+    {
+      "id": "P14",
+      "a": "izeo",
+      "b": "taxi-haiti-app-lovable",
+      "cosine": 0.48703542827204593,
+      "label": 0,
+      "split": "development"
+    },
+    {
+      "id": "P15",
+      "a": "lacoparentalite-fr",
+      "b": "popjam",
+      "cosine": 0.6996767927653723,
+      "label": 2,
+      "split": "development"
+    },
+    {
+      "id": "P16",
+      "a": "ltxvideo",
+      "b": "arx0n",
+      "cosine": 0.41599921880429347,
+      "label": 0,
+      "split": "development"
+    },
+    {
+      "id": "P17",
+      "a": "meshy",
+      "b": "aiimgeditor-org",
+      "cosine": 0.7977534676830849,
+      "label": 1,
+      "split": "development"
+    },
+    {
+      "id": "P18",
+      "a": "mysorbet",
+      "b": "tryaeos",
+      "cosine": 0.30178198451061433,
+      "label": 0,
+      "split": "development"
+    },
+    {
+      "id": "P19",
+      "a": "offer-genius-bot-lovable",
+      "b": "musci",
+      "cosine": 0.8274407472706311,
+      "label": 1,
+      "split": "development"
+    },
+    {
+      "id": "P20",
+      "a": "paperclaw-org",
+      "b": "seoperseo",
+      "cosine": 0.8866829968555826,
+      "label": 0,
+      "split": "development"
+    },
+    {
+      "id": "P21",
+      "a": "pixi-spell-fun-lovable",
+      "b": "image25sunburst",
+      "cosine": 0.5776537394538908,
+      "label": 0,
+      "split": "development"
+    },
+    {
+      "id": "P22",
+      "a": "prmptree",
+      "b": "lixrl",
+      "cosine": 0.49515465113697227,
+      "label": 0,
+      "split": "development"
+    },
+    {
+      "id": "P23",
+      "a": "rankparse",
+      "b": "namespyai",
+      "cosine": 0.8058487102690469,
+      "label": 1,
+      "split": "development"
+    },
+    {
+      "id": "P24",
+      "a": "roumy",
+      "b": "petprofessionals",
+      "cosine": 0.4092442221635847,
+      "label": 1,
+      "split": "development"
+    },
+    {
+      "id": "P25",
+      "a": "seedance2-today",
+      "b": "qwen-image-edit",
+      "cosine": 0.4563632120011535,
+      "label": 1,
+      "split": "development"
+    },
+    {
+      "id": "P26",
+      "a": "smartlyq",
+      "b": "sendroq",
+      "cosine": 0.7334769584174927,
+      "label": 1,
+      "split": "development"
+    },
+    {
+      "id": "P27",
+      "a": "stats-daily-dashboard-lovable",
+      "b": "swap-smile-corner-lovable",
+      "cosine": 0.7033288289135459,
+      "label": 0,
+      "split": "development"
+    },
+    {
+      "id": "P28",
+      "a": "teacher-match-pro-lovable",
+      "b": "vayovideo-com",
+      "cosine": 0.5008145151589914,
+      "label": 0,
+      "split": "development"
+    },
+    {
+      "id": "P29",
+      "a": "treino-redacao-smart-lovable",
+      "b": "xtokenchecker",
+      "cosine": 0.9366825207366496,
+      "label": 0,
+      "split": "development"
+    },
+    {
+      "id": "P30",
+      "a": "veelapp",
+      "b": "appiconkitchen",
+      "cosine": 0.7743701700272644,
+      "label": 0,
+      "split": "development"
+    },
+    {
+      "id": "P31",
+      "a": "cancelshut",
+      "b": "serafind",
+      "cosine": 0.9060392193771476,
+      "label": 2,
+      "split": "test"
+    },
+    {
+      "id": "P32",
+      "a": "resumely-live",
+      "b": "veloxonhub",
+      "cosine": 0.9095546897573787,
+      "label": 2,
+      "split": "test"
+    },
+    {
+      "id": "P33",
+      "a": "amy-aryam",
+      "b": "staxinvesting",
+      "cosine": 0.9188261372388911,
+      "label": 2,
+      "split": "test"
+    },
+    {
+      "id": "P34",
+      "a": "bmprun",
+      "b": "naborra-com",
+      "cosine": 0.5988197783171421,
+      "label": 0,
+      "split": "test"
+    },
+    {
+      "id": "P35",
+      "a": "cancelshut",
+      "b": "circlemate",
+      "cosine": 0.8818460401356033,
+      "label": 1,
+      "split": "test"
+    },
+    {
+      "id": "P36",
+      "a": "clipin-ai",
+      "b": "amy-aryam",
+      "cosine": 0.6057737199381059,
+      "label": 1,
+      "split": "test"
+    },
+    {
+      "id": "P37",
+      "a": "cronloop",
+      "b": "ohshitscenario-lovable",
+      "cosine": 0.7136449798742541,
+      "label": 1,
+      "split": "test"
+    },
+    {
+      "id": "P38",
+      "a": "hypocrisydetector",
+      "b": "aiforasmr",
+      "cosine": 0.2990457336405254,
+      "label": 1,
+      "split": "test"
+    },
+    {
+      "id": "P39",
+      "a": "examcoach-lovable",
+      "b": "maakann-lovable",
+      "cosine": 0.6946211740652433,
+      "label": 0,
+      "split": "test"
+    },
+    {
+      "id": "P40",
+      "a": "jammyjar",
+      "b": "arcaira",
+      "cosine": 0.367532347355376,
+      "label": 1,
+      "split": "test"
+    },
+    {
+      "id": "P41",
+      "a": "getredpen-cn",
+      "b": "glowenai-lovable",
+      "cosine": 0.5405517766420863,
+      "label": 0,
+      "split": "test"
+    },
+    {
+      "id": "P42",
+      "a": "h3-max",
+      "b": "attractivenessscale",
+      "cosine": 0.6271176065931324,
+      "label": 1,
+      "split": "test"
+    },
+    {
+      "id": "P43",
+      "a": "hypocrisydetector",
+      "b": "thepaintedladytarot",
+      "cosine": 0.29128601994897746,
+      "label": 1,
+      "split": "test"
+    },
+    {
+      "id": "P44",
+      "a": "jammyjar",
+      "b": "unabyss",
+      "cosine": 0.5451063428621793,
+      "label": 0,
+      "split": "test"
+    },
+    {
+      "id": "P45",
+      "a": "lagoshustler-lovable",
+      "b": "picture-solve-ace-lovable",
+      "cosine": 0.12101149559738057,
+      "label": 0,
+      "split": "test"
+    },
+    {
+      "id": "P46",
+      "a": "lucer-art",
+      "b": "aiforasmr",
+      "cosine": 0.1892996483558343,
+      "label": 0,
+      "split": "test"
+    },
+    {
+      "id": "P47",
+      "a": "metavoice",
+      "b": "heuron-news",
+      "cosine": 0.680923428536411,
+      "label": 0,
+      "split": "test"
+    },
+    {
+      "id": "P48",
+      "a": "mystic-star-quest-lovable",
+      "b": "element-explore-3d-lovable",
+      "cosine": 0.028610012931899104,
+      "label": 0,
+      "split": "test"
+    },
+    {
+      "id": "P49",
+      "a": "offergenius-lovable",
+      "b": "chaosbench",
+      "cosine": 0.6297222407568315,
+      "label": 0,
+      "split": "test"
+    },
+    {
+      "id": "P50",
+      "a": "paperfox",
+      "b": "fancanon",
+      "cosine": 0.8765796034634542,
+      "label": 0,
+      "split": "test"
+    },
+    {
+      "id": "P51",
+      "a": "pixoate",
+      "b": "imgveo",
+      "cosine": 0.670293129090389,
+      "label": 0,
+      "split": "test"
+    },
+    {
+      "id": "P52",
+      "a": "pro-studio-solutions-lovable",
+      "b": "loerei-github",
+      "cosine": 0.4093564808640426,
+      "label": 0,
+      "split": "test"
+    },
+    {
+      "id": "P53",
+      "a": "rankworker",
+      "b": "nanobanana2lite",
+      "cosine": 0.5886664781820552,
+      "label": 0,
+      "split": "test"
+    },
+    {
+      "id": "P54",
+      "a": "route2roster",
+      "b": "physics-ai-solver-step-by-step-problem-assistant",
+      "cosine": 0.12798548789491007,
+      "label": 0,
+      "split": "test"
+    },
+    {
+      "id": "P55",
+      "a": "seedance2",
+      "b": "railway",
+      "cosine": 0.6511622642373897,
+      "label": 1,
+      "split": "test"
+    },
+    {
+      "id": "P56",
+      "a": "smashpdf-online",
+      "b": "serafind",
+      "cosine": 0.9434043855232609,
+      "label": 2,
+      "split": "test"
+    },
+    {
+      "id": "P57",
+      "a": "staxinvesting",
+      "b": "synexa",
+      "cosine": 0.7652635509664123,
+      "label": 0,
+      "split": "test"
+    },
+    {
+      "id": "P58",
+      "a": "teacherplanner",
+      "b": "vedicastrologychart",
+      "cosine": 0.876240671092412,
+      "label": 0,
+      "split": "test"
+    },
+    {
+      "id": "P59",
+      "a": "trek-triumphant-lovable",
+      "b": "yarrow-5-polsia",
+      "cosine": 0.07849659775757344,
+      "label": 0,
+      "split": "test"
+    },
+    {
+      "id": "P60",
+      "a": "veloxonhub",
+      "b": "arcaira",
+      "cosine": 0.2046532245639429,
+      "label": 0,
+      "split": "test"
+    }
+  ]
+}

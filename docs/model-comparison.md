@@ -2,7 +2,7 @@
 
 ## Decision
 
-Keep the production candidate unchanged. DINOv2-small merits a larger independent evaluation as an auxiliary structural signal. This experiment does not justify replacing MobileCLIP or adding the larger SigLIP2 model to the visitor's download.
+Keep the production candidate unchanged. The subsequent [60-pair evaluation](product-trust-decision.md) found more detections but substantially more false positives with DINOv2; it is not promoted. This experiment does not justify replacing MobileCLIP or adding the larger SigLIP2 model to the visitor's download.
 
 ## Executed protocol
 
