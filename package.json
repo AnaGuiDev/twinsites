@@ -33,7 +33,8 @@
     "pretest:product": "npm run model:prepare",
     "prebuild": "npm run model:prepare",
     "quality:catalog": "node --import tsx scripts/audit-catalog.ts",
-    "quality:robustness": "npm run model:prepare && node --import tsx scripts/benchmark-robustness.ts"
+    "quality:robustness": "npm run model:prepare && node --import tsx scripts/benchmark-robustness.ts",
+    "quality:models": "npm run model:prepare && node scripts/prepare-model-comparison.mjs && node --import tsx scripts/compare-vision-models.ts"
   },
   "engines": {
     "node": ">=20"

@@ -30,8 +30,8 @@ A nearly uniform or fully transparent reviewed region is refused before model lo
 
 ## Next experiments
 
-- Controlled page families with known structural changes, same colors/different layout and same layout/different content.
+- Initial controlled template and three-model comparison completed: see [model comparison](model-comparison.md). Expand to multiple independent page families.
 - Re-run perturbations in browser WASM and on physical devices; measure ranking stability after excluding duplicate groups too.
-- Compare DINOv2/SigLIP2 offline on an identical frozen protocol before any model replacement. Neither alternative is benchmarked in this package.
+- DINOv2/SigLIP2 have now been benchmarked offline on identical inputs. Extend the small retrieval pool and obtain independent labels before any replacement.
 - Independently review duplicate capture provenance and suspicious semantic captures; rebuild calibration if the catalog changes.
 - Derive a result-level abstention policy using independent labels. No unvalidated score margin is presented as a probability of correctness.
