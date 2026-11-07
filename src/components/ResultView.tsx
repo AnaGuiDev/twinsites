@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ModelNotice } from "./ModelNotice";
 import { SlopPanel } from "./SlopPanel";
 import { DropZone } from "./DropZone";
 import { Inspiration } from "./Inspiration";
@@ -344,6 +345,7 @@ export function ResultView({
 
   return (
     <div className="results guided">
+      <ModelNotice />
       <section className="verdict-head" aria-labelledby="verdict-title">
         <div className="verdict-main">
           <p className="kicker">{own ? t.yourResult : t.siteResult(result.subjectTitle)}</p>

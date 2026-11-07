@@ -171,6 +171,9 @@ function zoneStubs(): Plugin {
       for (const [slug, title, description] of [
         ["services", "Human audit & redesign", "Visual twins and a free explainable Slop Score, followed by a human video audit, actionable prompts and a 30-day recheck."],
         ["guide", "What is web slop?", "An evidence-first guide to repeated landing-page conventions, with what screenshots can and cannot tell."],
+        ["legal", "Legal notice", "Seller identification, ownership and service information for Twinsites."],
+        ["terms", "Service terms", "Scope, price, delivery and rights for Twinsites human reviews."],
+        ["withdrawal", "Withdrawal and cancellations", "How to request cancellation and exercise applicable withdrawal rights."],
         ["sample-audit", "Sample human audit", "An illustrative report for a fictional landing page: five prioritized fixes with implementation prompts."],
       ]) writeStub(html, path.resolve("dist", slug), `${title} — Twinsites`, description, `https://twinsites.com/${slug}`, title);
       const report = JSON.parse(readFileSync(path.resolve("public/data/report.json"), "utf8")) as {

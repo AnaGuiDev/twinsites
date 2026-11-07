@@ -4,7 +4,7 @@ import { AuditService, businessDue, handleServices, offerFor, servicesReady, ver
 
 const realFetch = globalThis.fetch;
 afterEach(() => { globalThis.fetch = realFetch; });
-const configured: ServiceEnv = { SERVICES_ENABLED: "1", SERVICE_CONTACT: "studio@example.com", STRIPE_SECRET_KEY: "sk_test_fixture", STRIPE_WEBHOOK_SECRET: "whsec_fixture", SERVICES_ADMIN_TOKEN: "a".repeat(40), RESEND_API_KEY: "re_fixture", SERVICE_FROM: "Studio <studio@example.com>" };
+const configured: ServiceEnv = { SELLER_PUBLICATION_APPROVED: "1", SELLER_LEGAL_NAME: "Test Seller", SELLER_TAX_ID: "TEST-NOT-REAL", SELLER_ADDRESS: "Test address", SELLER_COUNTRY: "ES", SERVICE_OPERATOR_CONFIRMED: "1", SERVICE_LEGAL_REVIEWED: "1", SERVICE_TAX_CONFIGURED: "1", SERVICE_WEEKLY_CAPACITY: "20", SERVICES_ENABLED: "1", SERVICE_CONTACT: "studio@example.com", STRIPE_SECRET_KEY: "sk_test_fixture", STRIPE_WEBHOOK_SECRET: "whsec_fixture", SERVICES_ADMIN_TOKEN: "a".repeat(40), RESEND_API_KEY: "re_fixture", SERVICE_FROM: "Studio <studio@example.com>" };
 function fixture(extra: ServiceEnv = {}) {
   const records = new Map<string, unknown>(); let alarm = 0; let tail = Promise.resolve();
   const state = {
@@ -22,7 +22,7 @@ function fixture(extra: ServiceEnv = {}) {
   const env = { ...configured, ...extra };
   return { service: new AuditService({ ...state, storage: storage as never }, env), records, env, alarm: () => alarm };
 }
-function orderBody(extra = {}) { return { kind: "audit", email: "buyer@example.com", urls: ["https://example.com/"], pages: 1, notes: "Improve clarity", consent: true, terms: "twinsites-services-v1", quotedTotal: 30, lang: "es", requestId: crypto.randomUUID(), ...extra }; }
+function orderBody(extra = {}) { return { kind: "audit", email: "buyer@example.com", urls: ["https://example.com/"], pages: 1, notes: "Improve clarity", consent: true, startImmediately: true, terms: "twinsites-services-v2", quotedTotal: 89, lang: "es", requestId: crypto.randomUUID(), ...extra }; }
 function request(path: string, body?: unknown, headers: Record<string, string> = {}) {
   return new Request(`https://worker.example/services/${path}`, { method: body === undefined ? "GET" : "POST", headers: { origin: "https://twinsites.com", "content-type": "application/json", "cf-connecting-ip": "203.0.113.9", ...headers }, ...(body === undefined ? {} : { body: JSON.stringify(body) }) });
 }
@@ -31,19 +31,19 @@ async function signed(raw: string, timestamp = Math.floor(Date.now() / 1000)) {
   const signature = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(`${timestamp}.${raw}`));
   return `t=${timestamp},v1=${[...new Uint8Array(signature)].map(x => x.toString(16).padStart(2, "0")).join("")}`;
 }
-async function webhook(service: AuditService, id: string, amount = 3000) {
-  const event = { type: "checkout.session.completed", data: { object: { id: "cs_fixture", metadata: { order_id: id }, payment_status: "paid", amount_total: amount, currency: "usd", payment_intent: "pi_fixture" } } };
+async function webhook(service: AuditService, id: string, amount = 8900) {
+  const event = { type: "checkout.session.completed", data: { object: { id: "cs_fixture", metadata: { order_id: id }, payment_status: "paid", amount_total: amount, currency: "eur", payment_intent: "pi_fixture" } } };
   const raw = JSON.stringify(event);
   return service.fetch(request("webhook", event, { "stripe-signature": await signed(raw) }));
 }
-function stripe() { globalThis.fetch = async (input, init) => { assert.equal(String(input), "https://api.stripe.com/v1/checkout/sessions"); const params = new URLSearchParams(String(init?.body)); assert.equal(params.get("line_items[0][price_data][unit_amount]"), "3000"); return Response.json({ id: "cs_fixture", url: "https://checkout.stripe.com/c/pay/fixture" }); }; }
+function stripe() { globalThis.fetch = async (input, init) => { assert.equal(String(input), "https://api.stripe.com/v1/checkout/sessions"); const params = new URLSearchParams(String(init?.body)); assert.equal(params.get("line_items[0][price_data][unit_amount]"), "8900"); return Response.json({ id: "cs_fixture", url: "https://checkout.stripe.com/c/pay/fixture" }); }; }
 
 test("services fail closed until the full setup exists; price arithmetic is server-owned", async () => {
   assert.equal(servicesReady({}), false); assert.equal(servicesReady(configured), true);
   assert.equal(servicesReady({ ...configured, SERVICES_ADMIN_TOKEN: "short" }), false);
-  assert.equal(offerFor(0, { SERVICES_DYNAMIC_PRICE: "1" }).base, 20);
-  assert.equal(offerFor(3, { SERVICES_DYNAMIC_PRICE: "1" }).base, 30);
-  assert.equal(offerFor(8, { SERVICES_DYNAMIC_PRICE: "1" }).base, 40);
+  assert.equal(offerFor(0, {}).base, 89);
+  assert.equal(offerFor(3, {}).available, 0);
+  assert.equal(offerFor(0, { SERVICE_PRICE_EUR: "99" }).base, 99);
   const offer = await handleServices(request("offer"), configured); assert.equal((await offer.json()).enabled, false);
   assert.equal((await fixture({ SERVICES_ENABLED: "0" }).service.fetch(request("orders", orderBody()))).status, 503);
 });
@@ -68,11 +68,11 @@ test("checkout retries are idempotent, server-priced and do not confirm payment"
   assert.equal((await service.fetch(request(`orders/${first.id}`))).status, 404);
 });
 test("provider timeout preserves a recoverable checkout with the same idempotency key", async () => {
-  const { service, records } = fixture(); const body = orderBody(); let key = "";
-  globalThis.fetch = async (_input, init) => { key = new Headers(init?.headers).get("Idempotency-Key")!; throw new Error("network"); };
+  const { service, records } = fixture(); const body = orderBody(); let key = "", sentBody = "";
+  globalThis.fetch = async (_input, init) => { key = new Headers(init?.headers).get("Idempotency-Key")!; sentBody = String(init?.body); throw new Error("network"); };
   await assert.rejects(service.fetch(request("orders", body)));
   const id = [...records.keys()].find(k => k.startsWith("order:"))!.slice(6);
-  globalThis.fetch = async (_input, init) => { assert.equal(new Headers(init?.headers).get("Idempotency-Key"), key); return Response.json({ id: "cs_fixture", url: "https://checkout.stripe.com/c/pay/fixture" }); };
+  globalThis.fetch = async (_input, init) => { assert.equal(new Headers(init?.headers).get("Idempotency-Key"), key); assert.equal(String(init?.body), sentBody); return Response.json({ id: "cs_fixture", url: "https://checkout.stripe.com/c/pay/fixture" }); };
   const retry = await (await service.fetch(request("orders", body))).json(); assert.equal(retry.id, id); assert.ok(retry.checkout);
 });
 test("signed webhook checks amount, session and replay before scheduling human work", async () => {
@@ -124,15 +124,78 @@ test("a redesign quote credits the paid audit once and blocks reuse and separate
   const redesign = await (await service.fetch(request("orders", orderBody({ kind: "redesign", quotedTotal: 0 })))).json();
   const second = await (await service.fetch(request("orders", orderBody({ kind: "redesign", quotedTotal: 0 })))).json();
   globalThis.fetch = async (_input, init) => {
-    assert.equal(new URLSearchParams(String(init?.body)).get("line_items[0][price_data][unit_amount]"), "197000");
+    assert.equal(new URLSearchParams(String(init?.body)).get("line_items[0][price_data][unit_amount]"), "191100");
     return Response.json({ id: "cs_redesign", url: "https://checkout.stripe.com/c/pay/redesign" });
   };
   const admin = { authorization: `Bearer ${configured.SERVICES_ADMIN_TOKEN}` };
   assert.equal((await service.fetch(request("admin", { id: redesign.id, action: "quote", gross: 2000, auditId: audit.id }, admin))).status, 200);
-  assert.equal((records.get(`order:${redesign.id}`) as { total: number }).total, 1970);
+  assert.equal((records.get(`order:${redesign.id}`) as { total: number }).total, 1911);
   assert.equal((await service.fetch(request("admin", { id: second.id, action: "quote", gross: 2000, auditId: audit.id }, admin))).status, 409);
   assert.equal((await service.fetch(request("admin", { id: audit.id, action: "refund" }, admin))).status, 409);
   globalThis.fetch = async input => { assert.match(String(input), /cs_redesign\/expire$/); return Response.json({ status: "expired" }); };
   assert.equal((await service.fetch(request("admin", { id: redesign.id, action: "cancel-quote" }, admin))).status, 200);
   assert.equal((records.get(`order:${audit.id}`) as { creditedTo?: string }).creditedTo, undefined);
+});
+
+test("seller details cannot become public or enable payment without explicit publication approval", async () => {
+  const hidden = { ...configured, SELLER_PUBLICATION_APPROVED: "0" };
+  assert.equal(offerFor(0, hidden).seller, null);
+  assert.equal(servicesReady(hidden), false);
+  for (const missing of ["SERVICE_OPERATOR_CONFIRMED", "SERVICE_TAX_CONFIGURED", "SERVICE_LEGAL_REVIEWED", "SELLER_ADDRESS"] as const) {
+    assert.equal(servicesReady({ ...configured, [missing]: "" }), false, missing);
+  }
+  const { service } = fixture(hidden);
+  assert.equal((await service.fetch(request("orders", orderBody()))).status, 503);
+});
+
+test("weekly capacity includes unpaid reservations and cannot be oversold in parallel", async () => {
+  const { service } = fixture({ SERVICE_WEEKLY_CAPACITY: "2" }); stripe();
+  const results = await Promise.all(Array.from({ length: 3 }, (_, n) => service.fetch(request("orders", orderBody({ email: `buyer${n}@example.com` })))));
+  assert.equal(results.filter(r => r.status === 201).length, 2);
+  assert.equal(results.filter(r => r.status === 409).length, 1);
+  const offer = await (await service.fetch(request("offer"))).json(); assert.equal(offer.available, 0);
+});
+
+test("only a signed provider expiry releases an unpaid reservation", async () => {
+  const { service } = fixture({ SERVICE_WEEKLY_CAPACITY: "1" }); stripe();
+  const order = await (await service.fetch(request("orders", orderBody()))).json();
+  const event = { type: "checkout.session.expired", data: { object: { id: "cs_fixture", metadata: { order_id: order.id } } } };
+  assert.equal((await service.fetch(request("webhook", event))).status, 400);
+  assert.equal((await (await service.fetch(request("offer"))).json()).available, 0);
+  assert.equal((await service.fetch(request("webhook", event, { "stripe-signature": await signed(JSON.stringify(event)) }))).status, 200);
+  assert.equal((await (await service.fetch(request("offer"))).json()).available, 1);
+});
+
+test("checkout includes inclusive tax, billing, invoice metadata and explicit terms", async () => {
+  const { service } = fixture(); let captured = new URLSearchParams();
+  globalThis.fetch = async (_url, init) => { captured = new URLSearchParams(String(init?.body)); return Response.json({ id: "cs_fixture", url: "https://checkout.stripe.com/c/pay/fixture" }); };
+  assert.equal((await service.fetch(request("orders", orderBody()))).status, 201);
+  assert.equal(captured.get("automatic_tax[enabled]"), "true");
+  assert.equal(captured.get("line_items[0][price_data][tax_behavior]"), "inclusive");
+  assert.equal(captured.get("billing_address_collection"), "required");
+  assert.equal(captured.get("invoice_creation[enabled]"), "true");
+  assert.equal(captured.get("consent_collection[terms_of_service]"), "required");
+  assert.equal(captured.get("line_items[0][price_data][currency]"), "eur");
+});
+
+test("declining early start delays work, and cancellation requires the private order credential", async () => {
+  const { service, records } = fixture(); stripe();
+  const order = await (await service.fetch(request("orders", orderBody({ startImmediately: false })))).json();
+  await webhook(service, order.id);
+  const saved = records.get(`order:${order.id}`) as { paidAt: number; startAt: number };
+  assert.equal(saved.startAt - saved.paidAt, 14 * 86400000);
+  assert.equal((await service.fetch(request(`cancel/${order.id}`, { reason: "withdraw" }))).status, 404);
+  assert.equal((await service.fetch(request(`cancel/${order.id}`, { reason: "withdraw" }, { authorization: `Bearer ${order.token}` }))).status, 200);
+  assert.equal((records.get(`order:${order.id}`) as { status: string }).status, "paid", "a request is not a completed refund");
+  const admin = { authorization: `Bearer ${configured.SERVICES_ADMIN_TOKEN}` };
+  assert.equal((await service.fetch(request("admin", { id: order.id, action: "deliver", videoUrl: "https://video.example.com/", reportUrl: "https://report.example.com/", usefulChanges: 3 }, admin))).status, 409);
+});
+
+test("a signed invoice event attaches the matching customer invoice without exposing customer data", async () => {
+  const { service } = fixture(); stripe();
+  const order = await (await service.fetch(request("orders", orderBody()))).json();
+  const event = { type: "invoice.paid", data: { object: { id: "in_fixture", metadata: { order_id: order.id }, amount_paid: 8900, currency: "eur", hosted_invoice_url: "https://invoice.stripe.com/i/fixture" } } };
+  assert.equal((await service.fetch(request("webhook", event, { "stripe-signature": await signed(JSON.stringify(event)) }))).status, 200);
+  const status = await (await service.fetch(request(`orders/${order.id}`, undefined, { authorization: `Bearer ${order.token}` }))).json();
+  assert.equal(status.invoiceUrl, "https://invoice.stripe.com/i/fixture"); assert.equal(status.email, undefined);
 });

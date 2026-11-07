@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "releaseReady": false,
+  "reason": "No validated fp16/two-crop release or 60 human-labeled pairs supplied in this repository.",
+  "model": "Xenova/mobileclip_s0",
+  "visionDtype": "q8",
+  "vectorStorage": "f16",
+  "humanLabelsVerified": false,
+  "catalogReencoded": false,
+  "percentilesRecalibrated": false,
+  "stabilityVerified": false
+}
