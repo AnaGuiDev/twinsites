@@ -1,0 +1,2733 @@
+{
+  "schema": 1,
+  "runtime": "ONNX Runtime Node CPU FP16; not browser/device validation",
+  "protocol": "24 evenly spaced catalog entries, 5 fixed perturbations each. No tuning or human labels. Top-k excludes query identity; this measures neighborhood stability, not semantic accuracy.",
+  "embeddingSha256": "0d6350367e7ef476aef8d1c689512c7be25908448232246edbb41270f09d8005",
+  "summary": [
+    {
+      "name": "repeat",
+      "minCosine": 0.9999999999999992,
+      "meanTop10Overlap": 1,
+      "top1Unchanged": 24,
+      "count": 24
+    },
+    {
+      "name": "jpeg-q60",
+      "minCosine": 0.9587961159753239,
+      "meanTop10Overlap": 0.8458333333333333,
+      "top1Unchanged": 22,
+      "count": 24
+    },
+    {
+      "name": "resize-75pct",
+      "minCosine": 0.9443837147187091,
+      "meanTop10Overlap": 0.8416666666666667,
+      "top1Unchanged": 16,
+      "count": 24
+    },
+    {
+      "name": "crop-2pct",
+      "minCosine": 0.9388908869868557,
+      "meanTop10Overlap": 0.8541666666666669,
+      "top1Unchanged": 14,
+      "count": 24
+    },
+    {
+      "name": "brightness-105pct",
+      "minCosine": 0.9714000780406606,
+      "meanTop10Overlap": 0.8958333333333334,
+      "top1Unchanged": 21,
+      "count": 24
+    }
+  ],
+  "results": [
+    {
+      "slug": "100questionsai",
+      "index": 0,
+      "baselineCatalogCosine": 0.9998914048830456,
+      "variants": [
+        {
+          "name": "repeat",
+          "cosineToOriginal": 0.9999999999999996,
+          "top1Unchanged": true,
+          "top10Overlap": 1,
+          "inferenceMs": 189,
+          "top3": [
+            {
+              "slug": "trustrank",
+              "score": 0.7819260150585685
+            },
+            {
+              "slug": "kridona",
+              "score": 0.7774097553403961
+            },
+            {
+              "slug": "digimarket-info",
+              "score": 0.7672787919593566
+            }
+          ]
+        },
+        {
+          "name": "jpeg-q60",
+          "cosineToOriginal": 0.9874666247617219,
+          "top1Unchanged": true,
+          "top10Overlap": 0.9,
+          "inferenceMs": 201,
+          "top3": [
+            {
+              "slug": "trustrank",
+              "score": 0.7847022954120715
+            },
+            {
+              "slug": "kridona",
+              "score": 0.7644736444615302
+            },
+            {
+              "slug": "digimarket-info",
+              "score": 0.7513233885085759
+            }
+          ]
+        },
+        {
+          "name": "resize-75pct",
+          "cosineToOriginal": 0.9868047603672774,
+          "top1Unchanged": false,
+          "top10Overlap": 0.7,
+          "inferenceMs": 212,
+          "top3": [
+            {
+              "slug": "digimarket-info",
+              "score": 0.7722905363496725
+            },
+            {
+              "slug": "trustrank",
+              "score": 0.7711387163812056
+            },
+            {
+              "slug": "kridona",
+              "score": 0.7661071242624018
+            }
+          ]
+        },
+        {
+          "name": "crop-2pct",
+          "cosineToOriginal": 0.9774860614656794,
+          "top1Unchanged": false,
+          "top10Overlap": 0.8,
+          "inferenceMs": 228,
+          "top3": [
+            {
+              "slug": "kridona",
+              "score": 0.7664886348832953
+            },
+            {
+              "slug": "digimarket-info",
+              "score": 0.7656096792121343
+            },
+            {
+              "slug": "trustrank",
+              "score": 0.7617542313440716
+            }
+          ]
+        },
+        {
+          "name": "brightness-105pct",
+          "cosineToOriginal": 0.9997113371307271,
+          "top1Unchanged": true,
+          "top10Overlap": 1,
+          "inferenceMs": 210,
+          "top3": [
+            {
+              "slug": "trustrank",
+              "score": 0.7852226113380216
+            },
+            {
+              "slug": "kridona",
+              "score": 0.7807790339441268
+            },
+            {
+              "slug": "digimarket-info",
+              "score": 0.7688762677269931
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "aiturnitinchecker",
+      "index": 83,
+      "baselineCatalogCosine": 0.9997081631597043,
+      "variants": [
+        {
+          "name": "repeat",
+          "cosineToOriginal": 1.0000000000000002,
+          "top1Unchanged": true,
+          "top10Overlap": 1,
+          "inferenceMs": 224,
+          "top3": [
+            {
+              "slug": "claudewatermark",
+              "score": 0.6737847535065541
+            },
+            {
+              "slug": "sub-watchful-eye-lovable",
+              "score": 0.6375107582763844
+            },
+            {
+              "slug": "tempo-checker-rami-dev",
+              "score": 0.6082079936602753
+            }
+          ]
+        },
+        {
+          "name": "jpeg-q60",
+          "cosineToOriginal": 0.9837256156088644,
+          "top1Unchanged": true,
+          "top10Overlap": 0.9,
+          "inferenceMs": 190,
+          "top3": [
+            {
+              "slug": "claudewatermark",
+              "score": 0.6729526982677115
+            },
+            {
+              "slug": "sub-watchful-eye-lovable",
+              "score": 0.6247435510351101
+            },
+            {
+              "slug": "tempo-checker-rami-dev",
+              "score": 0.6095271606550424
+            }
+          ]
+        },
+        {
+          "name": "resize-75pct",
+          "cosineToOriginal": 0.9834475189042688,
+          "top1Unchanged": true,
+          "top10Overlap": 0.8,
+          "inferenceMs": 212,
+          "top3": [
+            {
+              "slug": "claudewatermark",
+              "score": 0.6714609466470199
+            },
+            {
+              "slug": "sub-watchful-eye-lovable",
+              "score": 0.622004479494452
+            },
+            {
+              "slug": "tempo-checker-rami-dev",
+              "score": 0.6146389330541029
+            }
+          ]
+        },
+        {
+          "name": "crop-2pct",
+          "cosineToOriginal": 0.9844491093585277,
+          "top1Unchanged": true,
+          "top10Overlap": 0.8,
+          "inferenceMs": 212,
+          "top3": [
+            {
+              "slug": "claudewatermark",
+              "score": 0.6576989418829026
+            },
+            {
+              "slug": "sub-watchful-eye-lovable",
+              "score": 0.630653661427301
+            },
+            {
+              "slug": "tempo-checker-rami-dev",
+              "score": 0.6086131162752917
+            }
+          ]
+        },
+        {
+          "name": "brightness-105pct",
+          "cosineToOriginal": 0.9714000780406606,
+          "top1Unchanged": true,
+          "top10Overlap": 0.7,
+          "inferenceMs": 236,
+          "top3": [
+            {
+              "slug": "claudewatermark",
+              "score": 0.6644289469132897
+            },
+            {
+              "slug": "sub-watchful-eye-lovable",
+              "score": 0.5895822497652223
+            },
+            {
+              "slug": "vibexp",
+              "score": 0.5820411518424431
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "autoshort",
+      "index": 166,
+      "baselineCatalogCosine": 0.9998214144050238,
+      "variants": [
+        {
+          "name": "repeat",
+          "cosineToOriginal": 1,
+          "top1Unchanged": true,
+          "top10Overlap": 1,
+          "inferenceMs": 167,
+          "top3": [
+            {
+              "slug": "songless",
+              "score": 0.710217436537053
+            },
+            {
+              "slug": "thefoundersapp",
+              "score": 0.7005780481394484
+            },
+            {
+              "slug": "beautyface",
+              "score": 0.6963168675722704
+            }
+          ]
+        },
+        {
+          "name": "jpeg-q60",
+          "cosineToOriginal": 0.9802037713208207,
+          "top1Unchanged": true,
+          "top10Overlap": 0.9,
+          "inferenceMs": 210,
+          "top3": [
+            {
+              "slug": "songless",
+              "score": 0.7034294533810871
+            },
+            {
+              "slug": "beautyface",
+              "score": 0.6990962440284207
+            },
+            {
+              "slug": "thefoundersapp",
+              "score": 0.6852304705770235
+            }
+          ]
+        },
+        {
+          "name": "resize-75pct",
+          "cosineToOriginal": 0.9839178259266379,
+          "top1Unchanged": true,
+          "top10Overlap": 0.8,
+          "inferenceMs": 238,
+          "top3": [
+            {
+              "slug": "songless",
+              "score": 0.710566096072219
+            },
+            {
+              "slug": "thefoundersapp",
+              "score": 0.7003469704318238
+            },
+            {
+              "slug": "beautyface",
+              "score": 0.6979430884943199
+            }
+          ]
+        },
+        {
+          "name": "crop-2pct",
+          "cosineToOriginal": 0.9767767412291256,
+          "top1Unchanged": true,
+          "top10Overlap": 0.9,
+          "inferenceMs": 197,
+          "top3": [
+            {
+              "slug": "songless",
+              "score": 0.7118797052233039
+            },
+            {
+              "slug": "thefoundersapp",
+              "score": 0.7071128955487309
+            },
+            {
+              "slug": "tube-synergy-ai-lovable",
+              "score": 0.6867724437431044
+            }
+          ]
+        },
+        {
+          "name": "brightness-105pct",
+          "cosineToOriginal": 0.999752302950881,
+          "top1Unchanged": true,
+          "top10Overlap": 1,
+          "inferenceMs": 221,
+          "top3": [
+            {
+              "slug": "songless",
+              "score": 0.7100978864932584
+            },
+            {
+              "slug": "thefoundersapp",
+              "score": 0.7009030477275601
+            },
+            {
+              "slug": "beautyface",
+              "score": 0.6968139964396621
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "build-a-go-lovable",
+      "index": 250,
+      "baselineCatalogCosine": 0.9990464008358845,
+      "variants": [
+        {
+          "name": "repeat",
+          "cosineToOriginal": 0.9999999999999994,
+          "top1Unchanged": true,
+          "top10Overlap": 1,
+          "inferenceMs": 207,
+          "top3": [
+            {
+              "slug": "lucky-aces-lounge-lovable",
+              "score": 0.7355608803775049
+            },
+            {
+              "slug": "firescrape-lovable",
+              "score": 0.7341687838507354
+            },
+            {
+              "slug": "farmgpt-ai-foundation-lovable",
+              "score": 0.7230986108809735
+            }
+          ]
+        },
+        {
+          "name": "jpeg-q60",
+          "cosineToOriginal": 0.9656187609918733,
+          "top1Unchanged": true,
+          "top10Overlap": 0.9,
+          "inferenceMs": 216,
+          "top3": [
+            {
+              "slug": "lucky-aces-lounge-lovable",
+              "score": 0.7182488609502478
+            },
+            {
+              "slug": "firescrape-lovable",
+              "score": 0.7178589435169361
+            },
+            {
+              "slug": "opening-mate-mastery-lovable",
+              "score": 0.7038807123797153
+            }
+          ]
+        },
+        {
+          "name": "resize-75pct",
+          "cosineToOriginal": 0.9619246913589232,
+          "top1Unchanged": true,
+          "top10Overlap": 0.9,
+          "inferenceMs": 216,
+          "top3": [
+            {
+              "slug": "lucky-aces-lounge-lovable",
+              "score": 0.7538548892801972
+            },
+            {
+              "slug": "firescrape-lovable",
+              "score": 0.7537656652343802
+            },
+            {
+              "slug": "farmgpt-ai-foundation-lovable",
+              "score": 0.7390042047599901
+            }
+          ]
+        },
+        {
+          "name": "crop-2pct",
+          "cosineToOriginal": 0.9388908869868557,
+          "top1Unchanged": true,
+          "top10Overlap": 0.9,
+          "inferenceMs": 204,
+          "top3": [
+            {
+              "slug": "lucky-aces-lounge-lovable",
+              "score": 0.7470931791188061
+            },
+            {
+              "slug": "firescrape-lovable",
+              "score": 0.7343456915822633
+            },
+            {
+              "slug": "farmgpt-ai-foundation-lovable",
+              "score": 0.7204293089921887
+            }
+          ]
+        },
+        {
+          "name": "brightness-105pct",
+          "cosineToOriginal": 0.9995190973937746,
+          "top1Unchanged": true,
+          "top10Overlap": 0.9,
+          "inferenceMs": 203,
+          "top3": [
+            {
+              "slug": "lucky-aces-lounge-lovable",
+              "score": 0.7348727637827432
+            },
+            {
+              "slug": "firescrape-lovable",
+              "score": 0.7334788214887417
+            },
+            {
+              "slug": "farmgpt-ai-foundation-lovable",
+              "score": 0.7227505538110851
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "claudewatermark",
+      "index": 333,
+      "baselineCatalogCosine": 0.998998908748489,
+      "variants": [
+        {
+          "name": "repeat",
+          "cosineToOriginal": 1.0000000000000002,
+          "top1Unchanged": true,
+          "top10Overlap": 1,
+          "inferenceMs": 185,
+          "top3": [
+            {
+              "slug": "un-claude",
+              "score": 0.7047176311739484
+            },
+            {
+              "slug": "payola-lol",
+              "score": 0.6717449254264071
+            },
+            {
+              "slug": "aiturnitinchecker",
+              "score": 0.6708280595336578
+            }
+          ]
+        },
+        {
+          "name": "jpeg-q60",
+          "cosineToOriginal": 0.9587961159753239,
+          "top1Unchanged": true,
+          "top10Overlap": 0.6,
+          "inferenceMs": 205,
+          "top3": [
+            {
+              "slug": "un-claude",
+              "score": 0.6552770571404559
+            },
+            {
+              "slug": "payola-lol",
+              "score": 0.6438663801221092
+            },
+            {
+              "slug": "aiturnitinchecker",
+              "score": 0.6406338539773291
+            }
+          ]
+        },
+        {
+          "name": "resize-75pct",
+          "cosineToOriginal": 0.9443837147187091,
+          "top1Unchanged": true,
+          "top10Overlap": 0.8,
+          "inferenceMs": 225,
+          "top3": [
+            {
+              "slug": "un-claude",
+              "score": 0.6944898288990958
+            },
+            {
+              "slug": "ghostwriting-ai",
+              "score": 0.6727491006384967
+            },
+            {
+              "slug": "payola-lol",
+              "score": 0.6697220704089331
+            }
+          ]
+        },
+        {
+          "name": "crop-2pct",
+          "cosineToOriginal": 0.9448018331712559,
+          "top1Unchanged": true,
+          "top10Overlap": 0.8,
+          "inferenceMs": 206,
+          "top3": [
+            {
+              "slug": "un-claude",
+              "score": 0.6895056646481463
+            },
+            {
+              "slug": "mom-always-knows-lovable",
+              "score": 0.6868771712145956
+            },
+            {
+              "slug": "payola-lol",
+              "score": 0.675144915619364
+            }
+          ]
+        },
+        {
+          "name": "brightness-105pct",
+          "cosineToOriginal": 0.9865598988650467,
+          "top1Unchanged": true,
+          "top10Overlap": 0.6,
+          "inferenceMs": 191,
+          "top3": [
+            {
+              "slug": "un-claude",
+              "score": 0.7027052030028826
+            },
+            {
+              "slug": "aiturnitinchecker",
+              "score": 0.6798188682776589
+            },
+            {
+              "slug": "payola-lol",
+              "score": 0.6743507328588084
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "cyclenova-lovable",
+      "index": 417,
+      "baselineCatalogCosine": 0.9999767005724313,
+      "variants": [
+        {
+          "name": "repeat",
+          "cosineToOriginal": 0.9999999999999997,
+          "top1Unchanged": true,
+          "top10Overlap": 1,
+          "inferenceMs": 190,
+          "top3": [
+            {
+              "slug": "screen-snap-magic-87-lovable",
+              "score": 0.8161891660759167
+            },
+            {
+              "slug": "opening-mate-mastery-lovable",
+              "score": 0.7515574944123942
+            },
+            {
+              "slug": "theviralmarketing",
+              "score": 0.7165700660751464
+            }
+          ]
+        },
+        {
+          "name": "jpeg-q60",
+          "cosineToOriginal": 0.9946450751814075,
+          "top1Unchanged": true,
+          "top10Overlap": 1,
+          "inferenceMs": 178,
+          "top3": [
+            {
+              "slug": "screen-snap-magic-87-lovable",
+              "score": 0.8097823556305515
+            },
+            {
+              "slug": "opening-mate-mastery-lovable",
+              "score": 0.7554810413108805
+            },
+            {
+              "slug": "theviralmarketing",
+              "score": 0.7121805425842412
+            }
+          ]
+        },
+        {
+          "name": "resize-75pct",
+          "cosineToOriginal": 0.9685821832322908,
+          "top1Unchanged": true,
+          "top10Overlap": 0.9,
+          "inferenceMs": 184,
+          "top3": [
+            {
+              "slug": "screen-snap-magic-87-lovable",
+              "score": 0.7860733553982157
+            },
+            {
+              "slug": "opening-mate-mastery-lovable",
+              "score": 0.7482828988101555
+            },
+            {
+              "slug": "theviralmarketing",
+              "score": 0.7370637203797424
+            }
+          ]
+        },
+        {
+          "name": "crop-2pct",
+          "cosineToOriginal": 0.9985064525989598,
+          "top1Unchanged": true,
+          "top10Overlap": 1,
+          "inferenceMs": 227,
+          "top3": [
+            {
+              "slug": "screen-snap-magic-87-lovable",
+              "score": 0.8092457466630628
+            },
+            {
+              "slug": "opening-mate-mastery-lovable",
+              "score": 0.7383883088913207
+            },
+            {
+              "slug": "theviralmarketing",
+              "score": 0.6976631341550035
+            }
+          ]
+        },
+        {
+          "name": "brightness-105pct",
+          "cosineToOriginal": 0.9995101050775991,
+          "top1Unchanged": true,
+          "top10Overlap": 1,
+          "inferenceMs": 199,
+          "top3": [
+            {
+              "slug": "screen-snap-magic-87-lovable",
+              "score": 0.8161286492584439
+            },
+            {
+              "slug": "opening-mate-mastery-lovable",
+              "score": 0.7538173606150727
+            },
+            {
+              "slug": "theviralmarketing",
+              "score": 0.7185070381022091
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "egx-sparkle-lovable",
+      "index": 500,
+      "baselineCatalogCosine": 0.9996973816796338,
+      "variants": [
+        {
+          "name": "repeat",
+          "cosineToOriginal": 0.9999999999999994,
+          "top1Unchanged": true,
+          "top10Overlap": 1,
+          "inferenceMs": 187,
+          "top3": [
+            {
+              "slug": "cira-ai-radar-lovable",
+              "score": 0.879497701190446
+            },
+            {
+              "slug": "moonscanner-lovable",
+              "score": 0.877312288081027
+            },
+            {
+              "slug": "edgeform-lovable",
+              "score": 0.8677137592317934
+            }
+          ]
+        },
+        {
+          "name": "jpeg-q60",
+          "cosineToOriginal": 0.9801594090122352,
+          "top1Unchanged": true,
+          "top10Overlap": 0.8,
+          "inferenceMs": 205,
+          "top3": [
+            {
+              "slug": "cira-ai-radar-lovable",
+              "score": 0.8733188803228861
+            },
+            {
+              "slug": "moonscanner-lovable",
+              "score": 0.8616328056832596
+            },
+            {
+              "slug": "tfsa-guard-lite-lovable",
+              "score": 0.8542593996536024
+            }
+          ]
+        },
+        {
+          "name": "resize-75pct",
+          "cosineToOriginal": 0.9784691947370725,
+          "top1Unchanged": false,
+          "top10Overlap": 0.9,
+          "inferenceMs": 228,
+          "top3": [
+            {
+              "slug": "moonscanner-lovable",
+              "score": 0.8891289805970053
+            },
+            {
+              "slug": "cira-ai-radar-lovable",
+              "score": 0.8778195667740775
+            },
+            {
+              "slug": "pixel-perfect-showcase-8660-lovable",
+              "score": 0.8738624180117786
+            }
+          ]
+        },
+        {
+          "name": "crop-2pct",
+          "cosineToOriginal": 0.9873401630786004,
+          "top1Unchanged": true,
+          "top10Overlap": 0.9,
+          "inferenceMs": 221,
+          "top3": [
+            {
+              "slug": "cira-ai-radar-lovable",
+              "score": 0.8770565187773071
+            },
+            {
+              "slug": "moonscanner-lovable",
+              "score": 0.8727074136121677
+            },
+            {
+              "slug": "edgeform-lovable",
+              "score": 0.8714689799454104
+            }
+          ]
+        },
+        {
+          "name": "brightness-105pct",
+          "cosineToOriginal": 0.9996884345950005,
+          "top1Unchanged": true,
+          "top10Overlap": 0.9,
+          "inferenceMs": 209,
+          "top3": [
+            {
+              "slug": "cira-ai-radar-lovable",
+              "score": 0.8786258439425385
+            },
+            {
+              "slug": "moonscanner-lovable",
+              "score": 0.8754767666678338
+            },
+            {
+              "slug": "pixel-perfect-showcase-8660-lovable",
+              "score": 0.8630024110817399
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "foldtask",
+      "index": 584,
+      "baselineCatalogCosine": 0.9997971500525271,
+      "variants": [
+        {
+          "name": "repeat",
+          "cosineToOriginal": 0.9999999999999992,
+          "top1Unchanged": true,
+          "top10Overlap": 1,
+          "inferenceMs": 183,
+          "top3": [
+            {
+              "slug": "aiinvitecode",
+              "score": 0.8134811609496335
+            },
+            {
+              "slug": "acquisition-ace-ai-lovable",
+              "score": 0.812289568271682
+            },
+            {
+              "slug": "liftwellapp",
+              "score": 0.8042330857641738
+            }
+          ]
+        },
+        {
+          "name": "jpeg-q60",
+          "cosineToOriginal": 0.9864795168842909,
+          "top1Unchanged": false,
+          "top10Overlap": 1,
+          "inferenceMs": 224,
+          "top3": [
+            {
+              "slug": "acquisition-ace-ai-lovable",
+              "score": 0.8050376102308234
+            },
+            {
+              "slug": "aiinvitecode",
+              "score": 0.801122635092012
+            },
+            {
+              "slug": "ghostwriting-ai",
+              "score": 0.7877773634677904
+            }
+          ]
+        },
+        {
+          "name": "resize-75pct",
+          "cosineToOriginal": 0.9857974165903469,
+          "top1Unchanged": false,
+          "top10Overlap": 0.9,
+          "inferenceMs": 223,
+          "top3": [
+            {
+              "slug": "ghostwriting-ai",
+              "score": 0.7996757204016317
+            },
+            {
+              "slug": "acquisition-ace-ai-lovable",
+              "score": 0.7960059907432341
+            },
+            {
+              "slug": "aiinvitecode",
+              "score": 0.7938546643339459
+            }
+          ]
+        },
+        {
+          "name": "crop-2pct",
+          "cosineToOriginal": 0.986278203709097,
+          "top1Unchanged": false,
+          "top10Overlap": 0.8,
+          "inferenceMs": 233,
+          "top3": [
+            {
+              "slug": "acquisition-ace-ai-lovable",
+              "score": 0.8011938121953202
+            },
+            {
+              "slug": "aiinvitecode",
+              "score": 0.8008076154821944
+            },
+            {
+              "slug": "protectedshare",
+              "score": 0.7895808056453534
+            }
+          ]
+        },
+        {
+          "name": "brightness-105pct",
+          "cosineToOriginal": 0.9899004770809446,
+          "top1Unchanged": false,
+          "top10Overlap": 0.9,
+          "inferenceMs": 244,
+          "top3": [
+            {
+              "slug": "ghostwriting-ai",
+              "score": 0.8034943785934064
+            },
+            {
+              "slug": "acquisition-ace-ai-lovable",
+              "score": 0.8015823179899391
+            },
+            {
+              "slug": "app-zio-studio",
+              "score": 0.7903100127865986
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "gizmokitten",
+      "index": 667,
+      "baselineCatalogCosine": 0.9995325403096462,
+      "variants": [
+        {
+          "name": "repeat",
+          "cosineToOriginal": 1.0000000000000007,
+          "top1Unchanged": true,
+          "top10Overlap": 1,
+          "inferenceMs": 227,
+          "top3": [
+            {
+              "slug": "yourizzai",
+              "score": 0.652951185581278
+            },
+            {
+              "slug": "wingbits",
+              "score": 0.6466677125403011
+            },
+            {
+              "slug": "nanobanana-ai",
+              "score": 0.6441592939990974
+            }
+          ]
+        },
+        {
+          "name": "jpeg-q60",
+          "cosineToOriginal": 0.9878499601958918,
+          "top1Unchanged": true,
+          "top10Overlap": 0.8,
+          "inferenceMs": 203,
+          "top3": [
+            {
+              "slug": "yourizzai",
+              "score": 0.6536610013148098
+            },
+            {
+              "slug": "nanobanana-ai",
+              "score": 0.6493787829493838
+            },
+            {
+              "slug": "wingbits",
+              "score": 0.6489734979798766
+            }
+          ]
+        },
+        {
+          "name": "resize-75pct",
+          "cosineToOriginal": 0.9787054501545425,
+          "top1Unchanged": false,
+          "top10Overlap": 0.7,
+          "inferenceMs": 250,
+          "top3": [
+            {
+              "slug": "wingbits",
+              "score": 0.6597620753993545
+            },
+            {
+              "slug": "nanobanana-ai",
+              "score": 0.6530326657830711
+            },
+            {
+              "slug": "yourizzai",
+              "score": 0.6509356523218749
+            }
+          ]
+        },
+        {
+          "name": "crop-2pct",
+          "cosineToOriginal": 0.9764083819174261,
+          "top1Unchanged": false,
+          "top10Overlap": 0.9,
+          "inferenceMs": 242,
+          "top3": [
+            {
+              "slug": "wingbits",
+              "score": 0.6347161057045057
+            },
+            {
+              "slug": "yourizzai",
+              "score": 0.6343684935130163
+            },
+            {
+              "slug": "gptimage2-wwkejishe-top",
+              "score": 0.6244357036602498
+            }
+          ]
+        },
+        {
+          "name": "brightness-105pct",
+          "cosineToOriginal": 0.9979377398253608,
+          "top1Unchanged": true,
+          "top10Overlap": 0.9,
+          "inferenceMs": 249,
+          "top3": [
+            {
+              "slug": "yourizzai",
+              "score": 0.6463837997146443
+            },
+            {
+              "slug": "wingbits",
+              "score": 0.6420822317345023
+            },
+            {
+              "slug": "nanobanana-ai",
+              "score": 0.6390260009808362
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "hindi-shabd-khel-lovable",
+      "index": 751,
+      "baselineCatalogCosine": 0.9997106998948959,
+      "variants": [
+        {
+          "name": "repeat",
+          "cosineToOriginal": 0.9999999999999997,
+          "top1Unchanged": true,
+          "top10Overlap": 1,
+          "inferenceMs": 207,
+          "top3": [
+            {
+              "slug": "sunbeam-maker-app-lovable",
+              "score": 0.7164433972348516
+            },
+            {
+              "slug": "nana-game-lovable",
+              "score": 0.686077114785171
+            },
+            {
+              "slug": "wafa-learn-ar-en-lovable",
+              "score": 0.6728996183512571
+            }
+          ]
+        },
+        {
+          "name": "jpeg-q60",
+          "cosineToOriginal": 0.9910581951258627,
+          "top1Unchanged": true,
+          "top10Overlap": 1,
+          "inferenceMs": 240,
+          "top3": [
+            {
+              "slug": "sunbeam-maker-app-lovable",
+              "score": 0.7021774868542423
+            },
+            {
+              "slug": "nana-game-lovable",
+              "score": 0.6876098670474394
+            },
+            {
+              "slug": "wafa-learn-ar-en-lovable",
+              "score": 0.676771047745916
+            }
+          ]
+        },
+        {
+          "name": "resize-75pct",
+          "cosineToOriginal": 0.9866531682562343,
+          "top1Unchanged": true,
+          "top10Overlap": 0.9,
+          "inferenceMs": 218,
+          "top3": [
+            {
+              "slug": "sunbeam-maker-app-lovable",
+              "score": 0.6952506336890074
+            },
+            {
+              "slug": "comfy-desk-flow-lovable",
+              "score": 0.6769775074760878
+            },
+            {
+              "slug": "nana-game-lovable",
+              "score": 0.6758312631932933
+            }
+          ]
+        },
+        {
+          "name": "crop-2pct",
+          "cosineToOriginal": 0.9847269681308606,
+          "top1Unchanged": false,
+          "top10Overlap": 0.8,
+          "inferenceMs": 239,
+          "top3": [
+            {
+              "slug": "nana-game-lovable",
+              "score": 0.6765233272890049
+            },
+            {
+              "slug": "sunbeam-maker-app-lovable",
+              "score": 0.6752964368392282
+            },
+            {
+              "slug": "comfy-desk-flow-lovable",
+              "score": 0.6727712963687356
+            }
+          ]
+        },
+        {
+          "name": "brightness-105pct",
+          "cosineToOriginal": 0.9981263746483491,
+          "top1Unchanged": true,
+          "top10Overlap": 1,
+          "inferenceMs": 238,
+          "top3": [
+            {
+              "slug": "sunbeam-maker-app-lovable",
+              "score": 0.709141635896487
+            },
+            {
+              "slug": "nana-game-lovable",
+              "score": 0.678388423404611
+            },
+            {
+              "slug": "wafa-learn-ar-en-lovable",
+              "score": 0.6693149336941148
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "iocombats",
+      "index": 834,
+      "baselineCatalogCosine": 0.9997903330698807,
+      "variants": [
+        {
+          "name": "repeat",
+          "cosineToOriginal": 1,
+          "top1Unchanged": true,
+          "top10Overlap": 1,
+          "inferenceMs": 192,
+          "top3": [
+            {
+              "slug": "venzotunay-lovable",
+              "score": 0.7516112699529551
+            },
+            {
+              "slug": "calcaas",
+              "score": 0.7322180934541018
+            },
+            {
+              "slug": "performace-tracker-for-review-lovable",
+              "score": 0.7154577125635851
+            }
+          ]
+        },
+        {
+          "name": "jpeg-q60",
+          "cosineToOriginal": 0.9828201281452404,
+          "top1Unchanged": true,
+          "top10Overlap": 0.7,
+          "inferenceMs": 207,
+          "top3": [
+            {
+              "slug": "venzotunay-lovable",
+              "score": 0.7380757287655706
+            },
+            {
+              "slug": "calcaas",
+              "score": 0.7181311328184713
+            },
+            {
+              "slug": "performace-tracker-for-review-lovable",
+              "score": 0.6974676418343885
+            }
+          ]
+        },
+        {
+          "name": "resize-75pct",
+          "cosineToOriginal": 0.9870287087226276,
+          "top1Unchanged": true,
+          "top10Overlap": 0.9,
+          "inferenceMs": 227,
+          "top3": [
+            {
+              "slug": "venzotunay-lovable",
+              "score": 0.747939813394126
+            },
+            {
+              "slug": "calcaas",
+              "score": 0.7294047853177072
+            },
+            {
+              "slug": "insightfulhealthsystem-lovable",
+              "score": 0.7089091036147832
+            }
+          ]
+        },
+        {
+          "name": "crop-2pct",
+          "cosineToOriginal": 0.9755604705345056,
+          "top1Unchanged": true,
+          "top10Overlap": 0.7,
+          "inferenceMs": 249,
+          "top3": [
+            {
+              "slug": "venzotunay-lovable",
+              "score": 0.7462711080382977
+            },
+            {
+              "slug": "calcaas",
+              "score": 0.7332459464298315
+            },
+            {
+              "slug": "exeltiq",
+              "score": 0.7137026024428594
+            }
+          ]
+        },
+        {
+          "name": "brightness-105pct",
+          "cosineToOriginal": 0.9998490352320687,
+          "top1Unchanged": true,
+          "top10Overlap": 1,
+          "inferenceMs": 238,
+          "top3": [
+            {
+              "slug": "venzotunay-lovable",
+              "score": 0.7533468770127671
+            },
+            {
+              "slug": "calcaas",
+              "score": 0.734426822569627
+            },
+            {
+              "slug": "performace-tracker-for-review-lovable",
+              "score": 0.7182776199202787
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "leavely",
+      "index": 918,
+      "baselineCatalogCosine": 0.9997431046786779,
+      "variants": [
+        {
+          "name": "repeat",
+          "cosineToOriginal": 1.0000000000000004,
+          "top1Unchanged": true,
+          "top10Overlap": 1,
+          "inferenceMs": 210,
+          "top3": [
+            {
+              "slug": "toptower",
+              "score": 0.6992306720567418
+            },
+            {
+              "slug": "autokonnekt",
+              "score": 0.6950373037683536
+            },
+            {
+              "slug": "zentivion",
+              "score": 0.6865132682749404
+            }
+          ]
+        },
+        {
+          "name": "jpeg-q60",
+          "cosineToOriginal": 0.9847023353442952,
+          "top1Unchanged": true,
+          "top10Overlap": 0.6,
+          "inferenceMs": 211,
+          "top3": [
+            {
+              "slug": "toptower",
+              "score": 0.7076019601768507
+            },
+            {
+              "slug": "autokonnekt",
+              "score": 0.6921912971170749
+            },
+            {
+              "slug": "zentivion",
+              "score": 0.6812468642516734
+            }
+          ]
+        },
+        {
+          "name": "resize-75pct",
+          "cosineToOriginal": 0.9889542013904827,
+          "top1Unchanged": true,
+          "top10Overlap": 0.9,
+          "inferenceMs": 217,
+          "top3": [
+            {
+              "slug": "toptower",
+              "score": 0.69918721758372
+            },
+            {
+              "slug": "openadapter",
+              "score": 0.6862389085724385
+            },
+            {
+              "slug": "veo3ai",
+              "score": 0.685725912226175
+            }
+          ]
+        },
+        {
+          "name": "crop-2pct",
+          "cosineToOriginal": 0.9813196504862519,
+          "top1Unchanged": true,
+          "top10Overlap": 0.8,
+          "inferenceMs": 222,
+          "top3": [
+            {
+              "slug": "toptower",
+              "score": 0.7058034425122583
+            },
+            {
+              "slug": "autokonnekt",
+              "score": 0.6961309144668701
+            },
+            {
+              "slug": "integraxai-lovable",
+              "score": 0.6922914297039238
+            }
+          ]
+        },
+        {
+          "name": "brightness-105pct",
+          "cosineToOriginal": 0.9997833470671117,
+          "top1Unchanged": true,
+          "top10Overlap": 0.9,
+          "inferenceMs": 229,
+          "top3": [
+            {
+              "slug": "toptower",
+              "score": 0.699915349186911
+            },
+            {
+              "slug": "autokonnekt",
+              "score": 0.6961008791047091
+            },
+            {
+              "slug": "zentivion",
+              "score": 0.6877742780108892
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "marquill",
+      "index": 1001,
+      "baselineCatalogCosine": 0.9997723496338266,
+      "variants": [
+        {
+          "name": "repeat",
+          "cosineToOriginal": 0.9999999999999999,
+          "top1Unchanged": true,
+          "top10Overlap": 1,
+          "inferenceMs": 184,
+          "top3": [
+            {
+              "slug": "postformatter",
+              "score": 0.7441833741630663
+            },
+            {
+              "slug": "mylance",
+              "score": 0.731001641432443
+            },
+            {
+              "slug": "postperfect-online",
+              "score": 0.7121538334465222
+            }
+          ]
+        },
+        {
+          "name": "jpeg-q60",
+          "cosineToOriginal": 0.9797861193788933,
+          "top1Unchanged": true,
+          "top10Overlap": 0.7,
+          "inferenceMs": 217,
+          "top3": [
+            {
+              "slug": "postformatter",
+              "score": 0.7258364172742043
+            },
+            {
+              "slug": "mylance",
+              "score": 0.714070919982739
+            },
+            {
+              "slug": "postperfect-online",
+              "score": 0.6965357658214998
+            }
+          ]
+        },
+        {
+          "name": "resize-75pct",
+          "cosineToOriginal": 0.9847553291742207,
+          "top1Unchanged": true,
+          "top10Overlap": 0.9,
+          "inferenceMs": 232,
+          "top3": [
+            {
+              "slug": "postformatter",
+              "score": 0.730592754801634
+            },
+            {
+              "slug": "mylance",
+              "score": 0.7084974788422898
+            },
+            {
+              "slug": "postperfect-online",
+              "score": 0.7031770195248448
+            }
+          ]
+        },
+        {
+          "name": "crop-2pct",
+          "cosineToOriginal": 0.9715367147564495,
+          "top1Unchanged": true,
+          "top10Overlap": 0.9,
+          "inferenceMs": 221,
+          "top3": [
+            {
+              "slug": "postformatter",
+              "score": 0.7206422234685756
+            },
+            {
+              "slug": "postperfect-online",
+              "score": 0.716544788899767
+            },
+            {
+              "slug": "mylance",
+              "score": 0.699897328042524
+            }
+          ]
+        },
+        {
+          "name": "brightness-105pct",
+          "cosineToOriginal": 0.9997289019607603,
+          "top1Unchanged": true,
+          "top10Overlap": 1,
+          "inferenceMs": 219,
+          "top3": [
+            {
+              "slug": "postformatter",
+              "score": 0.7434245993147819
+            },
+            {
+              "slug": "mylance",
+              "score": 0.7290197710363948
+            },
+            {
+              "slug": "postperfect-online",
+              "score": 0.7126698543078428
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "mylance",
+      "index": 1084,
+      "baselineCatalogCosine": 0.999837800830687,
+      "variants": [
+        {
+          "name": "repeat",
+          "cosineToOriginal": 0.9999999999999998,
+          "top1Unchanged": true,
+          "top10Overlap": 1,
+          "inferenceMs": 194,
+          "top3": [
+            {
+              "slug": "tarsen",
+              "score": 0.7326357966169651
+            },
+            {
+              "slug": "marquill",
+              "score": 0.7294256754792325
+            },
+            {
+              "slug": "postformatter",
+              "score": 0.720662302127307
+            }
+          ]
+        },
+        {
+          "name": "jpeg-q60",
+          "cosineToOriginal": 0.9859603464964335,
+          "top1Unchanged": true,
+          "top10Overlap": 0.9,
+          "inferenceMs": 191,
+          "top3": [
+            {
+              "slug": "tarsen",
+              "score": 0.7416553253159768
+            },
+            {
+              "slug": "postformatter",
+              "score": 0.730906537697345
+            },
+            {
+              "slug": "tallwatch",
+              "score": 0.7260325200906328
+            }
+          ]
+        },
+        {
+          "name": "resize-75pct",
+          "cosineToOriginal": 0.9877329558036153,
+          "top1Unchanged": true,
+          "top10Overlap": 1,
+          "inferenceMs": 215,
+          "top3": [
+            {
+              "slug": "tarsen",
+              "score": 0.7273194491719536
+            },
+            {
+              "slug": "marquill",
+              "score": 0.7259619812025123
+            },
+            {
+              "slug": "postformatter",
+              "score": 0.7207354291771485
+            }
+          ]
+        },
+        {
+          "name": "crop-2pct",
+          "cosineToOriginal": 0.9749550879385828,
+          "top1Unchanged": false,
+          "top10Overlap": 0.9,
+          "inferenceMs": 202,
+          "top3": [
+            {
+              "slug": "marquill",
+              "score": 0.7097995236456126
+            },
+            {
+              "slug": "postformatter",
+              "score": 0.696273344030212
+            },
+            {
+              "slug": "tarsen",
+              "score": 0.6935251199596695
+            }
+          ]
+        },
+        {
+          "name": "brightness-105pct",
+          "cosineToOriginal": 0.9998083259060245,
+          "top1Unchanged": true,
+          "top10Overlap": 1,
+          "inferenceMs": 232,
+          "top3": [
+            {
+              "slug": "tarsen",
+              "score": 0.7337344465713889
+            },
+            {
+              "slug": "marquill",
+              "score": 0.7295944699212641
+            },
+            {
+              "slug": "postformatter",
+              "score": 0.7235276199643516
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "onewayinterview",
+      "index": 1168,
+      "baselineCatalogCosine": 0.9994712358415248,
+      "variants": [
+        {
+          "name": "repeat",
+          "cosineToOriginal": 1.0000000000000009,
+          "top1Unchanged": true,
+          "top10Overlap": 1,
+          "inferenceMs": 236,
+          "top3": [
+            {
+              "slug": "vidbgremover",
+              "score": 0.7431590229298273
+            },
+            {
+              "slug": "phototovideo-ai",
+              "score": 0.7366682472742642
+            },
+            {
+              "slug": "snapvid",
+              "score": 0.7120771542792147
+            }
+          ]
+        },
+        {
+          "name": "jpeg-q60",
+          "cosineToOriginal": 0.9790313351134998,
+          "top1Unchanged": true,
+          "top10Overlap": 0.6,
+          "inferenceMs": 206,
+          "top3": [
+            {
+              "slug": "vidbgremover",
+              "score": 0.7444876597056913
+            },
+            {
+              "slug": "phototovideo-ai",
+              "score": 0.7360355302963973
+            },
+            {
+              "slug": "snapvid",
+              "score": 0.7202395837351372
+            }
+          ]
+        },
+        {
+          "name": "resize-75pct",
+          "cosineToOriginal": 0.9806433088542321,
+          "top1Unchanged": true,
+          "top10Overlap": 0.8,
+          "inferenceMs": 241,
+          "top3": [
+            {
+              "slug": "vidbgremover",
+              "score": 0.7341203073537875
+            },
+            {
+              "slug": "phototovideo-ai",
+              "score": 0.7202708258420265
+            },
+            {
+              "slug": "snapvid",
+              "score": 0.7142418933118285
+            }
+          ]
+        },
+        {
+          "name": "crop-2pct",
+          "cosineToOriginal": 0.9610203638510929,
+          "top1Unchanged": true,
+          "top10Overlap": 1,
+          "inferenceMs": 209,
+          "top3": [
+            {
+              "slug": "vidbgremover",
+              "score": 0.7389776534937932
+            },
+            {
+              "slug": "phototovideo-ai",
+              "score": 0.7282994945497059
+            },
+            {
+              "slug": "snapvid",
+              "score": 0.7047229680891488
+            }
+          ]
+        },
+        {
+          "name": "brightness-105pct",
+          "cosineToOriginal": 0.983839939717313,
+          "top1Unchanged": true,
+          "top10Overlap": 0.7,
+          "inferenceMs": 233,
+          "top3": [
+            {
+              "slug": "vidbgremover",
+              "score": 0.7531833451586535
+            },
+            {
+              "slug": "phototovideo-ai",
+              "score": 0.7414052852741787
+            },
+            {
+              "slug": "snapvid",
+              "score": 0.7235454863754607
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "picpicgo",
+      "index": 1251,
+      "baselineCatalogCosine": 0.9995191907449799,
+      "variants": [
+        {
+          "name": "repeat",
+          "cosineToOriginal": 0.9999999999999999,
+          "top1Unchanged": true,
+          "top10Overlap": 1,
+          "inferenceMs": 222,
+          "top3": [
+            {
+              "slug": "pixellisting",
+              "score": 0.709809552244365
+            },
+            {
+              "slug": "cortexdrop",
+              "score": 0.7051010398957557
+            },
+            {
+              "slug": "aiphotoagent",
+              "score": 0.7017803756124615
+            }
+          ]
+        },
+        {
+          "name": "jpeg-q60",
+          "cosineToOriginal": 0.9874275050858892,
+          "top1Unchanged": true,
+          "top10Overlap": 0.8,
+          "inferenceMs": 212,
+          "top3": [
+            {
+              "slug": "pixellisting",
+              "score": 0.7110593556339253
+            },
+            {
+              "slug": "cortexdrop",
+              "score": 0.7090762601566984
+            },
+            {
+              "slug": "image-waseverin",
+              "score": 0.7071955732323815
+            }
+          ]
+        },
+        {
+          "name": "resize-75pct",
+          "cosineToOriginal": 0.986391569539042,
+          "top1Unchanged": false,
+          "top10Overlap": 0.9,
+          "inferenceMs": 214,
+          "top3": [
+            {
+              "slug": "cortexdrop",
+              "score": 0.7074886537309529
+            },
+            {
+              "slug": "pixellisting",
+              "score": 0.7016857991952946
+            },
+            {
+              "slug": "aiphotoagent",
+              "score": 0.6974135404223064
+            }
+          ]
+        },
+        {
+          "name": "crop-2pct",
+          "cosineToOriginal": 0.9822272419154316,
+          "top1Unchanged": false,
+          "top10Overlap": 0.8,
+          "inferenceMs": 230,
+          "top3": [
+            {
+              "slug": "animegen",
+              "score": 0.694131638594611
+            },
+            {
+              "slug": "cortexdrop",
+              "score": 0.6936937639176831
+            },
+            {
+              "slug": "pixellisting",
+              "score": 0.6936023041474904
+            }
+          ]
+        },
+        {
+          "name": "brightness-105pct",
+          "cosineToOriginal": 0.9875611793526345,
+          "top1Unchanged": true,
+          "top10Overlap": 0.9,
+          "inferenceMs": 264,
+          "top3": [
+            {
+              "slug": "pixellisting",
+              "score": 0.7217207268246848
+            },
+            {
+              "slug": "image-waseverin",
+              "score": 0.7129761980731486
+            },
+            {
+              "slug": "qwen-image-edit",
+              "score": 0.6976087461292689
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "private-digital-journal-lovable",
+      "index": 1335,
+      "baselineCatalogCosine": 0.9997187378593088,
+      "variants": [
+        {
+          "name": "repeat",
+          "cosineToOriginal": 1.0000000000000007,
+          "top1Unchanged": true,
+          "top10Overlap": 1,
+          "inferenceMs": 196,
+          "top3": [
+            {
+              "slug": "local-finds-free-lovable",
+              "score": 0.8565299316040652
+            },
+            {
+              "slug": "vibetribeours-lovable",
+              "score": 0.845119793696604
+            },
+            {
+              "slug": "rdc-send-compare-lovable",
+              "score": 0.8433754416565515
+            }
+          ]
+        },
+        {
+          "name": "jpeg-q60",
+          "cosineToOriginal": 0.9774957661141943,
+          "top1Unchanged": false,
+          "top10Overlap": 0.7,
+          "inferenceMs": 220,
+          "top3": [
+            {
+              "slug": "vibetribeours-lovable",
+              "score": 0.8455255906818583
+            },
+            {
+              "slug": "finflowsite-lovable",
+              "score": 0.843427643524856
+            },
+            {
+              "slug": "creatr-buddy-lovable",
+              "score": 0.837694945037287
+            }
+          ]
+        },
+        {
+          "name": "resize-75pct",
+          "cosineToOriginal": 0.9729980732506516,
+          "top1Unchanged": false,
+          "top10Overlap": 0.9,
+          "inferenceMs": 193,
+          "top3": [
+            {
+              "slug": "creatr-buddy-lovable",
+              "score": 0.8580011337222463
+            },
+            {
+              "slug": "vibetribeours-lovable",
+              "score": 0.854534835914457
+            },
+            {
+              "slug": "local-finds-free-lovable",
+              "score": 0.8451601587366052
+            }
+          ]
+        },
+        {
+          "name": "crop-2pct",
+          "cosineToOriginal": 0.9782243483612243,
+          "top1Unchanged": false,
+          "top10Overlap": 0.9,
+          "inferenceMs": 230,
+          "top3": [
+            {
+              "slug": "vibetribeours-lovable",
+              "score": 0.8403183211641919
+            },
+            {
+              "slug": "rdc-send-compare-lovable",
+              "score": 0.8396314165678418
+            },
+            {
+              "slug": "creatr-buddy-lovable",
+              "score": 0.8354277165335348
+            }
+          ]
+        },
+        {
+          "name": "brightness-105pct",
+          "cosineToOriginal": 0.9899092001011982,
+          "top1Unchanged": true,
+          "top10Overlap": 0.8,
+          "inferenceMs": 244,
+          "top3": [
+            {
+              "slug": "local-finds-free-lovable",
+              "score": 0.8631804418695874
+            },
+            {
+              "slug": "rdc-send-compare-lovable",
+              "score": 0.8539770233613116
+            },
+            {
+              "slug": "finflowsite-lovable",
+              "score": 0.8501391983084994
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "reerize",
+      "index": 1418,
+      "baselineCatalogCosine": 0.9998562128042175,
+      "variants": [
+        {
+          "name": "repeat",
+          "cosineToOriginal": 1.0000000000000004,
+          "top1Unchanged": true,
+          "top10Overlap": 1,
+          "inferenceMs": 196,
+          "top3": [
+            {
+              "slug": "unshift",
+              "score": 0.7061549627564766
+            },
+            {
+              "slug": "al-ink",
+              "score": 0.7011030954606764
+            },
+            {
+              "slug": "instant-fix-market-lovable",
+              "score": 0.6968353691282065
+            }
+          ]
+        },
+        {
+          "name": "jpeg-q60",
+          "cosineToOriginal": 0.9829265747481415,
+          "top1Unchanged": true,
+          "top10Overlap": 0.9,
+          "inferenceMs": 192,
+          "top3": [
+            {
+              "slug": "unshift",
+              "score": 0.6961029775132724
+            },
+            {
+              "slug": "al-ink",
+              "score": 0.695914391078663
+            },
+            {
+              "slug": "mingshu-help",
+              "score": 0.6947013039293036
+            }
+          ]
+        },
+        {
+          "name": "resize-75pct",
+          "cosineToOriginal": 0.9778355528185098,
+          "top1Unchanged": true,
+          "top10Overlap": 0.6,
+          "inferenceMs": 193,
+          "top3": [
+            {
+              "slug": "unshift",
+              "score": 0.7013385902639117
+            },
+            {
+              "slug": "wingbits",
+              "score": 0.6944776936750634
+            },
+            {
+              "slug": "al-ink",
+              "score": 0.6891025083479873
+            }
+          ]
+        },
+        {
+          "name": "crop-2pct",
+          "cosineToOriginal": 0.9734103308254307,
+          "top1Unchanged": true,
+          "top10Overlap": 0.7,
+          "inferenceMs": 224,
+          "top3": [
+            {
+              "slug": "unshift",
+              "score": 0.7372697992590286
+            },
+            {
+              "slug": "wingbits",
+              "score": 0.7191883102323777
+            },
+            {
+              "slug": "elegantwears-lovable",
+              "score": 0.7148390997938145
+            }
+          ]
+        },
+        {
+          "name": "brightness-105pct",
+          "cosineToOriginal": 0.9982824030765615,
+          "top1Unchanged": true,
+          "top10Overlap": 0.9,
+          "inferenceMs": 232,
+          "top3": [
+            {
+              "slug": "unshift",
+              "score": 0.713720711941595
+            },
+            {
+              "slug": "al-ink",
+              "score": 0.7067986807072358
+            },
+            {
+              "slug": "wingbits",
+              "score": 0.7052757535920025
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "scibly",
+      "index": 1502,
+      "baselineCatalogCosine": 0.9997801395950572,
+      "variants": [
+        {
+          "name": "repeat",
+          "cosineToOriginal": 1.0000000000000002,
+          "top1Unchanged": true,
+          "top10Overlap": 1,
+          "inferenceMs": 211,
+          "top3": [
+            {
+              "slug": "zentivion",
+              "score": 0.7488175317601553
+            },
+            {
+              "slug": "oneshotsocials",
+              "score": 0.7467056270156683
+            },
+            {
+              "slug": "pixel-art-start-lovable",
+              "score": 0.7460046275137677
+            }
+          ]
+        },
+        {
+          "name": "jpeg-q60",
+          "cosineToOriginal": 0.9844427346889897,
+          "top1Unchanged": true,
+          "top10Overlap": 0.9,
+          "inferenceMs": 222,
+          "top3": [
+            {
+              "slug": "zentivion",
+              "score": 0.7437632852858556
+            },
+            {
+              "slug": "best-self-tracker-lovable",
+              "score": 0.742853663526128
+            },
+            {
+              "slug": "pixel-art-start-lovable",
+              "score": 0.7415018795662128
+            }
+          ]
+        },
+        {
+          "name": "resize-75pct",
+          "cosineToOriginal": 0.9797932427712744,
+          "top1Unchanged": false,
+          "top10Overlap": 0.8,
+          "inferenceMs": 194,
+          "top3": [
+            {
+              "slug": "veloraappy",
+              "score": 0.7490118353554137
+            },
+            {
+              "slug": "oneshotsocials",
+              "score": 0.748965614991402
+            },
+            {
+              "slug": "zentivion",
+              "score": 0.7488749128740465
+            }
+          ]
+        },
+        {
+          "name": "crop-2pct",
+          "cosineToOriginal": 0.9837565155262716,
+          "top1Unchanged": false,
+          "top10Overlap": 0.9,
+          "inferenceMs": 235,
+          "top3": [
+            {
+              "slug": "oneshotsocials",
+              "score": 0.7519277158889585
+            },
+            {
+              "slug": "zentivion",
+              "score": 0.7500277583588694
+            },
+            {
+              "slug": "pixel-art-start-lovable",
+              "score": 0.7481780458747889
+            }
+          ]
+        },
+        {
+          "name": "brightness-105pct",
+          "cosineToOriginal": 0.9924556915763041,
+          "top1Unchanged": false,
+          "top10Overlap": 0.8,
+          "inferenceMs": 228,
+          "top3": [
+            {
+              "slug": "pixel-art-start-lovable",
+              "score": 0.7483594753206336
+            },
+            {
+              "slug": "oneshotsocials",
+              "score": 0.7412918161300499
+            },
+            {
+              "slug": "promootlabs",
+              "score": 0.741023665235166
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "smashpdf-online",
+      "index": 1585,
+      "baselineCatalogCosine": 0.9998344103383521,
+      "variants": [
+        {
+          "name": "repeat",
+          "cosineToOriginal": 1.0000000000000002,
+          "top1Unchanged": true,
+          "top10Overlap": 1,
+          "inferenceMs": 188,
+          "top3": [
+            {
+              "slug": "pdfconverter",
+              "score": 0.7421327415622097
+            },
+            {
+              "slug": "pdfly-uk",
+              "score": 0.707678249802808
+            },
+            {
+              "slug": "ihatelovepdf",
+              "score": 0.6941263831929725
+            }
+          ]
+        },
+        {
+          "name": "jpeg-q60",
+          "cosineToOriginal": 0.9910046011687305,
+          "top1Unchanged": true,
+          "top10Overlap": 1,
+          "inferenceMs": 242,
+          "top3": [
+            {
+              "slug": "pdfconverter",
+              "score": 0.7348652024897877
+            },
+            {
+              "slug": "pdfly-uk",
+              "score": 0.7085008270927607
+            },
+            {
+              "slug": "ihatelovepdf",
+              "score": 0.6927689858758652
+            }
+          ]
+        },
+        {
+          "name": "resize-75pct",
+          "cosineToOriginal": 0.9910716301187004,
+          "top1Unchanged": true,
+          "top10Overlap": 0.9,
+          "inferenceMs": 193,
+          "top3": [
+            {
+              "slug": "pdfconverter",
+              "score": 0.7456819416622676
+            },
+            {
+              "slug": "pdfly-uk",
+              "score": 0.7097031761611359
+            },
+            {
+              "slug": "geekskai",
+              "score": 0.6994644163460548
+            }
+          ]
+        },
+        {
+          "name": "crop-2pct",
+          "cosineToOriginal": 0.9888747790751864,
+          "top1Unchanged": true,
+          "top10Overlap": 1,
+          "inferenceMs": 201,
+          "top3": [
+            {
+              "slug": "pdfconverter",
+              "score": 0.7399482719112409
+            },
+            {
+              "slug": "pdfly-uk",
+              "score": 0.7101877239096861
+            },
+            {
+              "slug": "ihatelovepdf",
+              "score": 0.6840138830510175
+            }
+          ]
+        },
+        {
+          "name": "brightness-105pct",
+          "cosineToOriginal": 0.9933839457824447,
+          "top1Unchanged": true,
+          "top10Overlap": 0.9,
+          "inferenceMs": 270,
+          "top3": [
+            {
+              "slug": "pdfconverter",
+              "score": 0.7440985721289236
+            },
+            {
+              "slug": "pdfly-uk",
+              "score": 0.7135649292055584
+            },
+            {
+              "slug": "ihatelovepdf",
+              "score": 0.6881463895428004
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "sub-watchful-eye-lovable",
+      "index": 1669,
+      "baselineCatalogCosine": 0.9997160522723963,
+      "variants": [
+        {
+          "name": "repeat",
+          "cosineToOriginal": 1.0000000000000004,
+          "top1Unchanged": true,
+          "top10Overlap": 1,
+          "inferenceMs": 178,
+          "top3": [
+            {
+              "slug": "esimbit",
+              "score": 0.7530958152100342
+            },
+            {
+              "slug": "drinkwater-plus-lovable",
+              "score": 0.7382439115366365
+            },
+            {
+              "slug": "privacypulse4u",
+              "score": 0.7366826649321265
+            }
+          ]
+        },
+        {
+          "name": "jpeg-q60",
+          "cosineToOriginal": 0.9864711849294463,
+          "top1Unchanged": true,
+          "top10Overlap": 0.9,
+          "inferenceMs": 214,
+          "top3": [
+            {
+              "slug": "esimbit",
+              "score": 0.7491626052256793
+            },
+            {
+              "slug": "drinkwater-plus-lovable",
+              "score": 0.7362521602923653
+            },
+            {
+              "slug": "privacypulse4u",
+              "score": 0.7303879001034815
+            }
+          ]
+        },
+        {
+          "name": "resize-75pct",
+          "cosineToOriginal": 0.9843802773277893,
+          "top1Unchanged": true,
+          "top10Overlap": 0.7,
+          "inferenceMs": 239,
+          "top3": [
+            {
+              "slug": "esimbit",
+              "score": 0.7569176378147424
+            },
+            {
+              "slug": "privacypulse4u",
+              "score": 0.7468387271630907
+            },
+            {
+              "slug": "drinkwater-plus-lovable",
+              "score": 0.7406139706590713
+            }
+          ]
+        },
+        {
+          "name": "crop-2pct",
+          "cosineToOriginal": 0.9778587092582974,
+          "top1Unchanged": false,
+          "top10Overlap": 0.6,
+          "inferenceMs": 234,
+          "top3": [
+            {
+              "slug": "privacypulse4u",
+              "score": 0.7398158502085138
+            },
+            {
+              "slug": "esimbit",
+              "score": 0.7391042336563336
+            },
+            {
+              "slug": "mondovo",
+              "score": 0.7356259263052352
+            }
+          ]
+        },
+        {
+          "name": "brightness-105pct",
+          "cosineToOriginal": 0.9892284937273524,
+          "top1Unchanged": true,
+          "top10Overlap": 0.8,
+          "inferenceMs": 278,
+          "top3": [
+            {
+              "slug": "esimbit",
+              "score": 0.753290523999525
+            },
+            {
+              "slug": "drinkwater-plus-lovable",
+              "score": 0.7322047700763993
+            },
+            {
+              "slug": "privacypulse4u",
+              "score": 0.7278446314061199
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "total-fitness-pal-lovable",
+      "index": 1752,
+      "baselineCatalogCosine": 0.9993278415628603,
+      "variants": [
+        {
+          "name": "repeat",
+          "cosineToOriginal": 1,
+          "top1Unchanged": true,
+          "top10Overlap": 1,
+          "inferenceMs": 205,
+          "top3": [
+            {
+              "slug": "egx-sparkle-lovable",
+              "score": 0.7999328925462957
+            },
+            {
+              "slug": "pixel-perfect-showcase-8660-lovable",
+              "score": 0.7865176151991092
+            },
+            {
+              "slug": "life-system-lyart-vercel",
+              "score": 0.7658951469127284
+            }
+          ]
+        },
+        {
+          "name": "jpeg-q60",
+          "cosineToOriginal": 0.9686746108832943,
+          "top1Unchanged": true,
+          "top10Overlap": 0.8,
+          "inferenceMs": 253,
+          "top3": [
+            {
+              "slug": "egx-sparkle-lovable",
+              "score": 0.7819945175853817
+            },
+            {
+              "slug": "life-system-lyart-vercel",
+              "score": 0.7803331774440231
+            },
+            {
+              "slug": "pixel-perfect-showcase-8660-lovable",
+              "score": 0.7721743629616306
+            }
+          ]
+        },
+        {
+          "name": "resize-75pct",
+          "cosineToOriginal": 0.979111992587553,
+          "top1Unchanged": true,
+          "top10Overlap": 0.8,
+          "inferenceMs": 223,
+          "top3": [
+            {
+              "slug": "egx-sparkle-lovable",
+              "score": 0.804190649761691
+            },
+            {
+              "slug": "pixel-perfect-showcase-8660-lovable",
+              "score": 0.7839349917421025
+            },
+            {
+              "slug": "cira-ai-radar-lovable",
+              "score": 0.7662674423719689
+            }
+          ]
+        },
+        {
+          "name": "crop-2pct",
+          "cosineToOriginal": 0.9632023741680551,
+          "top1Unchanged": true,
+          "top10Overlap": 0.8,
+          "inferenceMs": 249,
+          "top3": [
+            {
+              "slug": "egx-sparkle-lovable",
+              "score": 0.7981454255375485
+            },
+            {
+              "slug": "pixel-perfect-showcase-8660-lovable",
+              "score": 0.7818891585576292
+            },
+            {
+              "slug": "life-system-lyart-vercel",
+              "score": 0.775738522507074
+            }
+          ]
+        },
+        {
+          "name": "brightness-105pct",
+          "cosineToOriginal": 0.999364954064528,
+          "top1Unchanged": true,
+          "top10Overlap": 1,
+          "inferenceMs": 229,
+          "top3": [
+            {
+              "slug": "egx-sparkle-lovable",
+              "score": 0.794822418213564
+            },
+            {
+              "slug": "pixel-perfect-showcase-8660-lovable",
+              "score": 0.7835920137544357
+            },
+            {
+              "slug": "world-ticker-track-lovable",
+              "score": 0.7645134723437017
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "veloraappy",
+      "index": 1836,
+      "baselineCatalogCosine": 0.9998630018447592,
+      "variants": [
+        {
+          "name": "repeat",
+          "cosineToOriginal": 0.9999999999999998,
+          "top1Unchanged": true,
+          "top10Overlap": 1,
+          "inferenceMs": 296,
+          "top3": [
+            {
+              "slug": "scibly",
+              "score": 0.7423060904706439
+            },
+            {
+              "slug": "dobrodesk",
+              "score": 0.731602087153087
+            },
+            {
+              "slug": "aicofounders",
+              "score": 0.7273192310766389
+            }
+          ]
+        },
+        {
+          "name": "jpeg-q60",
+          "cosineToOriginal": 0.987544780541903,
+          "top1Unchanged": true,
+          "top10Overlap": 1,
+          "inferenceMs": 242,
+          "top3": [
+            {
+              "slug": "scibly",
+              "score": 0.7333071610010136
+            },
+            {
+              "slug": "aicofounders",
+              "score": 0.7263438719276519
+            },
+            {
+              "slug": "dobrodesk",
+              "score": 0.7207917319240847
+            }
+          ]
+        },
+        {
+          "name": "resize-75pct",
+          "cosineToOriginal": 0.9885605002862502,
+          "top1Unchanged": false,
+          "top10Overlap": 0.9,
+          "inferenceMs": 239,
+          "top3": [
+            {
+              "slug": "aicofounders",
+              "score": 0.7413159590439098
+            },
+            {
+              "slug": "scibly",
+              "score": 0.7350144116880069
+            },
+            {
+              "slug": "cookbook-team",
+              "score": 0.726748464154109
+            }
+          ]
+        },
+        {
+          "name": "crop-2pct",
+          "cosineToOriginal": 0.9791075007266442,
+          "top1Unchanged": false,
+          "top10Overlap": 0.9,
+          "inferenceMs": 226,
+          "top3": [
+            {
+              "slug": "dobrodesk",
+              "score": 0.7377556784845212
+            },
+            {
+              "slug": "scibly",
+              "score": 0.7245277677749157
+            },
+            {
+              "slug": "aicofounders",
+              "score": 0.7174123046898062
+            }
+          ]
+        },
+        {
+          "name": "brightness-105pct",
+          "cosineToOriginal": 0.9895819570537713,
+          "top1Unchanged": false,
+          "top10Overlap": 1,
+          "inferenceMs": 238,
+          "top3": [
+            {
+              "slug": "dobrodesk",
+              "score": 0.7256720504240928
+            },
+            {
+              "slug": "scibly",
+              "score": 0.7187606071402719
+            },
+            {
+              "slug": "aicofounders",
+              "score": 0.7151199017458829
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "webleadr",
+      "index": 1919,
+      "baselineCatalogCosine": 0.9998012547109104,
+      "variants": [
+        {
+          "name": "repeat",
+          "cosineToOriginal": 1.0000000000000007,
+          "top1Unchanged": true,
+          "top10Overlap": 1,
+          "inferenceMs": 206,
+          "top3": [
+            {
+              "slug": "mondovo",
+              "score": 0.8188151218190941
+            },
+            {
+              "slug": "lacomfe",
+              "score": 0.7896714782573168
+            },
+            {
+              "slug": "bot4u-in",
+              "score": 0.7834840438510086
+            }
+          ]
+        },
+        {
+          "name": "jpeg-q60",
+          "cosineToOriginal": 0.9900206106735955,
+          "top1Unchanged": true,
+          "top10Overlap": 1,
+          "inferenceMs": 217,
+          "top3": [
+            {
+              "slug": "mondovo",
+              "score": 0.8101069887304617
+            },
+            {
+              "slug": "lacomfe",
+              "score": 0.775748199843223
+            },
+            {
+              "slug": "bot4u-in",
+              "score": 0.7731030291322816
+            }
+          ]
+        },
+        {
+          "name": "resize-75pct",
+          "cosineToOriginal": 0.9849305776957363,
+          "top1Unchanged": true,
+          "top10Overlap": 0.9,
+          "inferenceMs": 234,
+          "top3": [
+            {
+              "slug": "mondovo",
+              "score": 0.820093210493544
+            },
+            {
+              "slug": "lacomfe",
+              "score": 0.7854265435105079
+            },
+            {
+              "slug": "bot4u-in",
+              "score": 0.7788325111052561
+            }
+          ]
+        },
+        {
+          "name": "crop-2pct",
+          "cosineToOriginal": 0.9886770991669271,
+          "top1Unchanged": true,
+          "top10Overlap": 1,
+          "inferenceMs": 258,
+          "top3": [
+            {
+              "slug": "mondovo",
+              "score": 0.8025970233485988
+            },
+            {
+              "slug": "lacomfe",
+              "score": 0.7700627893328533
+            },
+            {
+              "slug": "codewithchat",
+              "score": 0.7666129086358188
+            }
+          ]
+        },
+        {
+          "name": "brightness-105pct",
+          "cosineToOriginal": 0.9932067933094365,
+          "top1Unchanged": true,
+          "top10Overlap": 0.9,
+          "inferenceMs": 233,
+          "top3": [
+            {
+              "slug": "mondovo",
+              "score": 0.8137135652339882
+            },
+            {
+              "slug": "lacomfe",
+              "score": 0.7935231749203209
+            },
+            {
+              "slug": "webmoment",
+              "score": 0.7750905965047341
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
