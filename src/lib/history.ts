@@ -1,3 +1,4 @@
+import { MODEL_VERSION } from "./model-version";
 import type { KinVerdict } from "./calibrate";
 
 /**
@@ -6,6 +7,7 @@ import type { KinVerdict } from "./calibrate";
  */
 export interface Check {
   at: number;
+  modelVersion?: string;
   verdict: KinVerdict;
   /** Sites clearing each kin band, keyed by band (99, 97, 95, 90, 85, 80). */
   bands: Record<number, number>;
@@ -23,7 +25,7 @@ export function loadCheck(): Check | null {
     const raw = localStorage.getItem(KEY);
     if (!raw) return null;
     const check = JSON.parse(raw) as Check;
-    return check && typeof check.at === "number" && check.bands ? check : null;
+    return check && check.modelVersion === MODEL_VERSION && typeof check.at === "number" && check.bands ? check : null;
   } catch {
     return null;
   }
@@ -31,7 +33,7 @@ export function loadCheck(): Check | null {
 
 export function saveCheck(check: Check): void {
   try {
-    localStorage.setItem(KEY, JSON.stringify(check));
+    localStorage.setItem(KEY, JSON.stringify({ ...check, modelVersion: MODEL_VERSION }));
   } catch {
     // Private mode or full storage: progress is a convenience, not a requirement.
   }

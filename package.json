@@ -7,13 +7,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsx scripts/precompute-explore.ts && tsx scripts/report-data.ts && tsx scripts/embeddings-f16.ts && tsc --noEmit && vite build",
+    "build": "node --import tsx scripts/precompute-explore.ts && node --import tsx scripts/report-data.ts && node --import tsx scripts/embeddings-f16.ts && tsc --noEmit && vite build",
     "preview": "vite preview --host 127.0.0.1 --port 4173",
-    "test:worker": "tsx --test worker/test/*.test.ts",
+    "test:worker": "node --import tsx --test worker/test/*.test.ts",
     "dataset": "tsx scripts/build-dataset.ts",
     "dataset:capture": "tsx scripts/capture.ts",
     "dataset:embed": "tsx scripts/embed.ts",
-    "dataset:project": "tsx scripts/project.ts",
+    "dataset:project": "node --import tsx scripts/project.ts",
     "dataset:calibrate": "tsx scripts/refresh-meta.ts",
     "dataset:mosaic": "tsx scripts/mosaic.ts",
     "dataset:layout": "tsx scripts/refresh-layout.ts",
@@ -23,7 +23,15 @@
     "qa": "VITE_SHOT_ENDPOINT=https://twinsites-shot.twinsites.workers.dev VITE_TURNSTILE_SITEKEY=1x00000000000000000000AA npm run build && tsx scripts/qa-analyzer.ts",
     "dataset:report": "tsx scripts/report-data.ts",
     "weight": "tsx scripts/weight.ts",
-    "reliability": "tsx scripts/reliability.ts"
+    "reliability": "tsx scripts/reliability.ts",
+    "test:product": "node --import tsx --test test/*.test.ts",
+    "typecheck:worker": "tsc -p worker/tsconfig.json",
+    "model:lab": "TWINSITES_MODEL_LAB=1 vite",
+    "model:finalize": "node --import tsx scripts/finalize-model.ts",
+    "model:evaluate": "node --import tsx scripts/evaluate-pairs.ts",
+    "model:prepare": "node scripts/prepare-model.mjs",
+    "pretest:product": "npm run model:prepare",
+    "prebuild": "npm run model:prepare"
   },
   "engines": {
     "node": ">=20"

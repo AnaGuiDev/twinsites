@@ -9,6 +9,7 @@ interface TurnstileApi {
     options: { sitekey: string; theme: "light"; callback: (token: string) => void; "expired-callback": () => void; "error-callback": () => void },
   ) => string;
   reset: (id?: string) => void;
+  remove: (id: string) => void;
 }
 
 export interface Fix {
@@ -48,11 +49,12 @@ export function CorrectionReport({ fixes, traits }: { fixes: Fix[]; traits: Trai
   const [state, setState] = useState<"idle" | "sending" | "sent" | "error">("idle");
 
   useEffect(() => {
-    if (!url || !siteKey || !agree || !box.current || widget.current) return;
+    if (!url || !siteKey || !agree || !box.current) return;
+    let dead = false;
     const api = () => (window as Window & { turnstile?: TurnstileApi }).turnstile;
     const mount = () => {
       const turnstile = api();
-      if (!turnstile || !box.current || widget.current) return;
+      if (dead || !turnstile || !box.current || widget.current) return;
       widget.current = turnstile.render(box.current, {
         sitekey: siteKey,
         theme: "light",
@@ -69,6 +71,12 @@ export function CorrectionReport({ fixes, traits }: { fixes: Fix[]; traits: Trai
       script.onload = mount;
       document.head.appendChild(script);
     }
+    return () => {
+      dead = true;
+      if (widget.current) api()?.remove(widget.current);
+      widget.current = undefined;
+      setToken("");
+    };
   }, [url, siteKey, agree]);
 
   if (!url) return <p className="score-note">{t.correctionLocal}</p>;
@@ -85,11 +93,11 @@ export function CorrectionReport({ fixes, traits }: { fixes: Fix[]; traits: Trai
       centerShare: traits.centerShare,
     };
     try {
-      for (const fix of fixes) {
+      {
         const response = await fetch(url, {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({ ...fix, measures, version: RULES_VERSION, token }),
+          body: JSON.stringify({ corrections: fixes.map(fix => ({ ...fix, measures, version: RULES_VERSION })), token }),
         });
         if (!response.ok) throw new Error(String(response.status));
       }

@@ -32,7 +32,7 @@ export function parseCorrection(raw: unknown): Correction | null {
   if (!raw || typeof raw !== "object") return null;
   const body = raw as Record<string, unknown>;
   const trait = typeof body.trait === "string" ? body.trait : "";
-  const allowed = VALUES[trait];
+  const allowed = Object.hasOwn(VALUES, trait) ? VALUES[trait] : undefined;
   if (!allowed) return null;
   const detected = String(body.detected ?? "");
   const corrected = String(body.corrected ?? "");

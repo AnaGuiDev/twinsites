@@ -1,46 +1,27 @@
 import { useEffect } from "react";
-
+import { useI18n } from "../i18n";
+import { useOffer } from "../lib/useOffer";
+import { RouteLink } from "../router";
 export function PrivacyView() {
-  useEffect(() => {
-    document.title = "Privacy — Twinsites";
-  }, []);
-  return (
-    <article className="privacy-page">
-      <h1>Privacy</h1>
-      <p>
-        If you ask for the monthly report, Twinsites keeps the email address you type. That is the only thing this form collects.
-      </p>
-      <p>The address is used to send the monthly Twins report and a redesign prompt. Nothing else.</p>
-      <p>
-        The list lives in Cloudflare Workers KV. The key is a hash of the address. The record holds the address, the time you signed up, and the version of the consent sentence you checked.
-      </p>
-      <p>The list is not sold and not shared.</p>
-      <p>Every message has an unsubscribe link. Opening it deletes that record.</p>
-      <p>
-        A screenshot you upload never leaves your browser. A URL you paste is visited by the Cloudflare worker to take one screenshot, which is not stored.
-      </p>
-      <p>
-        Your last screenshot check (its scores and a small preview) is kept in this browser's local storage so the next
-        version of your page can be compared with it. It never leaves the browser, and the result page has a link to forget
-        it.
-      </p>
-      <p>
-        Reading the words on your screenshot and comparing competitors' screenshots both happen in this browser. The text
-        reader and its language data are downloaded from this site; nothing is sent back.
-      </p>
-      <p>
-        If you correct a trait and tick the box to send it, Twinsites receives which trait, what it read, what you chose,
-        six rounded measurements of the screenshot and the day. Not the image, the URL, your IP address or any cookie. To
-        stop abuse, a counter keyed by a salted hash of your IP for the current hour exists for up to two hours and is
-        never stored with the correction. Corrections are kept for up to 400 days to tune the rules.
-      </p>
-      <p>
-        There are no cookies. If a visit counter is on, it records only aggregate events: a visit, an example, an upload, a
-        result, a share, pointing at or opening a page on the wall, copying the redesign prompt, comparing with a previous check.
-      </p>
-      <p>
-        Questions: <a href="mailto:twinsites.dev@gmail.com">twinsites.dev@gmail.com</a>
-      </p>
-    </article>
-  );
+  const { lang } = useI18n(); const es = lang === "es";
+  const { offer } = useOffer();
+  useEffect(() => { document.title = es ? "Privacidad — Twinsites" : "Privacy — Twinsites"; }, [es]);
+  return <article className="guide-page legal-page"><p className="kicker">TWINSITES / PRIVACY</p><h1>{es ? "Tu página.\nTus datos." : "Your page.\nYour data."}</h1>
+    <h2>{es ? "Responsable y contacto" : "Controller and contact"}</h2>
+    {offer.seller ? <p>{offer.seller.name} · {offer.seller.address} · <a href={`mailto:${offer.seller.email}`}>{offer.seller.email}</a></p> : <p>{es ? "La contratación sigue cerrada mientras el titular publica y revisa la identificación del responsable. No se aceptan pedidos sin esos datos." : "Booking remains closed while the owner publishes and reviews the controller identification. No orders are accepted without these details."}</p>}
+    <h2>{es ? "El análisis gratuito" : "The free analysis"}</h2>
+    <p>{es ? "Las capturas que subes, su lectura de texto y su comparación visual se procesan en tu navegador. No se envían como parte del pedido. Si pegas una URL en la captura automática, el proveedor de capturas visita esa página pública para devolver una imagen. La última comparación, incluida una miniatura, puede guardarse en tu almacenamiento local; puedes borrarla desde el resultado." : "Uploaded screenshots, text reading and visual comparison run in your browser. They are not sent with an order. Pasting a URL into automatic capture sends that public page to the capture provider to return an image. The last comparison, including a thumbnail, may be stored locally; you can delete it from the result."}</p>
+    <h2>{es ? "Pedidos y atención al cliente" : "Orders and customer support"}</h2>
+    <p>{es ? "Al solicitar una auditoría o presupuesto se registran email, URL públicas, contexto, precio, fechas, aceptación de condiciones, elección de inicio anticipado y referencias de pago y entrega. Se usan para gestionar medidas precontractuales, ejecutar el contrato, atender incidencias y cumplir las obligaciones legales aplicables. No te suscriben a publicidad. No incluyas contraseñas, datos de salud ni información confidencial en el formulario." : "Audit and quote requests record email, public URLs, context, price, dates, accepted terms, early-start choice and payment/delivery references. They support pre-contractual requests, contract performance, support and applicable legal obligations. They do not subscribe you to advertising. Do not submit passwords, health data or confidential information."}</p>
+    <p>{es ? "Los registros operativos se conservan hasta 400 días en Cloudflare Durable Objects. Los datos fiscales y justificantes pueden conservarse por los plazos legales que correspondan en los sistemas de facturación. El enlace privado del pedido contiene una clave: quien la tenga puede consultar estado y entregables. No la compartas; la clave solo se guarda temporalmente en esta pestaña para recuperar el pedido." : "Operational records are kept for up to 400 days in Cloudflare Durable Objects. Tax records and evidence may be retained for applicable statutory periods in billing systems. The private order link contains an access key; anyone with it can read status and deliverables. Do not share it. The key is stored only for this tab's session to recover the order."}</p>
+    <h2>{es ? "Proveedores" : "Providers"}</h2>
+    <p>{es ? "Cloudflare aloja el Worker y los pedidos; Stripe procesa los pagos y las facturas, y Resend envía correos transaccionales. No recibimos el número completo de tu tarjeta. El alojamiento de vídeo e informes se define al entregar y debe respetar el acceso acordado. Los proveedores pueden tratar datos fuera del EEE conforme a sus condiciones y mecanismos de transferencia aplicables; el responsable debe verificar esos acuerdos antes de abrir la contratación." : "Cloudflare hosts the Worker and orders, Stripe processes payments and invoices, and Resend sends transactional mail. We do not receive full card numbers. Video/report hosting is chosen for delivery and must respect the agreed access. Providers may process data outside the EEA under their terms and applicable transfer mechanisms; the controller must verify those arrangements before booking opens."}</p>
+    <h2>{es ? "Correcciones, boletín y analítica" : "Corrections, newsletter and analytics"}</h2>
+    <p>{es ? "Solo si marcas la casilla de enviar una corrección se envían el rasgo corregido, sus valores, seis mediciones redondeadas y el día, sin imagen ni URL. Se conservan hasta 400 días. Los contadores de abuso usan identificadores de IP con hash y caducidad. El boletín exige un consentimiento independiente y permite darse de baja. La analítica opcional solo se carga si está configurada; el tratamiento adicional requiere la revisión aplicable del responsable." : "Only when you opt in to send a correction do we receive the trait, values, six rounded measurements and day, without the image or URL. Corrections are kept for up to 400 days. Abuse counters use expiring hashed IP identifiers. The newsletter requires separate consent and offers unsubscribe. Optional analytics loads only when configured; any additional processing requires the controller's applicable review."}</p>
+    <h2>{es ? "Tus derechos" : "Your rights"}</h2>
+    <p>{es ? "Puedes solicitar acceso, rectificación, supresión, limitación, portabilidad u oposición cuando correspondan escribiendo al responsable identificado arriba. Retirar un consentimiento no afecta al tratamiento previo lícito. Puedes presentar una reclamación ante la autoridad de protección de datos competente, incluida la AEPD en España. No se toman decisiones con efectos jurídicos sobre ti mediante el score." : "You can request access, correction, erasure, restriction, portability or objection where applicable using the controller contact above. Withdrawal of consent does not affect prior lawful processing. You can complain to the competent data protection authority, including the AEPD in Spain. The score does not make decisions with legal effects about you."}</p>
+    <h2>{es ? "Cookies y servicios externos" : "Cookies and external services"}</h2>
+    <p>{es ? "El análisis no necesita cookies publicitarias. Stripe y los servicios de verificación pueden usar sus propios mecanismos de seguridad en sus superficies. El almacenamiento local y de sesión descrito arriba tiene funciones de comparación y recuperación; no se utiliza para publicidad." : "The analysis needs no advertising cookies. Stripe and verification services may use their own security mechanisms on their surfaces. Local and session storage described above support comparison and recovery, not advertising."}</p>
+    <RouteLink href="/legal">{es ? "Identificación del prestador" : "Seller identification"}</RouteLink>
+  </article>;
 }

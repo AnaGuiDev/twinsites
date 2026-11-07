@@ -1,6 +1,7 @@
 /**
  * PCA + UMAP, cluster labels, and the static files the site serves.
  */
+import { MODEL_VERSION } from "../src/lib/model-version.ts";
 import { readFile, writeFile, mkdir, rm } from "node:fs/promises";
 import path from "node:path";
 import sharp from "sharp";
@@ -160,7 +161,8 @@ async function main(): Promise<void> {
   const k = Math.max(8, Math.min(16, Math.round(Math.sqrt(meta.count / 8))));
   const { assign, centers } = kmeans(points, k, mulberry32(7));
 
-  await rm(path.join(OUT, "thumbs"), { recursive: true, force: true });
+  const retainThumbs = process.argv.includes("--existing-thumbs");
+  if (!retainThumbs) await rm(path.join(OUT, "thumbs"), { recursive: true, force: true });
   await mkdir(path.join(OUT, "thumbs"), { recursive: true });
 
   const sites: Site[] = [];
@@ -169,7 +171,7 @@ async function main(): Promise<void> {
     const id = String(index + 1).padStart(4, "0");
     const thumb = `thumbs/${id}.webp`;
     const png = path.join(RAW, "shots", `${item.slug}.png`);
-    await sharp(png)
+    if (!retainThumbs) await sharp(png)
       .resize({ width: 420, withoutEnlargement: true })
       .webp({ quality: 58, effort: 4 })
       .toFile(path.join(OUT, thumb));
@@ -223,7 +225,8 @@ async function main(): Promise<void> {
   const catalog = {
     version: 1,
     model: "Xenova/mobileclip_s0",
-    dtype: "q8",
+    dtype: "fp16",
+    recipe: MODEL_VERSION,
     dim: meta.dim,
     generated: new Date().toISOString(),
     count: sites.length,

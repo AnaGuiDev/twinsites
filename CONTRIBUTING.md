@@ -29,6 +29,6 @@ If someone asks for a site to be taken down, delete its entry from `public/data/
 
 ## Please don't
 
-- Add analytics, accounts, or a backend.
+- Add tracking or accounts to the free on-device check. The optional Studio Worker is documented in docs/studio.md; keep service orders separate from screenshot analysis.
 - Load the model, thumbnails, or WASM from a third-party CDN.
 - Put real people's names in the source, the README, or package metadata. Site titles that arrive inside the catalog can stay, because they are the catalog.

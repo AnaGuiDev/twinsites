@@ -118,7 +118,7 @@ export default defineConfig({
     __ORT_BUILD__: JSON.stringify(ortBuildHash()),
     __DATA_BYTES__: JSON.stringify(["catalog.json", "embeddings.f16.bin", "calibration.json"].map((file) => statSync(`public/data/${file}`).size)),
   },
-  plugins: [react(), dropBundledOrtWasm(), zoneStubs(), precompress(), previewGzipStatic()],
+  plugins: [modelLab(), react(), dropBundledOrtWasm(), zoneStubs(), precompress(), previewGzipStatic()],
   resolve: {
     // Inference is CPU WebAssembly on one thread. The default entry carries the
     // WebGPU layer and asks for a runtime twice the size; this one does not.
@@ -142,7 +142,7 @@ export default defineConfig({
     },
   },
   // Dev injects CSS as inline <style> for hot reload, so it gets everything but the CSP.
-  server: { headers: Object.fromEntries(Object.entries(headers).filter(([name]) => name !== "Content-Security-Policy")) },
+  server: { allowedHosts: ["terminal.local"], headers: { ...Object.fromEntries(Object.entries(headers).filter(([name]) => name !== "Content-Security-Policy")), "X-Frame-Options": "SAMEORIGIN" } },
   preview: { headers },
 });
 
@@ -168,6 +168,14 @@ function zoneStubs(): Plugin {
         "https://twinsites.com/zones",
         "Zones",
       );
+      for (const [slug, title, description] of [
+        ["services", "Human audit & redesign", "Visual twins and a free explainable Slop Score, followed by a human video audit, actionable prompts and a 30-day recheck."],
+        ["guide", "What is web slop?", "An evidence-first guide to repeated landing-page conventions, with what screenshots can and cannot tell."],
+        ["legal", "Legal notice", "Seller identification, ownership and service information for Twinsites."],
+        ["terms", "Service terms", "Scope, price, delivery and rights for Twinsites human reviews."],
+        ["withdrawal", "Withdrawal and cancellations", "How to request cancellation and exercise applicable withdrawal rights."],
+        ["sample-audit", "Sample human audit", "An illustrative report for a fictional landing page: five prioritized fixes with implementation prompts."],
+      ]) writeStub(html, path.resolve("dist", slug), `${title} — Twinsites`, description, `https://twinsites.com/${slug}`, title);
       const report = JSON.parse(readFileSync(path.resolve("public/data/report.json"), "utf8")) as {
         total: number;
         twins: { top1Any: number; top5Crowd: number };
@@ -223,4 +231,34 @@ function writeStub(
 
 function esc(value: string): string {
   return value.replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char] ?? char);
+}
+
+/** Opt-in local artifact sink; excluded from production and disabled by default. */
+function modelLab(): Plugin {
+  return { name: "local-model-lab", configureServer(server) {
+    server.middlewares.use((req, res, next) => {
+      const pathname = new URL(req.url || "/", "http://local").pathname;
+      if (pathname !== "/ort/ort-wasm-simd-threaded.mjs") return next();
+      res.setHeader("Content-Type", "text/javascript");
+      res.end(readFileSync("public/ort/ort-wasm-simd-threaded.mjs"));
+    });
+    if (process.env.TWINSITES_MODEL_LAB !== "1") return;
+    server.middlewares.use((req, res, next) => {
+      if (!req.url?.startsWith("/__model_lab/")) return next();
+      const name = req.url.slice("/__model_lab/".length);
+      if (req.method !== "POST" || !/^catalog-[0-3]$|^stability$/.test(name)) { res.statusCode = 405; res.end(); return; }
+      const origin = req.headers.origin;
+      if (!origin || new URL(origin).host !== req.headers.host) { res.statusCode = 403; res.end(); return; }
+      let body = "";
+      req.on("data", chunk => { body += chunk; if (body.length > 40_000_000) req.destroy(); });
+      req.on("end", () => { try {
+        const data = JSON.parse(body);
+        if (!Array.isArray(data.rows) || data.rows.length > 2003 || !data.rows.every((row: unknown) => Array.isArray(row) && row.length === 512 && row.every(v => typeof v === "number" && Number.isFinite(v)))) throw new Error("invalid vectors");
+        mkdirSync("quality/generated", {recursive:true});
+        const target = name.startsWith("catalog-") ? name : `stability-${Date.now()}`;
+        writeFileSync(`quality/generated/${target}.json`, body);
+        res.end("saved");
+      } catch { res.statusCode = 400; res.end("invalid"); } });
+    });
+  }};
 }

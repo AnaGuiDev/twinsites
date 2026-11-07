@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "count": 2003,
+  "dim": 512,
+  "input": "Committed 420px desktop thumbnails; raw full-resolution shots unavailable",
+  "runtime": "Browser ONNX WASM, one thread per session, four independent shards",
+  "crop": "left and right overlapping squares, normalized mean",
+  "modelSha256": "22b1d36ecc6837e8205aee05003440a25e1c1ee0c7e2945dbb9dd597211c59dc",
+  "revision": "757d59c9c6870a76a4b0306f05f5061bca15c39f",
+  "vectorsSha256": "33ca222ccb107b03ccc04bb1ffd8dfbe285240b5ab6d6e99df3846fed1e3dcc6",
+  "medianEncodingMs": 642.445000000298,
+  "note": "Shared cloud browser throughput; not a mobile performance benchmark."
+}

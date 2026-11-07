@@ -1,0 +1,426 @@
+{
+  "schema": 2,
+  "uniquePairCount": 60,
+  "protocol": "Corrected exploratory evaluation after duplicate review; not a new untouched holdout. P16/P34 restored from the original seeded selection and labeled before computing replacement scores.",
+  "labelSource": "AI visual annotation, not independent human validation",
+  "humanLabelsVerified": false,
+  "positiveDefinition": "label 2 only; partial resemblance counts as negative",
+  "thresholdRule": "Maximize development balanced accuracy; ties select the higher threshold. Corrected test reported after duplicate review; not an untouched holdout.",
+  "limitations": [
+    "60 unique curated pairs; not a representative sample",
+    "P16/P34 replaced after the original evaluation was known; a fresh independent holdout is still required",
+    "Small positive class, unstable estimates",
+    "Same assistant implemented and labeled; no independent validation",
+    "Desktop thumbnails only; mobile/full-resolution equivalence not established"
+  ],
+  "labelsSha256": "2d891dd110e8f2a3e0fea51db3a35ee287b34cdcecc8fd2c3f26a3fab342c1f7",
+  "embeddingSha256": "0d6350367e7ef476aef8d1c689512c7be25908448232246edbb41270f09d8005",
+  "candidate": {
+    "threshold": 0.5792259739440262,
+    "development": {
+      "count": 30,
+      "tp": 5,
+      "fp": 5,
+      "tn": 19,
+      "fn": 1,
+      "precision": 0.5,
+      "recall": 0.8333333333333334,
+      "balancedAccuracy": 0.8125
+    },
+    "test": {
+      "count": 30,
+      "tp": 2,
+      "fp": 1,
+      "tn": 25,
+      "fn": 2,
+      "precision": 0.6666666666666666,
+      "recall": 0.5,
+      "balancedAccuracy": 0.7307692307692308
+    }
+  },
+  "baseline": {
+    "threshold": 0.6199962234736494,
+    "development": {
+      "count": 30,
+      "tp": 4,
+      "fp": 10,
+      "tn": 14,
+      "fn": 2,
+      "precision": 0.2857142857142857,
+      "recall": 0.6666666666666666,
+      "balancedAccuracy": 0.625
+    },
+    "test": {
+      "count": 30,
+      "tp": 2,
+      "fp": 15,
+      "tn": 11,
+      "fn": 2,
+      "precision": 0.11764705882352941,
+      "recall": 0.5,
+      "balancedAccuracy": 0.46153846153846156
+    }
+  },
+  "pairs": [
+    {
+      "id": "P01",
+      "cosine": 0.5990655895167915,
+      "label": 2,
+      "split": "development"
+    },
+    {
+      "id": "P02",
+      "cosine": 0.5421670025741893,
+      "label": 2,
+      "split": "development"
+    },
+    {
+      "id": "P03",
+      "cosine": 0.623174958769317,
+      "label": 2,
+      "split": "development"
+    },
+    {
+      "id": "P04",
+      "cosine": 0.6470869102854093,
+      "label": 2,
+      "split": "development"
+    },
+    {
+      "id": "P05",
+      "cosine": 0.6250071428705359,
+      "label": 1,
+      "split": "development"
+    },
+    {
+      "id": "P06",
+      "cosine": 0.5604406995665654,
+      "label": 1,
+      "split": "development"
+    },
+    {
+      "id": "P07",
+      "cosine": 0.46132486391750066,
+      "label": 0,
+      "split": "development"
+    },
+    {
+      "id": "P08",
+      "cosine": 0.6542965738113627,
+      "label": 1,
+      "split": "development"
+    },
+    {
+      "id": "P09",
+      "cosine": 0.35831735987421587,
+      "label": 0,
+      "split": "development"
+    },
+    {
+      "id": "P10",
+      "cosine": 0.5792259739440262,
+      "label": 2,
+      "split": "development"
+    },
+    {
+      "id": "P11",
+      "cosine": 0.37501023379463183,
+      "label": 1,
+      "split": "development"
+    },
+    {
+      "id": "P12",
+      "cosine": 0.5750098811125457,
+      "label": 1,
+      "split": "development"
+    },
+    {
+      "id": "P13",
+      "cosine": 0.5367311939399485,
+      "label": 0,
+      "split": "development"
+    },
+    {
+      "id": "P14",
+      "cosine": 0.547269718638121,
+      "label": 0,
+      "split": "development"
+    },
+    {
+      "id": "P15",
+      "cosine": 0.6602853481444451,
+      "label": 2,
+      "split": "development"
+    },
+    {
+      "id": "P16",
+      "cosine": 0.5464492208884218,
+      "label": 0,
+      "split": "development"
+    },
+    {
+      "id": "P17",
+      "cosine": 0.5656285196150277,
+      "label": 1,
+      "split": "development"
+    },
+    {
+      "id": "P18",
+      "cosine": 0.5058240420535339,
+      "label": 0,
+      "split": "development"
+    },
+    {
+      "id": "P19",
+      "cosine": 0.4849755929501181,
+      "label": 1,
+      "split": "development"
+    },
+    {
+      "id": "P20",
+      "cosine": 0.48335696371025694,
+      "label": 0,
+      "split": "development"
+    },
+    {
+      "id": "P21",
+      "cosine": 0.41779256724855257,
+      "label": 0,
+      "split": "development"
+    },
+    {
+      "id": "P22",
+      "cosine": 0.4406210951609838,
+      "label": 0,
+      "split": "development"
+    },
+    {
+      "id": "P23",
+      "cosine": 0.6647008494667649,
+      "label": 1,
+      "split": "development"
+    },
+    {
+      "id": "P24",
+      "cosine": 0.48286328069495743,
+      "label": 1,
+      "split": "development"
+    },
+    {
+      "id": "P25",
+      "cosine": 0.5395520176274917,
+      "label": 1,
+      "split": "development"
+    },
+    {
+      "id": "P26",
+      "cosine": 0.6848082199360145,
+      "label": 1,
+      "split": "development"
+    },
+    {
+      "id": "P27",
+      "cosine": 0.5465449405685839,
+      "label": 0,
+      "split": "development"
+    },
+    {
+      "id": "P28",
+      "cosine": 0.3511171792225663,
+      "label": 0,
+      "split": "development"
+    },
+    {
+      "id": "P29",
+      "cosine": 0.5764367181196911,
+      "label": 0,
+      "split": "development"
+    },
+    {
+      "id": "P30",
+      "cosine": 0.6174141744039652,
+      "label": 0,
+      "split": "development"
+    },
+    {
+      "id": "P31",
+      "cosine": 0.3234533718320937,
+      "label": 2,
+      "split": "test"
+    },
+    {
+      "id": "P32",
+      "cosine": 0.7119339300329602,
+      "label": 2,
+      "split": "test"
+    },
+    {
+      "id": "P33",
+      "cosine": 0.6030882599634234,
+      "label": 2,
+      "split": "test"
+    },
+    {
+      "id": "P34",
+      "cosine": 0.48393932524183886,
+      "label": 0,
+      "split": "test"
+    },
+    {
+      "id": "P35",
+      "cosine": 0.45219771488963195,
+      "label": 1,
+      "split": "test"
+    },
+    {
+      "id": "P36",
+      "cosine": 0.4447884369194909,
+      "label": 1,
+      "split": "test"
+    },
+    {
+      "id": "P37",
+      "cosine": 0.5684390779418431,
+      "label": 1,
+      "split": "test"
+    },
+    {
+      "id": "P38",
+      "cosine": 0.5472863771991121,
+      "label": 1,
+      "split": "test"
+    },
+    {
+      "id": "P39",
+      "cosine": 0.48685502174384343,
+      "label": 0,
+      "split": "test"
+    },
+    {
+      "id": "P40",
+      "cosine": 0.5752061826808155,
+      "label": 1,
+      "split": "test"
+    },
+    {
+      "id": "P41",
+      "cosine": 0.45998973000238325,
+      "label": 0,
+      "split": "test"
+    },
+    {
+      "id": "P42",
+      "cosine": 0.4042986493385232,
+      "label": 1,
+      "split": "test"
+    },
+    {
+      "id": "P43",
+      "cosine": 0.4887645627470142,
+      "label": 1,
+      "split": "test"
+    },
+    {
+      "id": "P44",
+      "cosine": 0.5981874968060709,
+      "label": 0,
+      "split": "test"
+    },
+    {
+      "id": "P45",
+      "cosine": 0.4817397255376189,
+      "label": 0,
+      "split": "test"
+    },
+    {
+      "id": "P46",
+      "cosine": 0.5592982165975339,
+      "label": 0,
+      "split": "test"
+    },
+    {
+      "id": "P47",
+      "cosine": 0.4037032239243883,
+      "label": 0,
+      "split": "test"
+    },
+    {
+      "id": "P48",
+      "cosine": 0.21243744255013874,
+      "label": 0,
+      "split": "test"
+    },
+    {
+      "id": "P49",
+      "cosine": 0.507326780851049,
+      "label": 0,
+      "split": "test"
+    },
+    {
+      "id": "P50",
+      "cosine": 0.4969723880289419,
+      "label": 0,
+      "split": "test"
+    },
+    {
+      "id": "P51",
+      "cosine": 0.5468750511634697,
+      "label": 0,
+      "split": "test"
+    },
+    {
+      "id": "P52",
+      "cosine": 0.5191983396950215,
+      "label": 0,
+      "split": "test"
+    },
+    {
+      "id": "P53",
+      "cosine": 0.398727653973815,
+      "label": 0,
+      "split": "test"
+    },
+    {
+      "id": "P54",
+      "cosine": 0.3195351683097733,
+      "label": 0,
+      "split": "test"
+    },
+    {
+      "id": "P55",
+      "cosine": 0.4884495782460071,
+      "label": 1,
+      "split": "test"
+    },
+    {
+      "id": "P56",
+      "cosine": 0.4887599065049532,
+      "label": 2,
+      "split": "test"
+    },
+    {
+      "id": "P57",
+      "cosine": 0.5051587372854411,
+      "label": 0,
+      "split": "test"
+    },
+    {
+      "id": "P58",
+      "cosine": 0.43158023189463823,
+      "label": 0,
+      "split": "test"
+    },
+    {
+      "id": "P59",
+      "cosine": 0.36619236807050304,
+      "label": 0,
+      "split": "test"
+    },
+    {
+      "id": "P60",
+      "cosine": 0.4721447616460822,
+      "label": 0,
+      "split": "test"
+    }
+  ]
+}

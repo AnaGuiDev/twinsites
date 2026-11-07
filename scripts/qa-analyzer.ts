@@ -178,23 +178,16 @@ try {
     assert(await page.evaluate(() => crossOriginIsolated), "not cross-origin isolated");
   });
 
-  await check("home: the wall lights up real twins", async () => {
-    await page.locator(".tile.is-twin").first().waitFor({ timeout: 8_000 });
-    const lit = await page.locator(".tile.is-twin").count();
-    const caption = await page.locator(".demo-title").innerText();
-    assert(lit >= 2, `only ${lit} twins lit`);
-    return `${lit} lit for “${caption}”`;
+  await check("home: real catalog specimen loads", async () => {
+    await page.locator(".specimen-pair img").first().waitFor();
+    assert(await page.locator(".specimen-pair img").count() === 2, "two catalog examples");
+    await page.waitForFunction(() => [...document.querySelectorAll<HTMLImageElement>(".specimen-pair img")].every(image => image.complete && image.naturalWidth > 0));
   });
 
-  await check("home: worked example card loads", async () => {
-    await page.waitForFunction(() => [...document.querySelectorAll<HTMLImageElement>(".example-teaser img")].every((image) => image.complete && image.naturalWidth > 0));
-    assert(/14 → 0/.test(await page.locator(".teaser-num").innerText()), "teaser numbers");
-    const card = page.locator(".example-card");
-    await card.scrollIntoViewIfNeeded();
-    await page.waitForFunction(() => {
-      const image = document.querySelector<HTMLImageElement>(".example-card");
-      return Boolean(image && image.complete && image.naturalWidth > 0);
-    });
+  await check("home: fictional before and after loads", async () => {
+    await page.locator(".worked-pair").scrollIntoViewIfNeeded();
+    assert(await page.locator(".worked-pair img").count() === 2, "two illustrative versions");
+    await page.waitForFunction(() => [...document.querySelectorAll<HTMLImageElement>(".worked-pair img")].every(image => image.complete && image.naturalWidth > 0));
   });
 
   await check("home: FAQ opens", async () => {
