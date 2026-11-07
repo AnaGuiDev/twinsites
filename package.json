@@ -13,7 +13,7 @@
     "dataset": "tsx scripts/build-dataset.ts",
     "dataset:capture": "tsx scripts/capture.ts",
     "dataset:embed": "tsx scripts/embed.ts",
-    "dataset:project": "tsx scripts/project.ts",
+    "dataset:project": "node --import tsx scripts/project.ts",
     "dataset:calibrate": "tsx scripts/refresh-meta.ts",
     "dataset:mosaic": "tsx scripts/mosaic.ts",
     "dataset:layout": "tsx scripts/refresh-layout.ts",
@@ -25,7 +25,13 @@
     "weight": "tsx scripts/weight.ts",
     "reliability": "tsx scripts/reliability.ts",
     "test:product": "node --import tsx --test test/*.test.ts",
-    "typecheck:worker": "tsc -p worker/tsconfig.json"
+    "typecheck:worker": "tsc -p worker/tsconfig.json",
+    "model:lab": "TWINSITES_MODEL_LAB=1 vite",
+    "model:finalize": "node --import tsx scripts/finalize-model.ts",
+    "model:evaluate": "node --import tsx scripts/evaluate-pairs.ts",
+    "model:prepare": "node scripts/prepare-model.mjs",
+    "pretest:product": "npm run model:prepare",
+    "prebuild": "npm run model:prepare"
   },
   "engines": {
     "node": ">=20"

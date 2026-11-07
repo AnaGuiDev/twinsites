@@ -1,0 +1,547 @@
+{
+  "schema": 1,
+  "selectionModel": "q8-center-crop",
+  "note": "Fixed before FP16 evaluation. Site-disjoint dev/test; AI labels are exploratory, not human validation.",
+  "pairs": [
+    {
+      "id": "P01",
+      "split": "development",
+      "a": "agints",
+      "b": "directorylab",
+      "selection": "q8-neighbor",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P02",
+      "split": "development",
+      "a": "ama-goal-dash-lovable",
+      "b": "kalyvox",
+      "selection": "q8-neighbor",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P03",
+      "split": "development",
+      "a": "auriko",
+      "b": "learnpomelo",
+      "selection": "q8-neighbor",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P04",
+      "split": "development",
+      "a": "bluewhiteflag",
+      "b": "kiril6-github",
+      "selection": "q8-neighbor",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P05",
+      "split": "development",
+      "a": "canairead",
+      "b": "saap-sidhi-joy-lovable",
+      "selection": "q8-neighbor",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P06",
+      "split": "development",
+      "a": "clip-showcase-buddy-lovable",
+      "b": "tanukade",
+      "selection": "q8-neighbor",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P07",
+      "split": "development",
+      "a": "crispforms",
+      "b": "cliffcheck",
+      "selection": "q8-neighbor",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P08",
+      "split": "development",
+      "a": "docs",
+      "b": "wmhub",
+      "selection": "q8-neighbor",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P09",
+      "split": "development",
+      "a": "exact-capture-screen-83-lovable",
+      "b": "supplementdex",
+      "selection": "q8-neighbor",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P10",
+      "split": "development",
+      "a": "formchat-lovable",
+      "b": "ruanzhu",
+      "selection": "q8-neighbor",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P11",
+      "split": "development",
+      "a": "getquality-md",
+      "b": "fundingcompass-hub-lovable",
+      "selection": "q8-rank26",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P12",
+      "split": "development",
+      "a": "gutsafe-educhange",
+      "b": "chats-llm",
+      "selection": "q8-rank26",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P13",
+      "split": "development",
+      "a": "hustlnaija-lovable",
+      "b": "moover-lovable",
+      "selection": "q8-rank26",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P14",
+      "split": "development",
+      "a": "izeo",
+      "b": "taxi-haiti-app-lovable",
+      "selection": "q8-rank26",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P15",
+      "split": "development",
+      "a": "lacoparentalite-fr",
+      "b": "popjam",
+      "selection": "q8-rank26",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P16",
+      "split": "development",
+      "a": "ltxvideo",
+      "b": "arx0n",
+      "selection": "q8-rank26",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P17",
+      "split": "development",
+      "a": "meshy",
+      "b": "aiimgeditor-org",
+      "selection": "q8-rank26",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P18",
+      "split": "development",
+      "a": "mysorbet",
+      "b": "tryaeos",
+      "selection": "q8-rank26",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P19",
+      "split": "development",
+      "a": "offer-genius-bot-lovable",
+      "b": "musci",
+      "selection": "q8-rank26",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P20",
+      "split": "development",
+      "a": "paperclaw-org",
+      "b": "seoperseo",
+      "selection": "q8-rank26",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P21",
+      "split": "development",
+      "a": "pixi-spell-fun-lovable",
+      "b": "image25sunburst",
+      "selection": "seeded-control",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P22",
+      "split": "development",
+      "a": "prmptree",
+      "b": "lixrl",
+      "selection": "seeded-control",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P23",
+      "split": "development",
+      "a": "rankparse",
+      "b": "namespyai",
+      "selection": "seeded-control",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P24",
+      "split": "development",
+      "a": "roumy",
+      "b": "petprofessionals",
+      "selection": "seeded-control",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P25",
+      "split": "development",
+      "a": "seedance2-today",
+      "b": "qwen-image-edit",
+      "selection": "seeded-control",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P26",
+      "split": "development",
+      "a": "smartlyq",
+      "b": "sendroq",
+      "selection": "seeded-control",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P27",
+      "split": "development",
+      "a": "stats-daily-dashboard-lovable",
+      "b": "swap-smile-corner-lovable",
+      "selection": "seeded-control",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P28",
+      "split": "development",
+      "a": "teacher-match-pro-lovable",
+      "b": "vayovideo-com",
+      "selection": "seeded-control",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P29",
+      "split": "development",
+      "a": "treino-redacao-smart-lovable",
+      "b": "xtokenchecker",
+      "selection": "seeded-control",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P30",
+      "split": "development",
+      "a": "veelapp",
+      "b": "appiconkitchen",
+      "selection": "seeded-control",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P31",
+      "split": "test",
+      "a": "agri-clarity-bot-lovable",
+      "b": "dynamic-cv-chat-lovable",
+      "selection": "q8-neighbor",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P32",
+      "split": "test",
+      "a": "amigronia-lovable",
+      "b": "axiomers-vercel",
+      "selection": "q8-neighbor",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P33",
+      "split": "test",
+      "a": "autobahn-dreams-lovable",
+      "b": "resumely-live",
+      "selection": "q8-neighbor",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P34",
+      "split": "test",
+      "a": "bmprun",
+      "b": "naborra-com",
+      "selection": "q8-neighbor",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P35",
+      "split": "test",
+      "a": "cancelshut",
+      "b": "circlemate",
+      "selection": "q8-neighbor",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P36",
+      "split": "test",
+      "a": "clipin-ai",
+      "b": "amy-aryam",
+      "selection": "q8-neighbor",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P37",
+      "split": "test",
+      "a": "cronloop",
+      "b": "ohshitscenario-lovable",
+      "selection": "q8-neighbor",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P38",
+      "split": "test",
+      "a": "docstash",
+      "b": "veinote",
+      "selection": "q8-neighbor",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P39",
+      "split": "test",
+      "a": "examcoach-lovable",
+      "b": "maakann-lovable",
+      "selection": "q8-neighbor",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P40",
+      "split": "test",
+      "a": "formula-buddy-maker-lovable",
+      "b": "vventuresaas",
+      "selection": "q8-neighbor",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P41",
+      "split": "test",
+      "a": "getredpen-cn",
+      "b": "glowenai-lovable",
+      "selection": "q8-rank26",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P42",
+      "split": "test",
+      "a": "h3-max",
+      "b": "attractivenessscale",
+      "selection": "q8-rank26",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P43",
+      "split": "test",
+      "a": "hypocrisydetector",
+      "b": "thepaintedladytarot",
+      "selection": "q8-rank26",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P44",
+      "split": "test",
+      "a": "jammyjar",
+      "b": "unabyss",
+      "selection": "q8-rank26",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P45",
+      "split": "test",
+      "a": "lagoshustler-lovable",
+      "b": "picture-solve-ace-lovable",
+      "selection": "q8-rank26",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P46",
+      "split": "test",
+      "a": "lucer-art",
+      "b": "aiforasmr",
+      "selection": "q8-rank26",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P47",
+      "split": "test",
+      "a": "metavoice",
+      "b": "heuron-news",
+      "selection": "q8-rank26",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P48",
+      "split": "test",
+      "a": "mystic-star-quest-lovable",
+      "b": "element-explore-3d-lovable",
+      "selection": "q8-rank26",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P49",
+      "split": "test",
+      "a": "offergenius-lovable",
+      "b": "chaosbench",
+      "selection": "q8-rank26",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P50",
+      "split": "test",
+      "a": "paperfox",
+      "b": "fancanon",
+      "selection": "q8-rank26",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P51",
+      "split": "test",
+      "a": "pixoate",
+      "b": "imgveo",
+      "selection": "seeded-control",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P52",
+      "split": "test",
+      "a": "pro-studio-solutions-lovable",
+      "b": "loerei-github",
+      "selection": "seeded-control",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P53",
+      "split": "test",
+      "a": "rankworker",
+      "b": "nanobanana2lite",
+      "selection": "seeded-control",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P54",
+      "split": "test",
+      "a": "route2roster",
+      "b": "physics-ai-solver-step-by-step-problem-assistant",
+      "selection": "seeded-control",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P55",
+      "split": "test",
+      "a": "seedance2",
+      "b": "railway",
+      "selection": "seeded-control",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P56",
+      "split": "test",
+      "a": "smashpdf-online",
+      "b": "serafind",
+      "selection": "seeded-control",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P57",
+      "split": "test",
+      "a": "staxinvesting",
+      "b": "synexa",
+      "selection": "seeded-control",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P58",
+      "split": "test",
+      "a": "teacherplanner",
+      "b": "vedicastrologychart",
+      "selection": "seeded-control",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P59",
+      "split": "test",
+      "a": "trek-triumphant-lovable",
+      "b": "yarrow-5-polsia",
+      "selection": "seeded-control",
+      "label": null,
+      "reason": ""
+    },
+    {
+      "id": "P60",
+      "split": "test",
+      "a": "veloxonhub",
+      "b": "arcaira",
+      "selection": "seeded-control",
+      "label": null,
+      "reason": ""
+    }
+  ]
+}

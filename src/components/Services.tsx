@@ -1,3 +1,4 @@
+import { track } from "../lib/analytics";
 import { useEffect, useState } from "react";
 import { useI18n } from "../i18n";
 import { RouteLink } from "../router";
@@ -47,11 +48,12 @@ export function ServicesPage() {
   const [consent, setConsent] = useState(false), [startImmediately, setStartImmediately] = useState(false);
   const [busy, setBusy] = useState(false), [error, setError] = useState("");
   useEffect(() => { document.title = es ? "Auditoría de tu web — Twinsites" : "Your website audit — Twinsites"; }, [es]);
+  useEffect(() => { track("services-view"); }, []);
   const total = offer.base + (pages - 1) * offer.extra;
   const full = kind === "audit" && offer.available === 0;
   const submit = async (event: React.FormEvent) => {
     event.preventDefault(); if (busy || !offer.enabled || full) return;
-    setBusy(true); setError("");
+    setBusy(true); setError(""); track("checkout-start");
     try {
       const endpoint = serviceEndpoint("/services/orders"); if (!endpoint) throw new Error();
       const response = await fetch(endpoint, { method: "POST", headers: { "content-type": "application/json" },
@@ -68,7 +70,7 @@ export function ServicesPage() {
         const url = new URL(data.checkout); if (url.hostname !== "checkout.stripe.com" || url.protocol !== "https:") throw new Error();
         window.location.assign(url.href);
       } else window.location.assign(`/order#${data.id}/${data.token}`);
-    } catch (err) { setError(err instanceof Error && err.message ? err.message : (es ? "Servicio no disponible. Inténtalo más tarde." : "Service unavailable. Try again later.")); }
+    } catch (err) { track("checkout-error"); setError(err instanceof Error && err.message ? err.message : (es ? "Servicio no disponible. Inténtalo más tarde." : "Service unavailable. Try again later.")); }
     finally { setBusy(false); }
   };
   return <article className="services-page launch-service">
@@ -147,7 +149,7 @@ export function OrderPage() {
     {error ? <p role="alert">{es ? "No se puede consultar el pedido. Abre el enlace completo del pago o inténtalo de nuevo." : "Could not read this order. Open the full checkout link or try again."}</p> : order ? <>
       <p className="offer-price">{labels[String(order.status)] || order.status}</p><p>{es ? "Referencia" : "Reference"}: {order.id}</p>
       {Number(order.total) > 0 && <p>{money(Number(order.total))} EUR</p>}
-      {["startAt", "dueAt", "recheckAt"].map(key => order[key] ? <p key={key}>{key === "startAt" ? (es ? "Inicio" : "Start") : key === "dueAt" ? (es ? "Entrega prevista" : "Delivery due") : (es ? "Revisión posterior" : "Follow-up")}: {new Date(Number(order[key])).toLocaleString(lang === "es" ? "es-ES" : "en-GB", { timeZone: "UTC" })} UTC</p> : null)}
+      {["startAt", "dueAt", "recheckAt"].map(key => order[key] ? <p key={key}>{key === "startAt" ? (es ? "Inicio" : "Start") : key === "dueAt" ? (es ? "Entrega prevista" : "Delivery due") : (es ? "Revisión posterior" : "Follow-up")}: {new Date(Number(order[key])).toLocaleString(lang === "es" ? "es-ES" : "en-GB", { timeZone: "Europe/Madrid" })} Europe/Madrid</p> : null)}
       {["videoUrl", "reportUrl", "recheckUrl", "invoiceUrl"].map(key => order[key] ? <p key={key}><a className="text-link" href={String(order[key])} target="_blank" rel="noreferrer">{key === "videoUrl" ? "Video" : key === "reportUrl" ? (es ? "Informe y prompts" : "Report & prompts") : key === "invoiceUrl" ? (es ? "Factura en Stripe" : "Invoice on Stripe") : (es ? "Revisión posterior" : "Follow-up") } ↗</a></p> : null)}
       {order.checkout && !order.cancelledAt && <p><a className="ticket" href={String(order.checkout)}>{es ? "Completar pago seguro" : "Complete secure payment"}</a></p>}
       {order.cancelledAt && <p className="service-notice">{es ? "Hay una solicitud de cancelación pendiente de resolución. No se ha confirmado un reembolso por el mero hecho de solicitarla." : "A cancellation request awaits resolution. Submitting it does not by itself confirm a refund."}</p>}

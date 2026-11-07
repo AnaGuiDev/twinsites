@@ -20,3 +20,9 @@ scripts/**/*.js
 .dev.vars
 .dev.vars.*
 !.dev.vars.example
+
+# Regenerable local model laboratory checkpoints
+quality/generated/
+
+# Verified, revision-pinned model fetched before tests/build.
+public/models/Xenova/mobileclip_s0/onnx/vision_model_fp16.onnx

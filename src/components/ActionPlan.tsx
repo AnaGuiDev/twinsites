@@ -1,0 +1,14 @@
+import { useState } from "react";
+import { useI18n } from "../i18n";
+import { type Trope } from "../lib/slop";
+import { type ActionNote, type ActionStatus, planMarkdown } from "../lib/action-plan";
+import { downloadText } from "../lib/report-export";
+import { track } from "../lib/analytics";
+export function ActionPlan({ signals }: { signals: Trope[] }) {
+  const { lang } = useI18n(); const es = lang === "es";
+  const [context,setContext] = useState(""); const [notes,setNotes] = useState<Record<string,ActionNote>>({});
+  const first = signals.slice(0,3); const done = first.filter(s=>notes[s.id]?.status === "done").length;
+  const update = (id: string, values: Partial<ActionNote>) => setNotes(current=>({...current,[id]:{...(current[id] || {evidence:"",status:"todo"}),...values}}));
+  if (!first.length) return null;
+  return <section className="action-plan"><div className="plan-heading"><div><p className="kicker">{es ? "TU PLAN DE TRABAJO" : "YOUR ACTION PLAN"}</p><h3>{es ? "Llévalo a tu proyecto." : "Take it into your project."}</h3></div><span>{done}/{first.length}</span></div><p>{es ? "Añade contexto y evidencia para las tres prioridades. Se mantiene en esta pantalla; descárgalo antes de salir. Marcar «Hecho» no verifica la mejora." : "Add context and evidence for the top three priorities. This stays on this screen; download before leaving. Marking an action done does not verify improvement."}</p><label>{es ? "Producto, público y objetivo" : "Product, audience and goal"}<textarea maxLength={1500} rows={3} value={context} onChange={e=>setContext(e.target.value)} placeholder={es ? "Para quién es, qué necesita conseguir y qué debemos conservar…" : "Who it is for, what it needs to achieve and what to preserve…"} /></label>{first.map((signal,i)=><div className="plan-task" key={signal.id}><div className="plan-task-title"><strong>0{i+1} / {signal.title[lang]}</strong><select aria-label={`${es ? "Estado" : "Status"}: ${signal.title[lang]}`} value={notes[signal.id]?.status || "todo"} onChange={e=>update(signal.id,{status:e.target.value as ActionStatus})}><option value="todo">{es ? "Pendiente" : "To do"}</option><option value="doing">{es ? "En curso" : "In progress"}</option><option value="done">{es ? "Hecho · sin verificar" : "Done · not verified"}</option></select></div><label>{es ? "¿Dónde lo has visto? ¿Qué comprobarás después?" : "Where did you see it? What will you check afterwards?"}<textarea rows={2} maxLength={1200} value={notes[signal.id]?.evidence || ""} onChange={e=>update(signal.id,{evidence:e.target.value})} /></label></div>)}<button className="ticket" onClick={()=>{track("plan-export");downloadText("twinsites-action-plan.md",planMarkdown(first,notes,context,lang));}}>{es ? "Descargar plan para mi editor" : "Download plan for my editor"} ↗</button></section>;
+}

@@ -12,7 +12,7 @@ Delivery is five weekdays from the agreed start, counted as 120 weekday hours in
 
 ## Two separate results
 
-Visual twins remain an indicative catalog comparison, with a visible calibration notice until `quality/model-release.json` is supported by actual evidence. No fp16/two-crop model release or 60 human-labeled pairs were supplied in this repository. No labels, stability results or rebuilt catalog are invented. The existing q8 model and embeddings are unchanged; f16 vector storage is not an fp16 vision model.
+Visual twins remain an indicative catalog comparison, with a visible calibration notice until `quality/model-release.json` is supported by actual evidence. The current technical candidate ships an FP16/two-crop model and a catalog rebuilt from 2,003 committed desktop thumbnails. Its 60 unique pair labels are AI annotations, not human validation. Independent review and physical mobile testing remain pending; see [the current release evidence](release-candidate.md). The earlier q8 implementation described in PR #18 has been superseded in this candidate.
 
 `editorial-v2` does **not** turn similarity or a centered hero into slop points. It scores reviewed editorial signals: purple/blue decoration 15, emoji cards 15, bento without hierarchy 15, glass 10, serif italic 10, clichés 20 and unsupported social proof 15. Only OCR contributes automatically; the other checks require review because the existing image rules failed reliability checks. Unknowns never pass silently. Below 80% weighted coverage the headline and export say Partial and suppress the overall number. That threshold is a display policy, not scientific validation. The diagnosis is never sold as proof of AI authorship or quality.
 

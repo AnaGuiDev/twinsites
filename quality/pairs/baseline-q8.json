@@ -1,0 +1,368 @@
+{
+  "model": "q8-center-crop",
+  "embeddingSha256": "a37bff9211c04626a7d3736ce4264b35c04c945bb848046ca83d8d419ca58085",
+  "scores": [
+    {
+      "id": "P01",
+      "a": "formchat-lovable",
+      "b": "popjam",
+      "cosine": 0.65871184111592
+    },
+    {
+      "id": "P02",
+      "a": "ruanzhu",
+      "b": "lacoparentalite-fr",
+      "cosine": 0.6199962234736494
+    },
+    {
+      "id": "P03",
+      "a": "crispforms",
+      "b": "roumy",
+      "cosine": 0.17167047563902793
+    },
+    {
+      "id": "P04",
+      "a": "docs",
+      "b": "prmptree",
+      "cosine": 0.5650860264939814
+    },
+    {
+      "id": "P05",
+      "a": "offer-genius-bot-lovable",
+      "b": "izeo",
+      "cosine": 0.35695076913410767
+    },
+    {
+      "id": "P06",
+      "a": "rankparse",
+      "b": "qwen-image-edit",
+      "cosine": 0.5982337626261705
+    },
+    {
+      "id": "P07",
+      "a": "crispforms",
+      "b": "cliffcheck",
+      "cosine": 0.7914425451348701
+    },
+    {
+      "id": "P08",
+      "a": "docs",
+      "b": "wmhub",
+      "cosine": 0.8932202059947625
+    },
+    {
+      "id": "P09",
+      "a": "exact-capture-screen-83-lovable",
+      "b": "supplementdex",
+      "cosine": 0.8196639703253796
+    },
+    {
+      "id": "P10",
+      "a": "formchat-lovable",
+      "b": "ruanzhu",
+      "cosine": 0.7033626719419964
+    },
+    {
+      "id": "P11",
+      "a": "getquality-md",
+      "b": "fundingcompass-hub-lovable",
+      "cosine": 0.5924877612084526
+    },
+    {
+      "id": "P12",
+      "a": "gutsafe-educhange",
+      "b": "chats-llm",
+      "cosine": 0.4546891565815723
+    },
+    {
+      "id": "P13",
+      "a": "hustlnaija-lovable",
+      "b": "moover-lovable",
+      "cosine": 0.8191030431415471
+    },
+    {
+      "id": "P14",
+      "a": "izeo",
+      "b": "taxi-haiti-app-lovable",
+      "cosine": 0.5660850411898246
+    },
+    {
+      "id": "P15",
+      "a": "lacoparentalite-fr",
+      "b": "popjam",
+      "cosine": 0.6882805307734454
+    },
+    {
+      "id": "P16",
+      "a": "ltxvideo",
+      "b": "arx0n",
+      "cosine": 0.5763934111026996
+    },
+    {
+      "id": "P17",
+      "a": "meshy",
+      "b": "aiimgeditor-org",
+      "cosine": 0.8154844977958775
+    },
+    {
+      "id": "P18",
+      "a": "mysorbet",
+      "b": "tryaeos",
+      "cosine": 0.7640580896021925
+    },
+    {
+      "id": "P19",
+      "a": "offer-genius-bot-lovable",
+      "b": "musci",
+      "cosine": 0.8785881240107171
+    },
+    {
+      "id": "P20",
+      "a": "paperclaw-org",
+      "b": "seoperseo",
+      "cosine": 0.7893705576510207
+    },
+    {
+      "id": "P21",
+      "a": "pixi-spell-fun-lovable",
+      "b": "image25sunburst",
+      "cosine": 0.4468157284871866
+    },
+    {
+      "id": "P22",
+      "a": "prmptree",
+      "b": "lixrl",
+      "cosine": 0.17554806506195275
+    },
+    {
+      "id": "P23",
+      "a": "rankparse",
+      "b": "namespyai",
+      "cosine": 0.5056563297770083
+    },
+    {
+      "id": "P24",
+      "a": "roumy",
+      "b": "petprofessionals",
+      "cosine": 0.12161815982019399
+    },
+    {
+      "id": "P25",
+      "a": "seedance2-today",
+      "b": "qwen-image-edit",
+      "cosine": 0.6387924363445512
+    },
+    {
+      "id": "P26",
+      "a": "smartlyq",
+      "b": "sendroq",
+      "cosine": 0.6931032300246357
+    },
+    {
+      "id": "P27",
+      "a": "stats-daily-dashboard-lovable",
+      "b": "swap-smile-corner-lovable",
+      "cosine": 0.1429297640312439
+    },
+    {
+      "id": "P28",
+      "a": "teacher-match-pro-lovable",
+      "b": "vayovideo-com",
+      "cosine": 0.18366384659248133
+    },
+    {
+      "id": "P29",
+      "a": "treino-redacao-smart-lovable",
+      "b": "xtokenchecker",
+      "cosine": 0.2567164303265858
+    },
+    {
+      "id": "P30",
+      "a": "veelapp",
+      "b": "appiconkitchen",
+      "cosine": 0.18275384443535364
+    },
+    {
+      "id": "P31",
+      "a": "cancelshut",
+      "b": "serafind",
+      "cosine": 0.3101080332197372
+    },
+    {
+      "id": "P32",
+      "a": "resumely-live",
+      "b": "veloxonhub",
+      "cosine": -0.08254840760366117
+    },
+    {
+      "id": "P33",
+      "a": "amy-aryam",
+      "b": "staxinvesting",
+      "cosine": 0.8488599599402997
+    },
+    {
+      "id": "P34",
+      "a": "bmprun",
+      "b": "naborra-com",
+      "cosine": 0.7191403921084671
+    },
+    {
+      "id": "P35",
+      "a": "cancelshut",
+      "b": "circlemate",
+      "cosine": 0.6070472151733073
+    },
+    {
+      "id": "P36",
+      "a": "clipin-ai",
+      "b": "amy-aryam",
+      "cosine": 0.9532584120306282
+    },
+    {
+      "id": "P37",
+      "a": "cronloop",
+      "b": "ohshitscenario-lovable",
+      "cosine": 0.9517822832980926
+    },
+    {
+      "id": "P38",
+      "a": "hypocrisydetector",
+      "b": "aiforasmr",
+      "cosine": 0.8707188962306027
+    },
+    {
+      "id": "P39",
+      "a": "examcoach-lovable",
+      "b": "maakann-lovable",
+      "cosine": 0.765522765508021
+    },
+    {
+      "id": "P40",
+      "a": "jammyjar",
+      "b": "arcaira",
+      "cosine": 0.7244353721043694
+    },
+    {
+      "id": "P41",
+      "a": "getredpen-cn",
+      "b": "glowenai-lovable",
+      "cosine": 0.7089526823267982
+    },
+    {
+      "id": "P42",
+      "a": "h3-max",
+      "b": "attractivenessscale",
+      "cosine": 0.7856008940238035
+    },
+    {
+      "id": "P43",
+      "a": "hypocrisydetector",
+      "b": "thepaintedladytarot",
+      "cosine": 0.8669451086019729
+    },
+    {
+      "id": "P44",
+      "a": "jammyjar",
+      "b": "unabyss",
+      "cosine": 0.8507676459103933
+    },
+    {
+      "id": "P45",
+      "a": "lagoshustler-lovable",
+      "b": "picture-solve-ace-lovable",
+      "cosine": 0.596242310286857
+    },
+    {
+      "id": "P46",
+      "a": "lucer-art",
+      "b": "aiforasmr",
+      "cosine": 0.9007905399589352
+    },
+    {
+      "id": "P47",
+      "a": "metavoice",
+      "b": "heuron-news",
+      "cosine": 0.4937454895365236
+    },
+    {
+      "id": "P48",
+      "a": "mystic-star-quest-lovable",
+      "b": "element-explore-3d-lovable",
+      "cosine": 0.8682958733740336
+    },
+    {
+      "id": "P49",
+      "a": "offergenius-lovable",
+      "b": "chaosbench",
+      "cosine": 0.7534917475176491
+    },
+    {
+      "id": "P50",
+      "a": "paperfox",
+      "b": "fancanon",
+      "cosine": 0.5525513616193475
+    },
+    {
+      "id": "P51",
+      "a": "pixoate",
+      "b": "imgveo",
+      "cosine": 0.48833626637104877
+    },
+    {
+      "id": "P52",
+      "a": "pro-studio-solutions-lovable",
+      "b": "loerei-github",
+      "cosine": 0.6128588786342293
+    },
+    {
+      "id": "P53",
+      "a": "rankworker",
+      "b": "nanobanana2lite",
+      "cosine": 0.11067893114941271
+    },
+    {
+      "id": "P54",
+      "a": "route2roster",
+      "b": "physics-ai-solver-step-by-step-problem-assistant",
+      "cosine": 0.08239592396258369
+    },
+    {
+      "id": "P55",
+      "a": "seedance2",
+      "b": "railway",
+      "cosine": 0.6852914279262322
+    },
+    {
+      "id": "P56",
+      "a": "smashpdf-online",
+      "b": "serafind",
+      "cosine": 0.7334886997110637
+    },
+    {
+      "id": "P57",
+      "a": "staxinvesting",
+      "b": "synexa",
+      "cosine": 0.4801085798348373
+    },
+    {
+      "id": "P58",
+      "a": "teacherplanner",
+      "b": "vedicastrologychart",
+      "cosine": 0.5092911536361686
+    },
+    {
+      "id": "P59",
+      "a": "trek-triumphant-lovable",
+      "b": "yarrow-5-polsia",
+      "cosine": 0.11828330868295014
+    },
+    {
+      "id": "P60",
+      "a": "veloxonhub",
+      "b": "arcaira",
+      "cosine": 0.7368504385837316
+    }
+  ],
+  "sourceCommit": "355c147e54d1ec288a125d18bb5494c2032bc675",
+  "sourcePath": "public/data/embeddings.bin"
+}

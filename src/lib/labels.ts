@@ -132,10 +132,10 @@ function profile(members: Traits[], world: Traits[]): Profile {
   }
   const lift = (pred: (trait: Traits) => boolean) => share(members, pred) - share(world, pred);
   const dark = lift((trait) => trait.mode === "dark");
-  const airy = lift((trait) => trait.density === "airy");
-  const packed = lift((trait) => trait.density === "packed");
-  const gradient = lift((trait) => trait.gradient);
-  const bento = lift((trait) => trait.bento);
+  const airy = 0; // Density inference is not reliable enough for public names.
+  const packed = 0;
+  const gradient = 0;
+  const bento = 0;
   const centered = lift((trait) => trait.centered);
   const neutral = lift((trait) => trait.dominantName === "neutral");
 
@@ -246,7 +246,7 @@ export function labelZones(groups: Traits[][]): { en: string; es: string }[] {
         break;
       }
     }
-    const pool = LANDFORMS[item.family];
+    const pool = [...LANDFORMS[item.family], ...Object.values(LANDFORMS).flat()];
     let land = pool[pool.length - 1];
     for (const candidate of pool) {
       if (!usedLands.has(candidate[0])) {

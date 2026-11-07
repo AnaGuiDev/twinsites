@@ -72,8 +72,8 @@ const COPY = {
     methodTitle: "How this was measured, and what it can't say",
     method: (r: Report["reliability"]) => [
       "Source: the public awesome-vibe-coded-apps list (CC0). Sites built with AI tools, not a random sample of the web.",
-      "One screenshot per site: the first 1440×900 screen, captured by headless Chrome. Anything below the fold is not measured.",
-      "Similarity comes from MobileCLIP-S0, an image model. Percentiles compare against every pair in the catalog: they measure likeness, not copying.",
+      "Original captures cover the first 1440×900 screen. The current FP16 catalog was re-encoded from the committed 420px desktop thumbnails, not the original captures.",
+      "Similarity uses MobileCLIP-S0 FP16 with two crops. Percentiles use 400,000 seeded catalog pairs: they measure relative likeness, not copying.",
       `The layout rules were checked against ${r.sample} random pages labelled one by one by eye, without seeing the detector's answer. Background: ${r.ground}% agreement. Centring: ${r.centred}% (right ${r.centredPrecision}% of the time when it says centred). The labelling was done by Claude, the AI that built this check, not by a panel of designers.`,
       `What we stopped claiming: spacing (${r.density}% agreement), gradient washes (a detected gradient was real ${Math.round(r.gradientPrecision / 10)} times in 10) and box grids. They are not in this report or in the diagnosis.`,
       "Text was read with Tesseract on small thumbnails. It misses small type and garbles some words.",
@@ -125,8 +125,8 @@ const COPY = {
     methodTitle: "Cómo se ha medido y qué no puede decir",
     method: (r: Report["reliability"]) => [
       "Fuente: la lista pública awesome-vibe-coded-apps (CC0). Webs hechas con herramientas de IA, no una muestra al azar de internet.",
-      "Una captura por web: la primera pantalla de 1440×900, tomada con Chrome sin interfaz. Lo que queda por debajo no se mide.",
-      "El parecido sale de MobileCLIP-S0, un modelo de imagen. Los percentiles comparan con todos los pares del catálogo: miden parecido, no copia.",
+      "Las capturas originales cubren la primera pantalla de 1440×900. El catálogo fp16 actual se ha recalculado con las miniaturas de escritorio de 420 px, no con las capturas originales.",
+      "El parecido usa MobileCLIP-S0 fp16 y dos recortes. Los percentiles usan 400.000 pares del catálogo con semilla fija: miden parecido relativo, no copia.",
       `Las reglas de maquetación se comprobaron con ${r.sample} webs al azar etiquetadas una a una a ojo, sin ver la respuesta del detector. Fondo: ${r.ground} % de coincidencia. Centrado: ${r.centred} % (acierta el ${r.centredPrecision} % de las veces que dice «centrado»). Etiquetó Claude, la IA que construyó esta comprobación, no un panel de diseñadores.`,
       `Lo que dejamos de afirmar: el espaciado (${r.density} % de coincidencia), los degradados (un degradado detectado era real ${Math.round(r.gradientPrecision / 10)} de cada 10 veces) y las retículas de cajas. No aparecen ni en este informe ni en el diagnóstico.`,
       "El texto se leyó con Tesseract sobre miniaturas pequeñas. Se le escapa la letra pequeña y lee mal algunas palabras.",
