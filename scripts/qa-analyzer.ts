@@ -108,6 +108,8 @@ async function snap(browser: Browser, file: string, out: string): Promise<void> 
 async function upload(page: Page, file: string): Promise<void> {
   await page.goto(`${BASE}/`, { waitUntil: "networkidle" });
   await page.setInputFiles("input[type=file]", file);
+  await page.locator(".capture-review input[type=checkbox]").check();
+  await page.locator(".capture-review .ticket").click();
   await page.locator(".diagnosis").waitFor({ timeout: 120_000 });
 }
 

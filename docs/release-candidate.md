@@ -42,7 +42,7 @@ The candidate makes fewer false-positive calls on this small curated set, but st
 - Browser: actual screenshot upload completed inference and displayed the diagnosis/action plan. Report annotations and original/proposed toggle inspected. Markdown report download completed. Method page displayed the real evaluation and pairs.
 - Responsive report and method at 390px simulated viewport (375px content width including scrollbar): no horizontal document overflow. Not a physical iPhone/Safari test.
 - Browser computation evidence is in `quality/model-encoding.json` and `quality/model-stability.json`. The graph SHA, vector SHA, dimensions, normalization and recipe agreement are covered by a product test.
-- The legacy `npm run qa` browser suite was **not run** in this environment. Its removed mosaic/14-to-0 homepage assertions were updated to the current specimen and fictional comparison; this is not a claim that the full suite passes. Production CSP browser smoke remains pending.
+- The legacy `npm run qa` browser suite was **not run** in this environment. Its removed mosaic/14-to-0 homepage assertions were updated to the current specimen and fictional comparison; this is not a claim that the full suite passes. The subsequent GitHub Actions run 42416574888 passed the production-CSP browser smoke at 1440px and 390px. Live-host verification remains pending.
 
 ![Report preview](release-report.jpg)
 
