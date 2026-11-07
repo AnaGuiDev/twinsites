@@ -1,0 +1,22 @@
+{
+  "schema": 2,
+  "releaseReady": false,
+  "technicalCandidateReady": true,
+  "reason": "FP16/two-crop catalog and exploratory AI-labeled evaluation completed. Independent human validation and physical mobile QA remain pending. Visual comparison is indicative.",
+  "model": "Xenova/mobileclip_s0",
+  "revision": "757d59c9c6870a76a4b0306f05f5061bca15c39f",
+  "visionDtype": "fp16",
+  "vectorStorage": "f16",
+  "modelSha256": "22b1d36ecc6837e8205aee05003440a25e1c1ee0c7e2945dbb9dd597211c59dc",
+  "recipe": "mobileclip-s0-fp16-two-crop-v1-thumbs-20261107",
+  "labelSource": "AI assistant visual inspection",
+  "pairCount": 60,
+  "humanLabelsVerified": false,
+  "catalogReencoded": true,
+  "catalogInput": "2003 committed desktop thumbnails, not original raw captures",
+  "percentilesRecalibrated": true,
+  "mapRebuilt": true,
+  "stabilityVerified": true,
+  "physicalMobileVerified": false,
+  "commercialProvidersVerified": false
+}

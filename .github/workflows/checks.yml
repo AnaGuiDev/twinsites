@@ -17,3 +17,17 @@ jobs:
       - run: npm ci
       - run: npm ci --prefix worker
       - run: npm run test:product && npm run test:worker && npm run typecheck:worker && npm run build
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run model:evaluate && git diff --exit-code -- quality/pairs/evaluation.json
+      - run: npm run build
+      - run: node --import tsx scripts/qa-release.ts

@@ -1,64 +1,88 @@
-# Twinsites Studio
+# Twinsites launch: free diagnosis and a paid human service
 
-The free product keeps the on-device visual twins, OCR, map, comparison and sharing. It adds an explainable `editorial-v1` Slop Score, category-by-category evidence, unknown checks, manual overrides, prioritized fixes, one implementation prompt per fix and a downloadable Markdown report. `/guide`, `/sample-audit` and `/services` explain the next steps in English and Spanish.
+This replaces the v1 proposal in #17. It is a concrete implementation for a commercial launch, not a promise that live payments have been activated. No production deploy, live charge, email or social post has been executed by this change.
 
-## What the score means
+## Product and offer
 
-Weights: likeness 30, centered hero 5, violet/blue gradient 10, three emoji cards 10, bento without hierarchy 10, decorative glass 5, serif italic 5, stock phrases 15, unsupported social proof 10. Total 100. Visual likeness is linear between pair-percentiles 80 and 100. OCR adds five points per distinct cliché, capped at 15. A manual review can override a finding. Unknowns are shown separately with coverage and the possible final range; they are never reported as passes.
+The homepage uses real catalog screenshots and the existing monochrome/yellow identity. The paid product is a human review, independent of the vision model: public URLs and a brief are enough to book. Default proposed price is **€89 inclusive of applicable tax for one page, €29 per additional page, up to three pages**. There is no subscription or demand pricing. Review this proposal as the seller before opening checkout; these amounts are not copied from the competitor.
 
-This is an editorial heuristic, **not** a validated AI-authorship detector or an expert quality rating. The existing screenshot gradient/bento/density rules failed reliability checks and are deliberately not used to assert those tropes. Those checks require a person. A screenshot cannot establish fabricated testimonials or logo permissions. The sample report is clearly fictional; there is no invented customer video.
+Scope: recorded walkthrough, prioritized report, three main changes with implementation prompts, and a human follow-up 30 days after delivery. Implementation and Figma are not included. Redesign is separately scoped and quoted; a matching non-refunded audit can be credited once. Default capacity is two audit bookings per UTC calendar week. No invented clients, testimonials, videos, conversion uplift or fake scarcity are shown. The old 14→0 marketing claim is removed from the home; the fictional before/after is presented as a visual example rather than a calibrated performance promise.
 
-## Offer and fulfillment
+Delivery is five weekdays from the agreed start, counted as 120 weekday hours in UTC, Monday–Friday without excluding holidays. Without an early-start request, the server waits 14 calendar days from confirmed payment before starting consumer work. The independent early-start checkbox explains proportional work and full-performance conditions. This choice, seller snapshot and version `twinsites-services-v2` are stored with the order. Cancellation can be requested from the private order page; receipt is acknowledged, and a human determines the applicable refund. A request is not falsely marked as a completed refund.
 
-Audit: $30 USD + $10 per extra public page, 1–10 pages. Optional demand pricing uses the number of **paid audit orders awaiting delivery**: 0–1 gives $20, 2–4 gives $30, 5+ gives $40. Extras stay $10. The server owns pricing and rejects stale client quotes. Prices are fixed once checkout starts.
+## Two separate results
 
-Audit delivery: 72 weekday hours from verified payment, with all public URLs supplied at checkout. Weekdays run all 24 hours Monday–Friday in UTC; there is no holiday calendar. Includes a video recorded by the reviewer, a prioritized report with individual prompts, and a human measurement 30 calendar days after delivery. Under five useful changes entitles the customer to request a refund while keeping the video. No Figma, implementation, logged-in page or app work is included in the audit.
+Visual twins remain an indicative catalog comparison, with a visible calibration notice until `quality/model-release.json` is supported by actual evidence. The current technical candidate ships an FP16/two-crop model and a catalog rebuilt from 2,003 committed desktop thumbnails. Its 60 unique pair labels are AI annotations, not human validation. Independent review and physical mobile testing remain pending; see [the current release evidence](release-candidate.md). The earlier q8 implementation described in PR #18 has been superseded in this candidate.
 
-Redesign: a quote request, then a manually agreed $1,000–$10,000 scope. A matching customer's non-refunded audit payment can be credited once. An audit credit is reserved when a quote is issued; cancel the unpaid quote to release it. A credited audit cannot be refunded separately until that quote is cancelled. Redesign delivery follows its agreed scope, not the audit's 72-hour deadline. Review taxes, business identity, consumer terms and operational capacity for your actual market before opening sales; the code does not calculate tax or invent a company identity.
+`editorial-v2` does **not** turn similarity or a centered hero into slop points. It scores reviewed editorial signals: purple/blue decoration 15, emoji cards 15, bento without hierarchy 15, glass 10, serif italic 10, clichés 20 and unsupported social proof 15. Only OCR contributes automatically; the other checks require review because the existing image rules failed reliability checks. Unknowns never pass silently. Below 80% weighted coverage the headline and export say Partial and suppress the overall number. That threshold is a display policy, not scientific validation. The diagnosis is never sold as proof of AI authorship or quality.
 
-## Configure (sales are closed by default)
+## Public identity and legal activation
 
-1. Install Worker dependencies: `npm ci --prefix worker`.
-2. Review the existing Cloudflare account/KV configuration. Deploy the Worker with its new SQLite Durable Object `AuditService` migration in `worker/wrangler.toml`. This is independent of the static-site deployment. Do not point a test deployment at production storage.
-3. Set Worker secrets through Wrangler, never in source: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `SERVICES_ADMIN_TOKEN` (at least 32 random characters), `RESEND_API_KEY`. Set `SERVICE_CONTACT` to the responsible studio email and `SERVICE_FROM` to an address on a verified Resend sending domain. Use Stripe **test mode** first.
-4. Configure Stripe webhooks at `https://<worker>/services/webhook`, subscribing to `checkout.session.completed` and `checkout.session.async_payment_succeeded`. Events must use the signing secret for that endpoint. An order is paid only after a valid signed event with matching session, USD amount and `paid` status. Card-only Checkout avoids unresolved delayed-payment flows. Returning to `/order` does not imply payment.
-5. Build the frontend with `VITE_SERVICES_ENDPOINT=https://<worker>` (or reuse `VITE_SHOT_ENDPOINT`). The nginx CSP must permit that exact origin in `connect-src`; the default Worker origin already does. No Stripe JS or embedded payment iframe is needed. Stripe-hosted checkout handles card data.
-6. Verify checkout, signed events, mail, operator handoff, delivery, refund and recheck in test mode. Then set `SERVICES_ENABLED=1`. Set `SERVICES_DYNAMIC_PRICE=1` only if you want demand pricing. Missing credentials keep both booking forms closed.
-7. Optional marketing: set frontend `VITE_FEEDBACK_X_HANDLE` to your own studio handle. The public feedback CTA prepares a post in X; the visitor reviews and submits it. No posts or replies are sent automatically, and there is no guarantee of free review or a response time.
+Brand, footer and presentation remain Twinsites / Ana Gui. No real personal identity is filled in from chat memory. Public seller fields are returned only when `SELLER_PUBLICATION_APPROVED=1` and complete data are configured. They are deliberately empty here. The legal notice, terms, withdrawal information/model notice and privacy pages use this approved configuration. While missing, they say booking is unavailable and do not impersonate a legal entity.
 
-`/services/offer` returns the current authoritative offer. `/services/orders` creates an order with a client-generated UUID for retries. Audit checkout goes to Stripe; redesign requests are free. Three new orders per IP/hour and 100/day are enforced by the serialized Durable Object. Raw IPs are not stored. They are hashed with an hourly salt derived from the admin secret; counters are pruned after two hours.
+To activate the same build from launch day, the owner must configure and verify:
 
-## Operate
+- `SERVICE_CONTACT`, `SERVICE_FROM` and a responsible human operator; set `SERVICE_OPERATOR_CONFIRMED=1` after confirming the actual service capacity.
+- Seller-controlled `SELLER_LEGAL_NAME`, `SELLER_TAX_ID`, `SELLER_ADDRESS`, `SELLER_COUNTRY`. The owner must decide who contracts and invoices, approve publication, and review the public surfaces before setting `SELLER_PUBLICATION_APPROVED=1`.
+- Review the terms/privacy against the actual business, consumer market, service providers and obligations. `SERVICE_LEGAL_REVIEWED=1` is an owner attestation, not a substitute for legal advice or a certification produced by code.
+- Stripe live/test credentials and webhook secret; configure Stripe Tax registrations, tax category, account legal details, terms and privacy URLs, and billing/invoice requirements for the actual seller. Set `SERVICE_TAX_CONFIGURED=1` only after testing the actual tax cases. Stripe invoices do not by themselves prove Spanish fiscal/VeriFactu compliance.
+- Configure Resend and a verified sender domain. Set `SERVICES_ENABLED=1` only after the deployed test flow works. There is no hidden beta flag or need to alter source to open sales.
 
-Set `SERVICES_ENDPOINT` and `SERVICES_ADMIN_TOKEN` in your operator shell. `node scripts/studio.mjs` lists orders and the email outbox. A JSON file argument submits one action. **The refund action issues a real refund when live credentials are configured.** The CLI never asks for or prints the admin secret.
+All of these default off in `worker/wrangler.toml`. Secrets: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `SERVICES_ADMIN_TOKEN` (32+ random characters), `RESEND_API_KEY`. Optional price/capacity configuration: `SERVICE_PRICE_EUR`, `SERVICE_EXTRA_EUR`, `SERVICE_WEEKLY_CAPACITY`.
 
-Deliver an audit after you have recorded and uploaded the actual video and report:
+## Hosting and Stripe
+
+Frontend: `VITE_SERVICES_ENDPOINT` (or existing `VITE_SHOT_ENDPOINT`) points at the Worker. Permit that exact origin in the production nginx CSP `connect-src`; the existing default Worker origin is already listed. New routes need the same SPA fallback as existing routes. Build-time legal stubs supply page metadata; runtime legal identity is loaded from the Worker. `/studio` and `/order` receive noindex metadata at runtime and contain no baked-in secrets.
+
+The static main-only deploy does not deploy the Worker. Deploy its existing `AuditService` SQLite Durable Object migration separately in the correct Cloudflare account, using isolated test storage before production. Do not use production storage for a test deployment.
+
+Stripe Checkout uses EUR, inclusive tax behavior, automatic tax, billing address and tax-ID collection, paid-invoice creation and required terms acceptance. Card details stay on Stripe. Register these webhooks:
+
+- `checkout.session.completed` and `checkout.session.async_payment_succeeded`: verify raw-body signature, order/session/currency/amount and paid status, then atomically record payment and notification outbox.
+- `checkout.session.expired`: release a pending slot only after the signed provider event. A local timeout never assumes a reservation is safe to release. Abandoned sessions use Stripe's default expiry. Monitor webhook delivery; missing expiry events can conservatively hold slots.
+- `invoice.paid`: attach the matching hosted invoice to the private order page. Invoice events never independently mark an order paid.
+
+The server owns the price and capacity. Concurrent reservations serialize in the Durable Object, including pending Checkout sessions. A refund before delivery releases the booking; delivered work still counts against capacity. Persistent request UUIDs and stable Stripe idempotency keys avoid duplicate sessions on retry; parameters, including any expiry setting, must remain stable across retries. Taxes causing a final amount that differs from the recorded all-in quote fail closed for reconciliation rather than silently fulfilling an unmatched price.
+
+## Operator workflow
+
+`/studio` is an authenticated work desk: load the agenda, inspect briefs/due dates/cancellation requests, register real video and report URLs and deliver the follow-up. The operator bearer credential stays in component memory, never in local storage, URLs or Vite variables. Sign out clears loaded customer data. Do not put customer reports at guessable public URLs without considering their access requirements.
+
+For quotes, refunds and email recovery, use `node scripts/studio.mjs` with `SERVICES_ENDPOINT` and `SERVICES_ADMIN_TOKEN` in the operator shell. No argument prints or embeds the secret. A JSON file argument performs an action. **With live credentials, refund issues a real full refund.** Example bodies:
 
 ```json
-{"id":"ORDER_UUID","action":"deliver","videoUrl":"https://your-video-host.example/review","reportUrl":"https://your-report-host.example/report-with-prompts","usefulChanges":5}
+{"id":"ORDER_UUID","action":"deliver","videoUrl":"https://your-host.example/private-video","reportUrl":"https://your-host.example/private-report","usefulChanges":3}
 ```
-
-Upload the new measurement and complete the 30-day follow-up:
 
 ```json
-{"id":"ORDER_UUID","action":"recheck","recheckUrl":"https://your-report-host.example/new-measurement"}
+{"id":"ORDER_UUID","action":"recheck","recheckUrl":"https://your-host.example/private-follow-up"}
 ```
-
-Issue an agreed redesign quote (gross USD integer; optional audit credit):
 
 ```json
-{"id":"REDESIGN_ORDER_UUID","action":"quote","gross":2000,"auditId":"AUDIT_ORDER_UUID"}
+{"id":"REDESIGN_UUID","action":"quote","gross":2000,"auditId":"AUDIT_UUID"}
 ```
 
-Other actions: `cancel-quote` expires the unpaid Stripe session before releasing its audit credit; `retry-checkout` recovers a provider timeout without issuing another order; `complete-redesign` requires `reportUrl` with the project handoff; `refund` issues a full Stripe refund for a paid order and preserves delivered video/report links. Never mark a manual dashboard refund as fulfilled without reconciling the application record: this version expects refunds through the operator endpoint. Failed/pending refunds remain visible for manual reconciliation rather than being falsely marked refunded.
+Other supported actions: `complete-redesign` with `reportUrl`, `cancel-quote` (expires the unpaid session before releasing credit), `retry-checkout`, `refund`, and `retry-mail` using its full `mail:...` outbox key. Confirm provider outcomes before manually retrying exhausted mail. Dashboard refunds outside this endpoint still require application reconciliation; that limitation is explicit, not evidence of a completed refund integration.
 
-Orders, accepted terms and delivery references persist for 400 days. Private status links carry a random 256-bit bearer token in the fragment (not in the request URL or referrer). Anyone with the link can view status and deliverables, but cannot list customers or operate the service. Keep uploaded report/video links private and use an appropriate host. The operator endpoint lists customer data and requires the admin secret.
+The outbox uses Resend idempotency keys and ten hourly attempts, then remains visible to the operator. The hourly Durable Object alarm notifies the operator when follow-up is due. A human does the review. Operational records are removed after 400 days; fiscal retention in billing systems follows the actual seller's obligations. The order bearer is held in the fragment and session storage for recovery, not query strings. Never share an order link publicly.
 
-Emails use a persistent outbox, stable provider idempotency keys and up to ten hourly attempts. Inspect the outbox for exhausted messages; after reconciling provider delivery, the authenticated `retry-mail` action with the full `mail:...` record ID can requeue one message. the code does not claim delivery merely because it was queued. An hourly Durable Object alarm notifies the operator when a recheck is due; **a human still performs and delivers the new measurement**. No fake video or auto-generated human review is sold. Resend retains idempotency keys for a limited period; ambiguous provider outcomes need operator reconciliation.
+## Research and legal basis
 
-## Validation
+The browser review on 7 November 2026 reached Anti Web Slop's home, legal page, sample report and first audit form step after text retrieval failed. No form was submitted or payment tested. Findings and verified page URLs are recorded in [the direct competitor review](anti-web-slop-review.md). The review found additional automated products in the legal page; these are not evidence that Twinsites should sell an insufficiently covered automated score. No competitor copy or visual assets were imported.
 
-`npm run test:product`, `npm run test:worker`, `npm run typecheck:worker`, `npm run build`. Tests use fake Stripe/Resend responses and memory storage, never live charges or emails. The PR workflow runs these checks; the existing static deploy remains main-only. Browser checks should verify home → sample → services, score overrides, individual prompts, the closed-booking state and mobile layout. Full integration also requires a Cloudflare/Stripe test deployment.
+Primary references used to design the interfaces (not a legal opinion):
 
+- [Spanish consumer withdrawal rules, especially articles 102, 103 and 108](https://www.boe.es/buscar/act.php?id=BOE-A-2007-20555).
+- [LSSI seller information](https://lssi.digital.gob.es/lssi/empresas).
+- [AEAT invoice contents](https://sede.agenciatributaria.gob.es/Sede/iva/facturacion-registro/facturacion-iva/contenido-facturas.html).
+- [Stripe account setup and public business information](https://docs.stripe.com/get-started/account/set-up).
+- [Stripe receipts and invoices](https://docs.stripe.com/receipts).
+- [Stripe Checkout Sessions create API](https://docs.stripe.com/api/checkout/sessions/create).
 
-Implementation validation: production frontend build, frontend and Worker TypeScript checks, 43 unit/integration tests across product and Worker, and Wrangler Worker bundle dry-run. Browser inspection verified the existing catalog result alongside Slop Score, a manual signal changing 28→38 with coverage 35→45%, the individual prompt, fictional sample report and closed booking state. Live Stripe/Resend/Cloudflare integration and mobile browser QA remain activation checks; no real payments, emails, posts or production deployments were performed.
+## Verification and what remains external
+
+Run `npm run test:product`, `npm run test:worker`, `npm run typecheck:worker`, `npm run build` and Wrangler `deploy --dry-run` with the Worker config. Unit/integration tests use memory storage and provider mocks; no charge or email is sent. Browser QA covers desktop home, bilingual service offer, totals, partial diagnosis and legal routes. Native mobile QA and a deployed Stripe/Cloudflare/Resend test purchase remain external activation checks. Test tax-inclusive B2C, applicable B2B/exempt cases, duplicate events, expiry, actual delivery, cancellation and refund before switching to live credentials.
+
+The product code is prepared for a paid human launch independently of the model. It has **not** been enabled for actual sales: seller identity/publication, legal/tax configuration, credentials and external end-to-end testing are still required. Model calibration remains a separate prerequisite to any claim that the automated visual comparison is validated.
+
+Recorded local results for this launch change: 49 tests passed (5 product + 44 Worker), frontend and Worker TypeScript checks passed, production build passed and Wrangler bundle dry-run passed. Browser checks verified EN/ES home and services, 1→3 page selection (€89→€147), disabled checkout without seller setup, the withdrawal route and a catalog result with visual twins plus an unscored Partial diagnosis. Screenshot: [desktop home](launch-home.png). No native mobile or deployed-provider result is claimed.

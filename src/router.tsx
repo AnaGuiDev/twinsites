@@ -8,12 +8,17 @@ export type Route =
   | { name: "privacy" }
   | { name: "faq" }
   | { name: "report" }
-  | { name: "services" | "guide" | "sample-audit" | "order" };
+  | { name: "method" | "services" | "guide" | "sample-audit" | "order" | "legal" | "terms" | "withdrawal" | "studio" };
 
 export function parseRoute(pathname: string): Route {
   let decoded: string;
   try { decoded = decodeURIComponent(pathname); } catch { return { name: "home" }; }
   const path = decoded.replace(/\/+$/, "") || "/";
+  if (path === "/method") return { name: "method" };
+  if (path === "/legal") return { name: "legal" };
+  if (path === "/terms") return { name: "terms" };
+  if (path === "/withdrawal") return { name: "withdrawal" };
+  if (path === "/studio") return { name: "studio" };
   if (path === "/services") return { name: "services" };
   if (path === "/guide") return { name: "guide" };
   if (path === "/sample-audit") return { name: "sample-audit" };

@@ -1,0 +1,614 @@
+{
+  "schema": 1,
+  "selectionModel": "q8-center-crop",
+  "note": "Curated exploratory set. AI visual labels assigned from screenshots without FP16 scores. Q8-seeded selection enriched with visual challenges; not a prevalence sample. Site-disjoint development/test, but sites may recur inside a split. Duplicate review restored seeded P16 and P34 after the original evaluation was known; these replacement labels were assigned from images before calculating their scores. The corrected test is exploratory and is not a new untouched holdout.",
+  "pairs": [
+    {
+      "id": "P01",
+      "split": "development",
+      "a": "formchat-lovable",
+      "b": "popjam",
+      "selection": "curated-from-blind-contact-sheets",
+      "label": 2,
+      "reason": "Hero claro en dos columnas; titular a la izquierda y panel de producto a la derecha con acciones debajo.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P02",
+      "split": "development",
+      "a": "ruanzhu",
+      "b": "lacoparentalite-fr",
+      "selection": "curated-from-blind-contact-sheets",
+      "label": 2,
+      "reason": "Dos columnas sobre fondo claro lavanda; bloque de texto y panel de producto ocupan posiciones equivalentes.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P03",
+      "split": "development",
+      "a": "crispforms",
+      "b": "roumy",
+      "selection": "curated-from-blind-contact-sheets",
+      "label": 2,
+      "reason": "Hero claro centrado, titular negro y acciones debajo; panel ancho en la mitad inferior.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P04",
+      "split": "development",
+      "a": "docs",
+      "b": "prmptree",
+      "selection": "curated-from-blind-contact-sheets",
+      "label": 2,
+      "reason": "Fondo casi negro, titular centrado estrecho y botón destacado con amplio espacio negativo.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P05",
+      "split": "development",
+      "a": "offer-genius-bot-lovable",
+      "b": "izeo",
+      "selection": "curated-from-blind-contact-sheets",
+      "label": 1,
+      "reason": "Hero oscuro centrado y acento verde; difieren tipografía, densidad y módulos inferiores.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P06",
+      "split": "development",
+      "a": "rankparse",
+      "b": "qwen-image-edit",
+      "selection": "curated-from-blind-contact-sheets",
+      "label": 1,
+      "reason": "Titular centrado sobre interfaz inferior; difieren color, proporciones y densidad del formulario.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P07",
+      "split": "development",
+      "a": "crispforms",
+      "b": "cliffcheck",
+      "selection": "q8-neighbor",
+      "label": 0,
+      "reason": "Landing centrada con demostración frente a calculadora con controles laterales y gráfico.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P08",
+      "split": "development",
+      "a": "docs",
+      "b": "wmhub",
+      "selection": "q8-neighbor",
+      "label": 1,
+      "reason": "Coinciden en base oscura y encabezado centrado; uno presenta vídeo y otro interfaz de generación con fondo pictórico.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P09",
+      "split": "development",
+      "a": "exact-capture-screen-83-lovable",
+      "b": "supplementdex",
+      "selection": "q8-neighbor",
+      "label": 0,
+      "reason": "Galería de dibujos sobre gradiente frente a hero blanco con diagrama de puntos.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P10",
+      "split": "development",
+      "a": "formchat-lovable",
+      "b": "ruanzhu",
+      "selection": "q8-neighbor",
+      "label": 2,
+      "reason": "Hero claro de dos columnas con titular izquierdo, interfaz derecha y botones próximos.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P11",
+      "split": "development",
+      "a": "getquality-md",
+      "b": "fundingcompass-hub-lovable",
+      "selection": "q8-rank26",
+      "label": 1,
+      "reason": "Contenido centrado y fondo claro; el documento largo difiere del buscador con banda azul y métricas.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P12",
+      "split": "development",
+      "a": "gutsafe-educhange",
+      "b": "chats-llm",
+      "selection": "q8-rank26",
+      "label": 1,
+      "reason": "Dos herramientas oscuras con paneles; composición y proporciones de las tarjetas distintas.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P13",
+      "split": "development",
+      "a": "hustlnaija-lovable",
+      "b": "moover-lovable",
+      "selection": "q8-rank26",
+      "label": 0,
+      "reason": "Interfaz estrecha vertical frente a landing amplia de dos columnas con fotografía.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P14",
+      "split": "development",
+      "a": "izeo",
+      "b": "taxi-haiti-app-lovable",
+      "selection": "q8-rank26",
+      "label": 0,
+      "reason": "Hero oscuro centrado frente a texto lateral sobre fotografía azul.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P15",
+      "split": "development",
+      "a": "lacoparentalite-fr",
+      "b": "popjam",
+      "selection": "q8-rank26",
+      "label": 2,
+      "reason": "Dos columnas claras, titular izquierdo y maqueta derecha; acciones y navegación en posiciones similares.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P16",
+      "split": "development",
+      "a": "ltxvideo",
+      "b": "arx0n",
+      "selection": "restored-original-seeded-pair-after-duplicate-review",
+      "label": 0,
+      "reason": "La captura de LTX muestra navegación sobre un área oscura casi vacía, posiblemente incompleta; Axon muestra un hero crema con texto a la izquierda y una ilustración circular a la derecha. La composición visible es distinta; no se evalúa contenido que no aparece.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P17",
+      "split": "development",
+      "a": "meshy",
+      "b": "aiimgeditor-org",
+      "selection": "q8-rank26",
+      "label": 1,
+      "reason": "Titular central y acentos de gradiente; formulario visible frente a botón y testimonios.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P18",
+      "split": "development",
+      "a": "mysorbet",
+      "b": "tryaeos",
+      "selection": "q8-rank26",
+      "label": 0,
+      "reason": "Fotografía de portátil y texto lateral frente a paisaje ilustrado y bloque central.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P19",
+      "split": "development",
+      "a": "offer-genius-bot-lovable",
+      "b": "musci",
+      "selection": "q8-rank26",
+      "label": 1,
+      "reason": "Fondo oscuro y cabecera centrada; hero tipográfico frente a formulario largo de generación.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P20",
+      "split": "development",
+      "a": "paperclaw-org",
+      "b": "seoperseo",
+      "selection": "q8-rank26",
+      "label": 0,
+      "reason": "Herramienta con formulario en dos columnas frente a landing con titular lateral y panel de producto.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P21",
+      "split": "development",
+      "a": "pixi-spell-fun-lovable",
+      "b": "image25sunburst",
+      "selection": "seeded-control",
+      "label": 0,
+      "reason": "Actividad educativa con ilustración frente a generador de imágenes con panel de control.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P22",
+      "split": "development",
+      "a": "prmptree",
+      "b": "lixrl",
+      "selection": "seeded-control",
+      "label": 0,
+      "reason": "Hero oscuro centrado frente a hero blanco lateral con ilustración.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P23",
+      "split": "development",
+      "a": "rankparse",
+      "b": "namespyai",
+      "selection": "seeded-control",
+      "label": 1,
+      "reason": "Estructura centrada con herramienta debajo; paleta, tipografía y proporciones diferentes.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P24",
+      "split": "development",
+      "a": "roumy",
+      "b": "petprofessionals",
+      "selection": "seeded-control",
+      "label": 1,
+      "reason": "Hero claro centrado y bloque inferior; tipo serif, imagen y distribución inferior diferentes.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P25",
+      "split": "development",
+      "a": "seedance2-today",
+      "b": "qwen-image-edit",
+      "selection": "seeded-control",
+      "label": 1,
+      "reason": "Titular centrado y herramienta inferior; fondo oscuro fotográfico frente a blanco con formulario.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P26",
+      "split": "development",
+      "a": "smartlyq",
+      "b": "sendroq",
+      "selection": "seeded-control",
+      "label": 1,
+      "reason": "Base oscura y contenido de producto; maqueta lateral frente a captura ancha bajo el titular.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P27",
+      "split": "development",
+      "a": "stats-daily-dashboard-lovable",
+      "b": "swap-smile-corner-lovable",
+      "selection": "seeded-control",
+      "label": 0,
+      "reason": "Hero oscuro centrado frente a composición clara lateral con tarjeta.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P28",
+      "split": "development",
+      "a": "teacher-match-pro-lovable",
+      "b": "vayovideo-com",
+      "selection": "seeded-control",
+      "label": 0,
+      "reason": "Hero claro con fotografía familiar frente a herramienta oscura de generación con galería.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P29",
+      "split": "development",
+      "a": "treino-redacao-smart-lovable",
+      "b": "xtokenchecker",
+      "selection": "seeded-control",
+      "label": 0,
+      "reason": "Landing de dos columnas lavanda frente a comparador tabular sobre blanco.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P30",
+      "split": "development",
+      "a": "veelapp",
+      "b": "appiconkitchen",
+      "selection": "seeded-control",
+      "label": 0,
+      "reason": "Hero centrado con cuatro tarjetas frente a hero lateral con mosaico de iconos.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P31",
+      "split": "test",
+      "a": "cancelshut",
+      "b": "serafind",
+      "selection": "curated-from-blind-contact-sheets",
+      "label": 2,
+      "reason": "Titular centrado negro sobre fondo blanco, navegación fina, botón azul y espacio abierto.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P32",
+      "split": "test",
+      "a": "resumely-live",
+      "b": "veloxonhub",
+      "selection": "curated-from-blind-contact-sheets",
+      "label": 2,
+      "reason": "Hero claro de dos columnas, titular negro con acento violeta y panel de producto a la derecha.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P33",
+      "split": "test",
+      "a": "amy-aryam",
+      "b": "staxinvesting",
+      "selection": "curated-from-blind-contact-sheets",
+      "label": 2,
+      "reason": "Hero oscuro centrado con titular serif, acento cálido y botón naranja; navegación y ritmo similares.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P34",
+      "split": "test",
+      "a": "bmprun",
+      "b": "naborra-com",
+      "selection": "restored-original-seeded-pair-after-duplicate-review",
+      "label": 0,
+      "reason": "BMP centra titular y llamada a la acción sobre un fondo claro con puntos; Naborra divide el hero entre buscador a la izquierda y fotografía de comida a la derecha. Comparten fondo claro, pero la composición visible es distinta.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P35",
+      "split": "test",
+      "a": "cancelshut",
+      "b": "circlemate",
+      "selection": "q8-neighbor",
+      "label": 1,
+      "reason": "Paleta blanca y tipografía negra compartidas; centrado frente a dos columnas con panel.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P36",
+      "split": "test",
+      "a": "clipin-ai",
+      "b": "amy-aryam",
+      "selection": "q8-neighbor",
+      "label": 1,
+      "reason": "Fondo oscuro y acento naranja compartidos; galería frente a hero serif sin imágenes.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P37",
+      "split": "test",
+      "a": "cronloop",
+      "b": "ohshitscenario-lovable",
+      "selection": "q8-neighbor",
+      "label": 1,
+      "reason": "Hero oscuro con acciones y contenido debajo; centrado frente a lateral y tipografía condensada.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P38",
+      "split": "test",
+      "a": "hypocrisydetector",
+      "b": "aiforasmr",
+      "selection": "curated-from-blind-contact-sheets",
+      "label": 1,
+      "reason": "Fondo fotográfico oscuro y titular centrado; escala, ubicación del texto y controles diferentes.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P39",
+      "split": "test",
+      "a": "examcoach-lovable",
+      "b": "maakann-lovable",
+      "selection": "q8-neighbor",
+      "label": 0,
+      "reason": "Landing con hero y tarjetas frente a listado inmobiliario con mapa.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P40",
+      "split": "test",
+      "a": "jammyjar",
+      "b": "arcaira",
+      "selection": "curated-from-blind-contact-sheets",
+      "label": 1,
+      "reason": "Composiciones oscuras divididas con imagen y texto; lados intercambiados y finalidades distintas.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P41",
+      "split": "test",
+      "a": "getredpen-cn",
+      "b": "glowenai-lovable",
+      "selection": "q8-rank26",
+      "label": 0,
+      "reason": "Interfaz estrecha editorial frente a landing amplia con gráfico circular.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P42",
+      "split": "test",
+      "a": "h3-max",
+      "b": "attractivenessscale",
+      "selection": "q8-rank26",
+      "label": 1,
+      "reason": "Titulares centrados sobre fondo claro y rosa; formulario técnico frente a subida de foto.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P43",
+      "split": "test",
+      "a": "hypocrisydetector",
+      "b": "thepaintedladytarot",
+      "selection": "q8-rank26",
+      "label": 1,
+      "reason": "Cabecera central sobre fondo oscuro; fotografía humana frente a ilustración astral.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P44",
+      "split": "test",
+      "a": "jammyjar",
+      "b": "unabyss",
+      "selection": "q8-rank26",
+      "label": 0,
+      "reason": "Hero dividido con collage frente a composición centrada sin imagen dominante.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P45",
+      "split": "test",
+      "a": "lagoshustler-lovable",
+      "b": "picture-solve-ace-lovable",
+      "selection": "q8-rank26",
+      "label": 0,
+      "reason": "Fotografía urbana oscura y titular lateral frente a herramienta crema casi vacía.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P46",
+      "split": "test",
+      "a": "lucer-art",
+      "b": "aiforasmr",
+      "selection": "q8-rank26",
+      "label": 0,
+      "reason": "Aplicación con barra lateral y tarjetas frente a hero fotográfico inmersivo.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P47",
+      "split": "test",
+      "a": "metavoice",
+      "b": "heuron-news",
+      "selection": "q8-rank26",
+      "label": 0,
+      "reason": "Hero blanco centrado frente a aplicación con barra lateral e interfaz vacía.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P48",
+      "split": "test",
+      "a": "mystic-star-quest-lovable",
+      "b": "element-explore-3d-lovable",
+      "selection": "q8-rank26",
+      "label": 0,
+      "reason": "Hero astral con tarjetas pequeñas frente a ilustración grande de personajes metálicos.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P49",
+      "split": "test",
+      "a": "offergenius-lovable",
+      "b": "chaosbench",
+      "selection": "q8-rank26",
+      "label": 0,
+      "reason": "Lista de pasos pixelada centrada frente a hero lateral con grafo técnico.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P50",
+      "split": "test",
+      "a": "paperfox",
+      "b": "fancanon",
+      "selection": "q8-rank26",
+      "label": 0,
+      "reason": "Landing centrada con producto debajo frente a portal con barra lateral y contenido listado.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P51",
+      "split": "test",
+      "a": "pixoate",
+      "b": "imgveo",
+      "selection": "seeded-control",
+      "label": 0,
+      "reason": "Hero blanco dividido con foto frente a herramienta oscura centrada.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P52",
+      "split": "test",
+      "a": "pro-studio-solutions-lovable",
+      "b": "loerei-github",
+      "selection": "seeded-control",
+      "label": 0,
+      "reason": "Hero claro dividido con fotografía frente a hero negro centrado sin imagen dominante.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P53",
+      "split": "test",
+      "a": "rankworker",
+      "b": "nanobanana2lite",
+      "selection": "seeded-control",
+      "label": 0,
+      "reason": "Hero blanco lateral con lista frente a herramienta oscura con mosaico de imágenes.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P54",
+      "split": "test",
+      "a": "route2roster",
+      "b": "physics-ai-solver-step-by-step-problem-assistant",
+      "selection": "seeded-control",
+      "label": 0,
+      "reason": "Fotografía deportiva oscura frente a herramienta blanca con formulario central.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P55",
+      "split": "test",
+      "a": "seedance2",
+      "b": "railway",
+      "selection": "seeded-control",
+      "label": 1,
+      "reason": "Hero oscuro centrado y panel debajo; sidebar y mosaicos frente a escena ilustrada.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P56",
+      "split": "test",
+      "a": "smashpdf-online",
+      "b": "serafind",
+      "selection": "seeded-control",
+      "label": 2,
+      "reason": "Hero blanco centrado, acento azul, navegación fina y control principal ancho debajo.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P57",
+      "split": "test",
+      "a": "staxinvesting",
+      "b": "synexa",
+      "selection": "seeded-control",
+      "label": 0,
+      "reason": "Hero oscuro serif centrado frente a titular sans lateral y bloque de código.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P58",
+      "split": "test",
+      "a": "teacherplanner",
+      "b": "vedicastrologychart",
+      "selection": "seeded-control",
+      "label": 0,
+      "reason": "Hero lavanda con titular y maqueta frente a formulario editorial crema.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P59",
+      "split": "test",
+      "a": "trek-triumphant-lovable",
+      "b": "yarrow-5-polsia",
+      "selection": "seeded-control",
+      "label": 0,
+      "reason": "Planificador estrecho sobre crema frente a hero fotográfico de ancho completo.",
+      "annotator": "AI assistant; not human review"
+    },
+    {
+      "id": "P60",
+      "split": "test",
+      "a": "veloxonhub",
+      "b": "arcaira",
+      "selection": "seeded-control",
+      "label": 0,
+      "reason": "Hero blanco dividido con panel azul frente a pantalla negra con personaje y acceso.",
+      "annotator": "AI assistant; not human review"
+    }
+  ],
+  "rubric": {
+    "0": "Distinct composition",
+    "1": "Partial resemblance, not a strong twin",
+    "2": "Strong resemblance in hierarchy, composition and visual treatment"
+  },
+  "humanLabelsVerified": false,
+  "revision": "deduplicated-2026-11-07"
+}

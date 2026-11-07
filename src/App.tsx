@@ -1,8 +1,12 @@
+import { MethodPage } from "./components/MethodPage";
+import { AuditReport } from "./components/AuditReport";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { GuidePage, OrderPage, ServiceLadder, ServicesPage, TropeCatalog } from "./components/Services";
 import { DropZone } from "./components/DropZone";
 import { Faq } from "./components/Faq";
-import { Mosaic } from "./components/Mosaic";
+import { LaunchSpecimen } from "./components/LaunchSpecimen";
+import { LegalPage } from "./components/LegalPages";
+import { StudioConsole } from "./components/StudioConsole";
 import { ZoneIndex } from "./components/ZoneIndex";
 import { PrivacyView } from "./components/PrivacyView";
 import { ResultView } from "./components/ResultView";
@@ -81,14 +85,14 @@ export function App() {
   }, []);
 
   useEffect(() => {
-    if (deferHeavyLoad()) return;
+    if (!["home", "site"].includes(route.name) || deferHeavyLoad()) return;
     const idle = window.requestIdleCallback?.(warm, { timeout: 1200 });
     const timer = idle === undefined ? window.setTimeout(warm, 500) : undefined;
     return () => {
       if (idle !== undefined) window.cancelIdleCallback(idle);
       if (timer !== undefined) window.clearTimeout(timer);
     };
-  }, [warm]);
+  }, [warm, route.name]);
 
   useEffect(() => {
     window.addEventListener("dragenter", warm);
@@ -301,9 +305,13 @@ export function App() {
       </header>
 
       <main>
+        {stage && <div className="analysis-controls" role="status"><span>{stageCopy[stage]} · {shown}%</span><button type="button" className="text-link" onClick={()=>{uploadRun.current++;setStage(null);setProgress(null);}}>{lang === "es" ? "Cancelar esta comparación" : "Cancel this comparison"}</button></div>}
+        {(route.name === "legal" || route.name === "terms" || route.name === "withdrawal") && <LegalPage page={route.name} />}
+        {route.name === "method" && <MethodPage />}
+        {route.name === "studio" && <StudioConsole />}
         {route.name === "services" && <ServicesPage />}
         {route.name === "guide" && <GuidePage />}
-        {route.name === "sample-audit" && <GuidePage sample />}
+        {route.name === "sample-audit" && <AuditReport />}
         {route.name === "order" && <OrderPage />}
         {route.name === "privacy" && <PrivacyView />}
         {route.name === "faq" && <Faq page />}
@@ -316,16 +324,10 @@ export function App() {
         {route.name === "site" && !catalog && <p className="score-note">{catalogNote ?? t.loadingCatalog}</p>}
         {route.name === "home" && !homeResult && (
           <section className="hero">
-            <Mosaic
-              slot={
-                <>
-                  <p className="kicker">SLOP SCORE + VISUAL TWINS</p>
-                  <h1>
-                    {t.title
-                      .split(/(AI-built)/)
-                      .map((part, index) => (part === "AI-built" ? <span key={index} className="nowrap">{part}</span> : part))}
-                  </h1>
-                  <p className="lede">{lang === "es" ? `Compara tu portada con ${(catalogCount ?? 2003).toLocaleString("es-ES")} webs: encuentra sus gemelas, revisa su Slop Score y llévate un prompt por arreglo. Si quieres criterio humano, pide una auditoría.` : `Compare your homepage with ${(catalogCount ?? 2003).toLocaleString("en-GB")} sites: find its twins, review its Slop Score and get a prompt per fix. Get a human audit when you want a second pair of eyes.`}</p>
+            <div className="launch-hero"><div className="launch-hero-copy">
+                  <p className="kicker">TWINSITES / VISUAL IDENTITY LAB</p>
+                  <h1>{lang === "es" ? <>Que se reconozca<br />tu web.<br /><em>No la plantilla.</em></> : <>Recognizably<br />your website.<br /><em>Not the template.</em></>}</h1>
+                  <p className="lede">{lang === "es" ? `Encuentra tus gemelas entre ${(catalogCount ?? 2003).toLocaleString("es-ES")} portadas. Revisa las señales, llévate los prompts y decide qué cambiar. Si quieres ir más lejos, una persona lo revisa contigo.` : `Find your twins among ${(catalogCount ?? 2003).toLocaleString("en-GB")} homepages. Review the signals, take the prompts and decide what to change. For the next step, get a human review.`}</p>
                   <div className="actions">
                     <DropZone
                       inline
@@ -339,11 +341,11 @@ export function App() {
                     <button type="button" className="example-teaser" onClick={onExample}>
                       <span className="teaser-pair" aria-hidden="true">
                         <img src="/example/acme-before-thumb.webp" alt="" width={120} height={75} />
-                        <span className="teaser-num">14 → 0</span>
+                        <span className="teaser-num">↔</span>
                         <img src="/example/acme-after-thumb.webp" alt="" width={120} height={75} />
                       </span>
                       <span className="teaser-text">
-                        {t.exampleTeaser} <span className="text-link">{t.exampleSee}</span>
+                        {lang === "es" ? "Explora una comparación del catálogo." : "Explore a catalog comparison."} <span className="text-link">{lang === "es" ? "Abrir ejemplo" : "Open example"}</span>
                       </span>
                     </button>
                   </div>
@@ -355,38 +357,11 @@ export function App() {
                   <p className="privacy">
                     {t.privacyShort} <RouteLink className="text-link" href="/privacy">{t.privacyMore}</RouteLink>
                   </p>
-                </>
-              }
-            />
+
+            </div><LaunchSpecimen onOpen={onExample} /></div>
             <section className="example" aria-labelledby="example-title">
-              <div className="example-text">
-                <h2 id="example-title">{t.exampleTitle}</h2>
-                <p className="dek">{t.exampleDek}</p>
-                <ol className="steps">
-                  {t.exampleSteps.map((step) => (
-                    <li key={step}>{step}</li>
-                  ))}
-                </ol>
-                <p className="score-note">
-                  {t.exampleNote}{" "}
-                  <a className="text-link" href="/example/acme-before.html" target="_blank" rel="noreferrer">
-                    {t.exampleBefore}
-                  </a>
-                  {", "}
-                  <a className="text-link" href="/example/acme-after.html" target="_blank" rel="noreferrer">
-                    {t.exampleAfter}
-                  </a>
-                  .
-                </p>
-              </div>
-              <img
-                className="example-card"
-                src={`/example/progress-${lang}.webp`}
-                alt={t.exampleAlt}
-                width={1200}
-                height={630}
-                loading="lazy"
-              />
+              <div className="example-text"><p className="kicker">{lang === "es" ? "DEL CRITERIO AL CAMBIO" : "FROM REVIEW TO CHANGE"}</p><h2 id="example-title">{lang === "es" ? "Un cambio que puedes ver." : "A change you can see."}</h2><p className="dek">{lang === "es" ? "Dos versiones de una página ficticia: una composición repetida y otra dirección para el mismo producto. Un ejemplo visual, no un cliente ni una promesa de mejora de puntuación o ventas." : "Two versions of a fictional page: a familiar composition and another direction for the same product. A visual example, not a customer or a promised score or sales improvement."}</p><p><a className="text-link" href="/example/acme-before.html" target="_blank" rel="noreferrer">{lang === "es" ? "Abrir antes" : "Open before"}</a>{" · "}<a className="text-link" href="/example/acme-after.html" target="_blank" rel="noreferrer">{lang === "es" ? "Abrir después" : "Open after"}</a></p></div>
+              <div className="worked-pair"><figure><img src="/example/acme-before-thumb.webp" alt={lang === "es" ? "Página ficticia antes del cambio" : "Fictional page before changes"} width={420} height={263} loading="lazy" /><figcaption>{lang === "es" ? "ANTES / ejemplo ficticio" : "BEFORE / fictional example"}</figcaption></figure><figure><img src="/example/acme-after-thumb.webp" alt={lang === "es" ? "Otra dirección visual para la misma página ficticia" : "Another visual direction for the same fictional page"} width={420} height={263} loading="lazy" /><figcaption>{lang === "es" ? "DESPUÉS / otra dirección" : "AFTER / another direction"}</figcaption></figure></div>
             </section>
             <TropeCatalog />
             <ServiceLadder />
@@ -424,6 +399,10 @@ export function App() {
           <li>
             <a href="https://github.com/JefferyLee/awesome-vibe-coded-apps">{t.footerCatalog}</a>
           </li>
+          <li><RouteLink href="/method">{lang === "es" ? "Método y evidencia" : "Method & evidence"}</RouteLink></li>
+          <li><RouteLink href="/legal">{lang === "es" ? "Aviso legal" : "Legal notice"}</RouteLink></li>
+          <li><RouteLink href="/terms">{lang === "es" ? "Condiciones" : "Terms"}</RouteLink></li>
+          <li><RouteLink href="/withdrawal">{lang === "es" ? "Cancelaciones" : "Cancellations"}</RouteLink></li>
           <li>
             <RouteLink href="/privacy">{t.listPrivacy}</RouteLink>
           </li>
