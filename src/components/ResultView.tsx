@@ -382,7 +382,7 @@ export function ResultView({
       <SlopPanel key={result.preview} traits={traits} nearest={nearest} cliches={words.status === "done" ? words.found.length : undefined} readWords={() => void readWords()} />
 
       {delta && previous && compare !== false && (
-        <section className="progress" aria-live="polite">
+        <section className="progress" aria-live="polite"><p>{lang === "es" ? "Solo compara capturas de la misma página, con el mismo tamaño y contenido visible. Un cambio de parecido no demuestra una mejora de diseño o conversión." : "Only compare captures of the same page with the same dimensions and visible content. A change in similarity does not prove better design or conversion."}</p>
           <div className="section-head">
             <h2>{t.progressTitle}</h2>
             <p>{new Date(previous.at).toLocaleString(lang === "es" ? "es-ES" : "en-GB", { dateStyle: "medium", timeStyle: "short" })}</p>

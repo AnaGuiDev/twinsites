@@ -1,3 +1,4 @@
+import { CaptureReview } from "./components/CaptureReview";
 import { MethodPage } from "./components/MethodPage";
 import { AuditReport } from "./components/AuditReport";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -42,6 +43,8 @@ export function App() {
   const [catalogCount, setCatalogCount] = useState<number | null>(null);
   const [stage, setStage] = useState<Stage | null>(null);
   const [progress, setProgress] = useState<number | null>(null);
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [retryFile, setRetryFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [upload, setUpload] = useState<ResultData | null>(null);
   const [catalog, setCatalog] = useState<ResultData | null>(null);
@@ -79,10 +82,7 @@ export function App() {
     document.querySelector(".sleeve")?.scrollIntoView({ block: "center" });
   }, [stage]);
 
-  const warm = useCallback(() => {
-    void import("./lib/model").then((mod) => mod.preloadEngine());
-    void import("./lib/dataset").then((mod) => mod.preloadData());
-  }, []);
+  const warm = useCallback(() => {}, []);
 
   useEffect(() => {
     if (!["home", "site"].includes(route.name) || deferHeavyLoad()) return;
@@ -126,16 +126,15 @@ export function App() {
       .catch(() => setError(t.errorCatalog));
   };
 
-  const onFile = useCallback(
+  const analyzeFile = useCallback(
     async (file: File) => {
       const run = ++uploadRun.current;
       const current = () => run === uploadRun.current;
       setError(null);
       go("/");
-      setUpload((current) => {
-        if (current?.preview.startsWith("blob:")) URL.revokeObjectURL(current.preview);
-        return null;
-      });
+      setStage(null);
+      setProgress(null);
+      setRetryFile(file);
       if (!file.type.startsWith("image/")) {
         setError(t.errorImage);
         return;
@@ -208,12 +207,15 @@ export function App() {
           zoneEs: cluster?.labelEs ?? "",
           preview: small,
         });
-        setUpload({
+        const completedPreview = preview;
+        setUpload((previousUpload) => {
+          if (previousUpload?.preview.startsWith("blob:")) URL.revokeObjectURL(previousUpload.preview);
+          return {
           source: "upload",
           vector,
           bands,
           previous,
-          preview,
+          preview: completedPreview,
           subjectTitle: "",
           traits,
           twins: twins.map((twin) => ({
@@ -234,7 +236,8 @@ export function App() {
           cropped: frame.cropped,
           small: frameWidth < 1000,
           catalogCount: dataset.catalog.count,
-        });
+        }; });
+        setRetryFile(null);
         setCatalogCount(dataset.catalog.count);
         setStage(null);
         setProgress(null);
@@ -257,6 +260,11 @@ export function App() {
     },
     [go, publish, t],
   );
+
+  const onFile = useCallback((file: File) => {
+    uploadRun.current++; setStage(null); setProgress(null); setError(null);
+    setPendingFile(file); go('/');
+  }, [go]);
 
   const stageCopy: Record<Stage, string> = {
     read: t.stageRead,
@@ -305,7 +313,10 @@ export function App() {
       </header>
 
       <main>
-        {stage && <div className="analysis-controls" role="status"><span>{stageCopy[stage]} · {shown}%</span><button type="button" className="text-link" onClick={()=>{uploadRun.current++;setStage(null);setProgress(null);}}>{lang === "es" ? "Cancelar esta comparación" : "Cancel this comparison"}</button></div>}
+        {pendingFile && <CaptureReview key={`${pendingFile.name}-${pendingFile.lastModified}-${pendingFile.size}`} file={pendingFile} onCancel={()=>setPendingFile(null)} onAccept={()=>{const file=pendingFile;setPendingFile(null);void analyzeFile(file);}} />}
+        {error && retryFile && !pendingFile && <button className="ticket" onClick={()=>onFile(retryFile)}>{lang === 'es' ? 'Reintentar con mi captura' : 'Retry my screenshot'}</button>}
+
+        {stage && <div className="analysis-controls" role="status"><span>{stageCopy[stage]} · {shown}%</span><button type="button" className="text-link" onClick={()=>{uploadRun.current++;setStage(null);setProgress(null);}}>{lang === "es" ? "Descartar esta comparación" : "Discard this comparison"}</button></div>}
         {(route.name === "legal" || route.name === "terms" || route.name === "withdrawal") && <LegalPage page={route.name} />}
         {route.name === "method" && <MethodPage />}
         {route.name === "studio" && <StudioConsole />}

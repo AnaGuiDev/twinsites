@@ -1,4 +1,5 @@
 /** Built release smoke with the actual nginx CSP; no commercial provider calls. */
+import sharp from "sharp";
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { mkdir, readFile } from "node:fs/promises";
@@ -40,6 +41,20 @@ try {
     assert(response?.headers()["content-security-policy"]?.includes("style-src 'self'"));
     assert(await page.evaluate(() => crossOriginIsolated));
     await page.locator(".specimen-pair img").first().waitFor();
+    const tiny = await sharp({create:{width:300,height:200,channels:3,background:'#ffffff'}}).png().toBuffer();
+    await page.locator('input[type=file]').first().setInputFiles({name:'small.png',mimeType:'image/png',buffer:tiny});
+    await page.locator('.capture-review [role=alert]').waitFor();
+    assert.equal(await page.locator('.capture-review .ticket').count(),0);
+    await page.locator('.capture-review .text-link').click();
+    const usable = await sharp({create:{width:1440,height:1800,channels:3,background:'#ffffff'}}).png().toBuffer();
+    await page.locator('input[type=file]').first().setInputFiles({name:'desktop.png',mimeType:'image/png',buffer:usable});
+    await page.locator('.capture-review img').waitFor();
+    assert(await page.locator('.capture-review .ticket').isDisabled());
+    await page.locator('.capture-review input[type=checkbox]').check();
+    assert(await page.locator('.capture-review .ticket').isEnabled());
+    await fits(page);
+    await page.locator('.capture-review .text-link').click();
+
     await fits(page);
     for (const lang of ["en", "es"]) {
       if (lang === "es") await page.getByRole("button", { name: "Español", exact: true }).click();
