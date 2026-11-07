@@ -1,0 +1,230 @@
+{
+  "schema": 1,
+  "description": "32 SVG-rendered controlled page fixtures. Same text/colors with moved layout; recolor preserves geometry; text variant preserves geometry. These are interventions, not human similarity labels.",
+  "fixtures": [
+    {
+      "id": "family-0-base",
+      "family": 0,
+      "variant": "base",
+      "sha256": "b316e991e0e3f8d3d72c5392b6e7942c0f24990d6e38eccba22635c40214b6e6"
+    },
+    {
+      "id": "family-0-recolor",
+      "family": 0,
+      "variant": "recolor",
+      "sha256": "6edc3f326c6373a47fc45051b34917c7b93250237c6c6cda054049e50cc03e1a"
+    },
+    {
+      "id": "family-0-text",
+      "family": 0,
+      "variant": "text",
+      "sha256": "19c8e65b57440ff68bcf8c0e5fcf1526487fa3a4256432044c0f8127cdd30b1e"
+    },
+    {
+      "id": "family-0-layout",
+      "family": 0,
+      "variant": "layout",
+      "sha256": "f66804c7a43f0ffce1d62b4ac0ffbfdaa093f175b704522836f468b1a1b0a152"
+    },
+    {
+      "id": "family-1-base",
+      "family": 1,
+      "variant": "base",
+      "sha256": "d6772b66b79443f000647d0f8c9ca2cb0e72e8bb3e1f0ab7106a1eb82adc9ca5"
+    },
+    {
+      "id": "family-1-recolor",
+      "family": 1,
+      "variant": "recolor",
+      "sha256": "547d98884b087710e7f24e6de1f72f0f248d1f2003b704dc0e9c2260364de830"
+    },
+    {
+      "id": "family-1-text",
+      "family": 1,
+      "variant": "text",
+      "sha256": "de35af0a77aa3d1c1caca2860afc4e5cf65d44982ecd60b779051e41557dea76"
+    },
+    {
+      "id": "family-1-layout",
+      "family": 1,
+      "variant": "layout",
+      "sha256": "453d025a1177dae9fc173d70cd8e0cea8413bf391549d8e747b0d30066293311"
+    },
+    {
+      "id": "family-2-base",
+      "family": 2,
+      "variant": "base",
+      "sha256": "5cc442d07a8ba57dccff8df135e92079fdeeccf3d9328963ab5e263ee3f68da7"
+    },
+    {
+      "id": "family-2-recolor",
+      "family": 2,
+      "variant": "recolor",
+      "sha256": "f3ffbacbe3b8c556580ea583139757871b468da54b7aff5f0b83d5632d6a688c"
+    },
+    {
+      "id": "family-2-text",
+      "family": 2,
+      "variant": "text",
+      "sha256": "6d6c4c48a6e5f26ebc869b330bf2ed306246f0a0b9a178ef4e95e664de2a899a"
+    },
+    {
+      "id": "family-2-layout",
+      "family": 2,
+      "variant": "layout",
+      "sha256": "269d415b1fd70c1422e4a754b5c8b79c6a8d400859da8e7361b687048489eef3"
+    },
+    {
+      "id": "family-3-base",
+      "family": 3,
+      "variant": "base",
+      "sha256": "085b68ce9e932b011f98e3a2d1f2865fdf357f19da94ce0cc42439dd3c372332"
+    },
+    {
+      "id": "family-3-recolor",
+      "family": 3,
+      "variant": "recolor",
+      "sha256": "a5fe7e40a08a86e973b509c850ffa3c1490d99480516d3cd4bdc05ea9755c137"
+    },
+    {
+      "id": "family-3-text",
+      "family": 3,
+      "variant": "text",
+      "sha256": "6c1264100386ac39d5da11d9646559d62fbd3e96181adc0801ffb0e4045165e2"
+    },
+    {
+      "id": "family-3-layout",
+      "family": 3,
+      "variant": "layout",
+      "sha256": "2c34f2f5c0a92497b70288f1f21a0fad79fbf321759c64ae7271448de7f0888c"
+    },
+    {
+      "id": "family-4-base",
+      "family": 4,
+      "variant": "base",
+      "sha256": "34449b0ff4ab8b8ff9349cb1aa35342f0e845641074cfff9febd03813add4031"
+    },
+    {
+      "id": "family-4-recolor",
+      "family": 4,
+      "variant": "recolor",
+      "sha256": "2b7328923fc86c9b75ed9f9bae93d21f893012ecc04a1c022f68b48d4ef719fd"
+    },
+    {
+      "id": "family-4-text",
+      "family": 4,
+      "variant": "text",
+      "sha256": "baa5f9a76cec55e8ef95389924ef5f9247044c0e375e51cf636d80b4e3a752b9"
+    },
+    {
+      "id": "family-4-layout",
+      "family": 4,
+      "variant": "layout",
+      "sha256": "51dee008ca2940d89431e110ea2372b3fc918f444c898dd2c8c0662f0b7e4213"
+    },
+    {
+      "id": "family-5-base",
+      "family": 5,
+      "variant": "base",
+      "sha256": "65621aa78ec0e52a333d122b79410baacef9094e30f27129f72b605d782f86ac"
+    },
+    {
+      "id": "family-5-recolor",
+      "family": 5,
+      "variant": "recolor",
+      "sha256": "2ceffc29f926e71c27c120957c3fc944ea31c110ba494bed7982338960f99995"
+    },
+    {
+      "id": "family-5-text",
+      "family": 5,
+      "variant": "text",
+      "sha256": "6f0ba826b73018ec9f3713627befa5a94b9292296a0f6430f750a1cc1843ebdc"
+    },
+    {
+      "id": "family-5-layout",
+      "family": 5,
+      "variant": "layout",
+      "sha256": "61daebffd1b8b146a5afb2d59044db249a393e33982c11b606a6a5591bd7e1c5"
+    },
+    {
+      "id": "family-6-base",
+      "family": 6,
+      "variant": "base",
+      "sha256": "cc9078f66756512cbd5ed02855fd4f8ee3dc3695b4cee54d62192b3b8ef8ddc5"
+    },
+    {
+      "id": "family-6-recolor",
+      "family": 6,
+      "variant": "recolor",
+      "sha256": "8307022221714ef74071e9e55991209236b5b899c8e929647351caffb10cdca2"
+    },
+    {
+      "id": "family-6-text",
+      "family": 6,
+      "variant": "text",
+      "sha256": "96442abdbfa952dec3fdc6bb27f61b0690e43e1e84cca26541e0e00547fc67a1"
+    },
+    {
+      "id": "family-6-layout",
+      "family": 6,
+      "variant": "layout",
+      "sha256": "59dad5826051c22da82dd14404b6b2252242528e5b6d7b43679eaacb931897df"
+    },
+    {
+      "id": "family-7-base",
+      "family": 7,
+      "variant": "base",
+      "sha256": "8a1d8fe5fcc9806c150ca70fbe9cc8d185cffb7931b81c0cb858025275503f5f"
+    },
+    {
+      "id": "family-7-recolor",
+      "family": 7,
+      "variant": "recolor",
+      "sha256": "4890edbc318ed2488105c6cd99a604f9f3955bd6fd17c630225ab8087e8cdf1f"
+    },
+    {
+      "id": "family-7-text",
+      "family": 7,
+      "variant": "text",
+      "sha256": "53aaf0ae32a348336ba2fc43610e838687bf10a3be8f85a1129e62ae9817fe79"
+    },
+    {
+      "id": "family-7-layout",
+      "family": 7,
+      "variant": "layout",
+      "sha256": "8adb49de12825942c1e23a7588ab84724da42bd0351327b52065f64bf74ce5f4"
+    }
+  ],
+  "renderer": {
+    "aom": "3.13.1",
+    "archive": "3.8.2",
+    "cairo": "1.18.4",
+    "cgif": "0.5.0",
+    "exif": "0.6.25",
+    "expat": "2.7.3",
+    "ffi": "3.5.2",
+    "fontconfig": "2.17.1",
+    "freetype": "2.14.1",
+    "fribidi": "1.0.16",
+    "glib": "2.86.1",
+    "harfbuzz": "12.1.0",
+    "heif": "1.20.2",
+    "highway": "1.3.0",
+    "imagequant": "2.4.1",
+    "lcms": "2.17",
+    "mozjpeg": "0826579",
+    "pango": "1.57.0",
+    "pixman": "0.46.4",
+    "png": "1.6.50",
+    "proxy-libintl": "0.5",
+    "rsvg": "2.61.2",
+    "spng": "0.7.4",
+    "tiff": "4.7.1",
+    "vips": "8.17.3",
+    "webp": "1.6.0",
+    "xml2": "2.15.1",
+    "zlib-ng": "2.2.5",
+    "sharp": "0.34.5"
+  },
+  "fontNote": "System sans-serif fonts; PNG hashes record actual rendered inputs. Different fonts can change results."
+}

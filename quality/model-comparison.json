@@ -1,0 +1,1007 @@
+{
+  "schema": 1,
+  "protocol": "Node CPU, same two square crops averaged after L2 normalization, each model uses its published processor. 32 controlled fixtures and 12 fixed real catalog entries × 4 versions. Real retrieval pool only 12 entries, not full catalog. No labels, threshold tuning, or semantic accuracy claim. Geometry preference is a hypothesis, not ground truth.",
+  "runtime": "v24.22.1",
+  "models": [
+    {
+      "name": "mobileclip",
+      "id": "Xenova/mobileclip_s0",
+      "dtype": "fp16",
+      "dim": 512,
+      "loadMs": 93,
+      "medianEncodeMs": 241,
+      "controlled": [
+        {
+          "family": 0,
+          "recolor": 0.9145962233867143,
+          "text": 0.8452210378109557,
+          "layout": 0.9334049293588113,
+          "recolorAboveLayout": false,
+          "textAboveLayout": false
+        },
+        {
+          "family": 1,
+          "recolor": 0.8811942126227927,
+          "text": 0.8561000288225015,
+          "layout": 0.9480531702906304,
+          "recolorAboveLayout": false,
+          "textAboveLayout": false
+        },
+        {
+          "family": 2,
+          "recolor": 0.9185424434739685,
+          "text": 0.826452155566468,
+          "layout": 0.9218330627180242,
+          "recolorAboveLayout": false,
+          "textAboveLayout": false
+        },
+        {
+          "family": 3,
+          "recolor": 0.9145266771392485,
+          "text": 0.8490782882506032,
+          "layout": 0.9508853662863269,
+          "recolorAboveLayout": false,
+          "textAboveLayout": false
+        },
+        {
+          "family": 4,
+          "recolor": 0.9175147017459141,
+          "text": 0.7911078721542272,
+          "layout": 0.9277148604656761,
+          "recolorAboveLayout": false,
+          "textAboveLayout": false
+        },
+        {
+          "family": 5,
+          "recolor": 0.8895515912306751,
+          "text": 0.789775130457615,
+          "layout": 0.9514918982269287,
+          "recolorAboveLayout": false,
+          "textAboveLayout": false
+        },
+        {
+          "family": 6,
+          "recolor": 0.9159519680517235,
+          "text": 0.7971865351504239,
+          "layout": 0.9306462414152828,
+          "recolorAboveLayout": false,
+          "textAboveLayout": false
+        },
+        {
+          "family": 7,
+          "recolor": 0.9202322527367853,
+          "text": 0.7759479782558214,
+          "layout": 0.9514578269172504,
+          "recolorAboveLayout": false,
+          "textAboveLayout": false
+        }
+      ],
+      "summary": {
+        "recolorAboveLayout": 0,
+        "textAboveLayout": 0,
+        "families": 8
+      },
+      "perturbations": [
+        {
+          "slug": "100questionsai",
+          "variant": "jpeg60",
+          "cosine": 0.987466623485542,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "100questionsai",
+          "variant": "resize75",
+          "cosine": 0.9868047603784897,
+          "top1Unchanged": false,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "100questionsai",
+          "variant": "crop2",
+          "cosine": 0.9774860574285342,
+          "top1Unchanged": true,
+          "top3Overlap": 0.6666666666666666
+        },
+        {
+          "slug": "autoshort",
+          "variant": "jpeg60",
+          "cosine": 0.98020377143382,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "autoshort",
+          "variant": "resize75",
+          "cosine": 0.9839178256878959,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "autoshort",
+          "variant": "crop2",
+          "cosine": 0.9767767396923542,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "claudewatermark",
+          "variant": "jpeg60",
+          "cosine": 0.958796116468901,
+          "top1Unchanged": true,
+          "top3Overlap": 0.6666666666666666
+        },
+        {
+          "slug": "claudewatermark",
+          "variant": "resize75",
+          "cosine": 0.9443837131491398,
+          "top1Unchanged": true,
+          "top3Overlap": 0.6666666666666666
+        },
+        {
+          "slug": "claudewatermark",
+          "variant": "crop2",
+          "cosine": 0.9448018330649604,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "egx-sparkle-lovable",
+          "variant": "jpeg60",
+          "cosine": 0.9801594083209745,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "egx-sparkle-lovable",
+          "variant": "resize75",
+          "cosine": 0.9784691947598366,
+          "top1Unchanged": true,
+          "top3Overlap": 0.6666666666666666
+        },
+        {
+          "slug": "egx-sparkle-lovable",
+          "variant": "crop2",
+          "cosine": 0.9873401622823089,
+          "top1Unchanged": true,
+          "top3Overlap": 0.6666666666666666
+        },
+        {
+          "slug": "gizmokitten",
+          "variant": "jpeg60",
+          "cosine": 0.9878499606994844,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "gizmokitten",
+          "variant": "resize75",
+          "cosine": 0.9787054513749913,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "gizmokitten",
+          "variant": "crop2",
+          "cosine": 0.9764083829803045,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "iocombats",
+          "variant": "jpeg60",
+          "cosine": 0.9828201280572819,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "iocombats",
+          "variant": "resize75",
+          "cosine": 0.9870287110239211,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "iocombats",
+          "variant": "crop2",
+          "cosine": 0.9755604729917193,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "marquill",
+          "variant": "jpeg60",
+          "cosine": 0.9797861194031426,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "marquill",
+          "variant": "resize75",
+          "cosine": 0.9847553298676341,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "marquill",
+          "variant": "crop2",
+          "cosine": 0.9715367174659698,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "onewayinterview",
+          "variant": "jpeg60",
+          "cosine": 0.9790313333928617,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "onewayinterview",
+          "variant": "resize75",
+          "cosine": 0.9806433104455123,
+          "top1Unchanged": false,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "onewayinterview",
+          "variant": "crop2",
+          "cosine": 0.9610203676498826,
+          "top1Unchanged": false,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "private-digital-journal-lovable",
+          "variant": "jpeg60",
+          "cosine": 0.9774957663033083,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "private-digital-journal-lovable",
+          "variant": "resize75",
+          "cosine": 0.9729980674892087,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "private-digital-journal-lovable",
+          "variant": "crop2",
+          "cosine": 0.9782243450596395,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "scibly",
+          "variant": "jpeg60",
+          "cosine": 0.9844427345526375,
+          "top1Unchanged": true,
+          "top3Overlap": 0.6666666666666666
+        },
+        {
+          "slug": "scibly",
+          "variant": "resize75",
+          "cosine": 0.979793243271093,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "scibly",
+          "variant": "crop2",
+          "cosine": 0.9837565161120653,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "sub-watchful-eye-lovable",
+          "variant": "jpeg60",
+          "cosine": 0.986471184704711,
+          "top1Unchanged": false,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "sub-watchful-eye-lovable",
+          "variant": "resize75",
+          "cosine": 0.9843802759969426,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "sub-watchful-eye-lovable",
+          "variant": "crop2",
+          "cosine": 0.9778587071347982,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "veloraappy",
+          "variant": "jpeg60",
+          "cosine": 0.9875447802561004,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "veloraappy",
+          "variant": "resize75",
+          "cosine": 0.9885605002915091,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "veloraappy",
+          "variant": "crop2",
+          "cosine": 0.9791075010922258,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        }
+      ]
+    },
+    {
+      "name": "dinov2",
+      "id": "onnx-community/dinov2-small",
+      "dtype": "fp16",
+      "dim": 384,
+      "loadMs": 134,
+      "medianEncodeMs": 215,
+      "controlled": [
+        {
+          "family": 0,
+          "recolor": 0.9561294695502474,
+          "text": 0.9979579533661564,
+          "layout": 0.9856992622275504,
+          "recolorAboveLayout": false,
+          "textAboveLayout": true
+        },
+        {
+          "family": 1,
+          "recolor": 0.8754153811710625,
+          "text": 0.9976571908899781,
+          "layout": 0.9864326959118473,
+          "recolorAboveLayout": false,
+          "textAboveLayout": true
+        },
+        {
+          "family": 2,
+          "recolor": 0.966608089926306,
+          "text": 0.997780029477228,
+          "layout": 0.987306685891138,
+          "recolorAboveLayout": false,
+          "textAboveLayout": true
+        },
+        {
+          "family": 3,
+          "recolor": 0.8971762257571699,
+          "text": 0.9974877932334529,
+          "layout": 0.9872529109986783,
+          "recolorAboveLayout": false,
+          "textAboveLayout": true
+        },
+        {
+          "family": 4,
+          "recolor": 0.9572283712046784,
+          "text": 0.9982406594510314,
+          "layout": 0.9838727048135997,
+          "recolorAboveLayout": false,
+          "textAboveLayout": true
+        },
+        {
+          "family": 5,
+          "recolor": 0.8844344437171807,
+          "text": 0.9973751689113287,
+          "layout": 0.9829758392611746,
+          "recolorAboveLayout": false,
+          "textAboveLayout": true
+        },
+        {
+          "family": 6,
+          "recolor": 0.9681677862319285,
+          "text": 0.9981839586807095,
+          "layout": 0.9853077972050589,
+          "recolorAboveLayout": false,
+          "textAboveLayout": true
+        },
+        {
+          "family": 7,
+          "recolor": 0.8985566207776907,
+          "text": 0.9967866745252727,
+          "layout": 0.9876306535193122,
+          "recolorAboveLayout": false,
+          "textAboveLayout": true
+        }
+      ],
+      "summary": {
+        "recolorAboveLayout": 0,
+        "textAboveLayout": 8,
+        "families": 8
+      },
+      "perturbations": [
+        {
+          "slug": "100questionsai",
+          "variant": "jpeg60",
+          "cosine": 0.9842069489324364,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "100questionsai",
+          "variant": "resize75",
+          "cosine": 0.9893800750467805,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "100questionsai",
+          "variant": "crop2",
+          "cosine": 0.9795188309024296,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "autoshort",
+          "variant": "jpeg60",
+          "cosine": 0.9796902331589415,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "autoshort",
+          "variant": "resize75",
+          "cosine": 0.9974080928468589,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "autoshort",
+          "variant": "crop2",
+          "cosine": 0.9876899243395623,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "claudewatermark",
+          "variant": "jpeg60",
+          "cosine": 0.9912158176749968,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "claudewatermark",
+          "variant": "resize75",
+          "cosine": 0.9982775678059256,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "claudewatermark",
+          "variant": "crop2",
+          "cosine": 0.9964741047417387,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "egx-sparkle-lovable",
+          "variant": "jpeg60",
+          "cosine": 0.9843924021359737,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "egx-sparkle-lovable",
+          "variant": "resize75",
+          "cosine": 0.9949324538734818,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "egx-sparkle-lovable",
+          "variant": "crop2",
+          "cosine": 0.9883388975151475,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "gizmokitten",
+          "variant": "jpeg60",
+          "cosine": 0.9854856544798797,
+          "top1Unchanged": true,
+          "top3Overlap": 0.6666666666666666
+        },
+        {
+          "slug": "gizmokitten",
+          "variant": "resize75",
+          "cosine": 0.9950053925691867,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "gizmokitten",
+          "variant": "crop2",
+          "cosine": 0.9813946972815274,
+          "top1Unchanged": true,
+          "top3Overlap": 0.6666666666666666
+        },
+        {
+          "slug": "iocombats",
+          "variant": "jpeg60",
+          "cosine": 0.9764217376520623,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "iocombats",
+          "variant": "resize75",
+          "cosine": 0.9903337883240403,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "iocombats",
+          "variant": "crop2",
+          "cosine": 0.9783471321276396,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "marquill",
+          "variant": "jpeg60",
+          "cosine": 0.9876949408986798,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "marquill",
+          "variant": "resize75",
+          "cosine": 0.996463572616974,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "marquill",
+          "variant": "crop2",
+          "cosine": 0.9723133665823637,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "onewayinterview",
+          "variant": "jpeg60",
+          "cosine": 0.9853775074099058,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "onewayinterview",
+          "variant": "resize75",
+          "cosine": 0.9918714555126916,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "onewayinterview",
+          "variant": "crop2",
+          "cosine": 0.9683953565897323,
+          "top1Unchanged": true,
+          "top3Overlap": 0.6666666666666666
+        },
+        {
+          "slug": "private-digital-journal-lovable",
+          "variant": "jpeg60",
+          "cosine": 0.9847695382796214,
+          "top1Unchanged": true,
+          "top3Overlap": 0.6666666666666666
+        },
+        {
+          "slug": "private-digital-journal-lovable",
+          "variant": "resize75",
+          "cosine": 0.9969961979230565,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "private-digital-journal-lovable",
+          "variant": "crop2",
+          "cosine": 0.9870827348523203,
+          "top1Unchanged": true,
+          "top3Overlap": 0.6666666666666666
+        },
+        {
+          "slug": "scibly",
+          "variant": "jpeg60",
+          "cosine": 0.9727720651647468,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "scibly",
+          "variant": "resize75",
+          "cosine": 0.9910254472157259,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "scibly",
+          "variant": "crop2",
+          "cosine": 0.9204044904712138,
+          "top1Unchanged": true,
+          "top3Overlap": 0.6666666666666666
+        },
+        {
+          "slug": "sub-watchful-eye-lovable",
+          "variant": "jpeg60",
+          "cosine": 0.9391802842268537,
+          "top1Unchanged": true,
+          "top3Overlap": 0.6666666666666666
+        },
+        {
+          "slug": "sub-watchful-eye-lovable",
+          "variant": "resize75",
+          "cosine": 0.9957145401133947,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "sub-watchful-eye-lovable",
+          "variant": "crop2",
+          "cosine": 0.9924344412190804,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "veloraappy",
+          "variant": "jpeg60",
+          "cosine": 0.9925022436734318,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "veloraappy",
+          "variant": "resize75",
+          "cosine": 0.996303252695007,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "veloraappy",
+          "variant": "crop2",
+          "cosine": 0.9877435653678198,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        }
+      ]
+    },
+    {
+      "name": "siglip2",
+      "id": "onnx-community/siglip2-base-patch16-224-ONNX",
+      "dtype": "fp16",
+      "dim": 768,
+      "loadMs": 177,
+      "medianEncodeMs": 353,
+      "controlled": [
+        {
+          "family": 0,
+          "recolor": 0.9251131506148932,
+          "text": 0.9450586953458204,
+          "layout": 0.9793335339863062,
+          "recolorAboveLayout": false,
+          "textAboveLayout": false
+        },
+        {
+          "family": 1,
+          "recolor": 0.9060277891463003,
+          "text": 0.9482776327681811,
+          "layout": 0.9832041944277041,
+          "recolorAboveLayout": false,
+          "textAboveLayout": false
+        },
+        {
+          "family": 2,
+          "recolor": 0.934752837025297,
+          "text": 0.9291381294292401,
+          "layout": 0.9769562857286289,
+          "recolorAboveLayout": false,
+          "textAboveLayout": false
+        },
+        {
+          "family": 3,
+          "recolor": 0.9381064373777326,
+          "text": 0.9423166675322401,
+          "layout": 0.9845921644327699,
+          "recolorAboveLayout": false,
+          "textAboveLayout": false
+        },
+        {
+          "family": 4,
+          "recolor": 0.9296273007270649,
+          "text": 0.9279263139411392,
+          "layout": 0.9833885512024378,
+          "recolorAboveLayout": false,
+          "textAboveLayout": false
+        },
+        {
+          "family": 5,
+          "recolor": 0.9071856104477798,
+          "text": 0.9265148822425732,
+          "layout": 0.9852385436117638,
+          "recolorAboveLayout": false,
+          "textAboveLayout": false
+        },
+        {
+          "family": 6,
+          "recolor": 0.9350899114799823,
+          "text": 0.9252025428835075,
+          "layout": 0.9830127330803399,
+          "recolorAboveLayout": false,
+          "textAboveLayout": false
+        },
+        {
+          "family": 7,
+          "recolor": 0.9288078647591298,
+          "text": 0.9260472993094894,
+          "layout": 0.9825540822068127,
+          "recolorAboveLayout": false,
+          "textAboveLayout": false
+        }
+      ],
+      "summary": {
+        "recolorAboveLayout": 0,
+        "textAboveLayout": 0,
+        "families": 8
+      },
+      "perturbations": [
+        {
+          "slug": "100questionsai",
+          "variant": "jpeg60",
+          "cosine": 0.9488854927486386,
+          "top1Unchanged": true,
+          "top3Overlap": 0.3333333333333333
+        },
+        {
+          "slug": "100questionsai",
+          "variant": "resize75",
+          "cosine": 0.9734673939459809,
+          "top1Unchanged": true,
+          "top3Overlap": 0.6666666666666666
+        },
+        {
+          "slug": "100questionsai",
+          "variant": "crop2",
+          "cosine": 0.9619299733469024,
+          "top1Unchanged": true,
+          "top3Overlap": 0.6666666666666666
+        },
+        {
+          "slug": "autoshort",
+          "variant": "jpeg60",
+          "cosine": 0.966864027547054,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "autoshort",
+          "variant": "resize75",
+          "cosine": 0.9585683084194462,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "autoshort",
+          "variant": "crop2",
+          "cosine": 0.9688230896183591,
+          "top1Unchanged": false,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "claudewatermark",
+          "variant": "jpeg60",
+          "cosine": 0.9357499016233446,
+          "top1Unchanged": false,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "claudewatermark",
+          "variant": "resize75",
+          "cosine": 0.9613346834173133,
+          "top1Unchanged": false,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "claudewatermark",
+          "variant": "crop2",
+          "cosine": 0.9596236372905584,
+          "top1Unchanged": false,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "egx-sparkle-lovable",
+          "variant": "jpeg60",
+          "cosine": 0.9663216717459762,
+          "top1Unchanged": false,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "egx-sparkle-lovable",
+          "variant": "resize75",
+          "cosine": 0.9746543213917033,
+          "top1Unchanged": false,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "egx-sparkle-lovable",
+          "variant": "crop2",
+          "cosine": 0.9744826509766457,
+          "top1Unchanged": false,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "gizmokitten",
+          "variant": "jpeg60",
+          "cosine": 0.9666836852497452,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "gizmokitten",
+          "variant": "resize75",
+          "cosine": 0.9681094685375942,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "gizmokitten",
+          "variant": "crop2",
+          "cosine": 0.9695967061211842,
+          "top1Unchanged": true,
+          "top3Overlap": 0.6666666666666666
+        },
+        {
+          "slug": "iocombats",
+          "variant": "jpeg60",
+          "cosine": 0.9618222342172545,
+          "top1Unchanged": false,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "iocombats",
+          "variant": "resize75",
+          "cosine": 0.950634784139323,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "iocombats",
+          "variant": "crop2",
+          "cosine": 0.9588565036666303,
+          "top1Unchanged": false,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "marquill",
+          "variant": "jpeg60",
+          "cosine": 0.9448119378188679,
+          "top1Unchanged": false,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "marquill",
+          "variant": "resize75",
+          "cosine": 0.9648910128232128,
+          "top1Unchanged": false,
+          "top3Overlap": 0.6666666666666666
+        },
+        {
+          "slug": "marquill",
+          "variant": "crop2",
+          "cosine": 0.960347201140888,
+          "top1Unchanged": false,
+          "top3Overlap": 0.6666666666666666
+        },
+        {
+          "slug": "onewayinterview",
+          "variant": "jpeg60",
+          "cosine": 0.9637013074965386,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "onewayinterview",
+          "variant": "resize75",
+          "cosine": 0.9747227809690877,
+          "top1Unchanged": false,
+          "top3Overlap": 0.6666666666666666
+        },
+        {
+          "slug": "onewayinterview",
+          "variant": "crop2",
+          "cosine": 0.9640194134968816,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "private-digital-journal-lovable",
+          "variant": "jpeg60",
+          "cosine": 0.9622794698610979,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "private-digital-journal-lovable",
+          "variant": "resize75",
+          "cosine": 0.9738350037576102,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "private-digital-journal-lovable",
+          "variant": "crop2",
+          "cosine": 0.969465170895115,
+          "top1Unchanged": true,
+          "top3Overlap": 0.6666666666666666
+        },
+        {
+          "slug": "scibly",
+          "variant": "jpeg60",
+          "cosine": 0.9551286806607581,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "scibly",
+          "variant": "resize75",
+          "cosine": 0.9706579957711616,
+          "top1Unchanged": true,
+          "top3Overlap": 0.6666666666666666
+        },
+        {
+          "slug": "scibly",
+          "variant": "crop2",
+          "cosine": 0.9528054700220502,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "sub-watchful-eye-lovable",
+          "variant": "jpeg60",
+          "cosine": 0.9497329653812757,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "sub-watchful-eye-lovable",
+          "variant": "resize75",
+          "cosine": 0.9602523688594871,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "sub-watchful-eye-lovable",
+          "variant": "crop2",
+          "cosine": 0.9657287934576982,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "veloraappy",
+          "variant": "jpeg60",
+          "cosine": 0.9746512960754943,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        },
+        {
+          "slug": "veloraappy",
+          "variant": "resize75",
+          "cosine": 0.9712450257996847,
+          "top1Unchanged": true,
+          "top3Overlap": 0.6666666666666666
+        },
+        {
+          "slug": "veloraappy",
+          "variant": "crop2",
+          "cosine": 0.9686198064590597,
+          "top1Unchanged": true,
+          "top3Overlap": 1
+        }
+      ]
+    }
+  ],
+  "complete": true
+}

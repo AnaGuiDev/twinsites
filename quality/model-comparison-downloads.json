@@ -1,0 +1,44 @@
+[
+  {
+    "repo": "onnx-community/dinov2-small",
+    "revision": "8b1f705a3a7f6f062f6bdd21986c1583d3ef105d",
+    "file": "config.json",
+    "bytes": 899,
+    "sha256": "50965b6c1dc4a9e38af8b5e8736cf059e56aa60d9047c2aef05f7e134371d02a"
+  },
+  {
+    "repo": "onnx-community/dinov2-small",
+    "revision": "8b1f705a3a7f6f062f6bdd21986c1583d3ef105d",
+    "file": "preprocessor_config.json",
+    "bytes": 436,
+    "sha256": "14e780d86fa1861f8751f868d7f45425b5feb55c38ca26f152ca5097ab30f828"
+  },
+  {
+    "repo": "onnx-community/dinov2-small",
+    "revision": "8b1f705a3a7f6f062f6bdd21986c1583d3ef105d",
+    "file": "onnx/model_fp16.onnx",
+    "bytes": 44420939,
+    "sha256": "16845e153bbaf3fd1ef8a2154c454940f901f6fe8a80dd4c6c319eaecdb4d2ee"
+  },
+  {
+    "repo": "onnx-community/siglip2-base-patch16-224-ONNX",
+    "revision": "ba1f3b0843f24bc5417d38e19c37b287d719b2f4",
+    "file": "config.json",
+    "bytes": 435,
+    "sha256": "e43a9f7692d3819886a82cb2097048258d444f123c67d37ec825f9345b019cf2"
+  },
+  {
+    "repo": "onnx-community/siglip2-base-patch16-224-ONNX",
+    "revision": "ba1f3b0843f24bc5417d38e19c37b287d719b2f4",
+    "file": "preprocessor_config.json",
+    "bytes": 394,
+    "sha256": "9b36b57ebaf20f09bf4c22100ccc21877ea6bfe5aead0c00c59f8af8ccefacfc"
+  },
+  {
+    "repo": "onnx-community/siglip2-base-patch16-224-ONNX",
+    "revision": "ba1f3b0843f24bc5417d38e19c37b287d719b2f4",
+    "file": "onnx/vision_model_fp16.onnx",
+    "bytes": 186039516,
+    "sha256": "a1959f7bd3993a607e48839f6d01e25b876fe76afda301b028b78eef68aabd95"
+  }
+]
