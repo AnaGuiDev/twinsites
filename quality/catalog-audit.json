@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "catalogSha256": "39e81bdf138202442612fe9c51d6baaa603295b57d24fdb1d3ed75bae8fedd4c",
+  "count": 2003,
+  "policy": "Read-only audit; flags require review, no automatic deletion. Does not detect semantic error pages or banners.",
+  "exactDuplicateGroups": [
+    [
+      "aria-8-polsia",
+      "dockethearth-ln7cw3-polsia",
+      "play-locale",
+      "pricelet-polsia",
+      "yarrow-5-polsia"
+    ],
+    [
+      "compeddit-ai-vercel",
+      "compeddit-pages"
+    ],
+    [
+      "twiflux",
+      "twimate"
+    ]
+  ],
+  "identicalResizedPixelGroups": [
+    [
+      "aria-8-polsia",
+      "dockethearth-ln7cw3-polsia",
+      "play-locale",
+      "pricelet-polsia",
+      "yarrow-5-polsia"
+    ],
+    [
+      "compeddit-ai-vercel",
+      "compeddit-pages"
+    ],
+    [
+      "twiflux",
+      "twimate"
+    ]
+  ],
+  "suspects": []
+}

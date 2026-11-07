@@ -31,7 +31,9 @@
     "model:evaluate": "node --import tsx scripts/evaluate-pairs.ts",
     "model:prepare": "node scripts/prepare-model.mjs",
     "pretest:product": "npm run model:prepare",
-    "prebuild": "npm run model:prepare"
+    "prebuild": "npm run model:prepare",
+    "quality:catalog": "node --import tsx scripts/audit-catalog.ts",
+    "quality:robustness": "npm run model:prepare && node --import tsx scripts/benchmark-robustness.ts"
   },
   "engines": {
     "node": ">=20"
