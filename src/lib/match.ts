@@ -1,3 +1,4 @@
+import { distinctCaptures } from "./catalog-duplicates";
 import { KIN_BANDS, percentileOf } from "./calibrate";
 import type { Dataset, Twin } from "../types";
 
@@ -9,6 +10,7 @@ export function dotAt(vector: Float32Array, embeddings: Float32Array, index: num
 }
 
 export function nearest(vector: Float32Array, dataset: Dataset, k: number): Twin[] {
+  if (!Number.isInteger(k) || k <= 0) return [];
   const { embeddings, dim, catalog } = dataset;
   const n = catalog.sites.length;
   const best: Twin[] = [];
@@ -25,6 +27,12 @@ export function nearest(vector: Float32Array, dataset: Dataset, k: number): Twin
   }
   best.sort((a, b) => b.similarity - a.similarity);
   return best;
+}
+
+/** Select unique audited captures before truncation. Raw band counts stay unchanged. */
+export function nearestDistinct(vector: Float32Array, dataset: Dataset, k: number): Twin[] {
+  if (!Number.isInteger(k) || k <= 0) return [];
+  return distinctCaptures(nearest(vector, dataset, dataset.catalog.sites.length)).slice(0, k);
 }
 
 /**
