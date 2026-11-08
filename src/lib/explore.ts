@@ -1,3 +1,4 @@
+import { isCaptureQuarantined } from "./catalog-duplicates";
 import { KIN_BANDS, judgeKin, type KinVerdict } from "./calibrate";
 import type { ZoneRecord } from "./zones";
 import type { Check } from "./history";
@@ -117,6 +118,7 @@ export function searchSites(file: ExploreFile, query: string, limit = 8): Explor
   if (needle.length < 2) return [];
   const hits: { score: number; site: ExploreSite }[] = [];
   for (const site of file.sites) {
+    if (isCaptureQuarantined(site.slug)) continue;
     const title = site.title.toLowerCase();
     const url = site.url.toLowerCase();
     const slug = site.slug.toLowerCase();
@@ -188,6 +190,7 @@ export function exampleResult(file: ExampleFile): ResultData {
 }
 
 export async function siteResult(slug: string): Promise<ResultData> {
+  if (isCaptureQuarantined(slug)) throw new Error("missing-site");
   const example = await loadExample();
   if (example.slug === slug) return exampleResult(example);
   const file = await loadExplore();

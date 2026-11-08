@@ -1,4 +1,5 @@
-import { distinctCaptures, duplicateCaptureCount } from "../lib/catalog-duplicates";
+import { resultCandidates } from "../lib/result-candidates";
+import { duplicateCaptureCount } from "../lib/catalog-duplicates";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ModelNotice } from "./ModelNotice";
 import { SlopPanel } from "./SlopPanel";
@@ -45,10 +46,10 @@ export function ResultView({
   const [mapSites, setMapSites] = useState<Site[]>(result.sites);
   const [mapClusters, setMapClusters] = useState<Cluster[]>(result.clusters);
   const zoneName = lang === "es" ? result.zone.labelEs : result.zone.labelEn;
-  const visibleTwins = useMemo(() => distinctCaptures(result.twins), [result.twins]);
-  const nearest = result.twins[0]?.percentile ?? 0;
+  const visibleTwins = useMemo(() => resultCandidates(result.twins, result.verdict.band), [result.twins, result.verdict.band]);
+  const nearest = visibleTwins[0]?.percentile ?? 0;
   const secondary = t.resultLine(result.verdict, nearest);
-  const twinTraits = useMemo(() => result.twins.map((twin) => twin.site.traits), [result]);
+  const twinTraits = useMemo(() => visibleTwins.map((twin) => twin.site.traits), [visibleTwins]);
   const catalogTraits = useMemo(() => mapSites.map((site) => site.traits), [mapSites]);
   const [fixes, setFixes] = useState<Fix[]>([]);
   const [editing, setEditing] = useState<TraitKey | null>(null);
@@ -129,12 +130,12 @@ export function ResultView({
   );
   const topCategory = useMemo(() => {
     const counts = new Map<string, number>();
-    for (const twin of result.twins) {
+    for (const twin of visibleTwins) {
       const key = twin.site.category || "other";
       counts.set(key, (counts.get(key) ?? 0) + 1);
     }
     return [...counts.entries()].filter(([key]) => key !== "other").sort((a, b) => b[1] - a[1])[0]?.[0] ?? "productivity";
-  }, [result.twins]);
+  }, [visibleTwins]);
   const [regions, setRegions] = useState<Marks | null>(null);
   const [showMarks, setShowMarks] = useState(true);
   useEffect(() => {
@@ -235,11 +236,12 @@ export function ResultView({
 
   useEffect(() => {
     if (showProgress) return;
+    if (!visibleTwins.length) { setCardUrl(null); cardBlob.current = null; return; }
     let cancel = false;
     const both = showMine || result.source === "catalog";
     const images = both
-      ? [result.preview, thumb(result.twins[0]?.site.thumb ?? "")]
-      : [thumb(result.twins[0]?.site.thumb ?? "")];
+      ? [result.preview, thumb(visibleTwins[0]?.site.thumb ?? "")]
+      : [thumb(visibleTwins[0]?.site.thumb ?? "")];
     const clip = (text: string) => (text.length > 34 ? `${text.slice(0, 33).trimEnd()}…` : text);
     const labels = both
       ? [result.source === "upload" ? t.cardYou : clip(result.subjectTitle), t.cardTwin]
@@ -301,10 +303,10 @@ export function ResultView({
   };
 
   const own = result.source === "upload";
-  const none = result.verdict.mode === "none";
+  const none = visibleTwins.length === 0;
   const level = none ? 0 : result.verdict.mode === "neighborhood" || result.verdict.top <= 5 ? 2 : 1;
   const levelWord = t.meterLevels[level];
-  const closest = result.twins[0];
+  const closest = visibleTwins[0];
   const [allTwins, setAllTwins] = useState(false);
   const youLabel = own ? t.compareYou : clipTitle(result.subjectTitle);
   const marked = (
@@ -466,7 +468,8 @@ export function ResultView({
           {none ? t.stepTwinsNone : t.stepTwins}
         </h2>
         <p className="score-note">{lang === 'es' ? 'Los percentiles indican posición respecto a parejas del catálogo, no un porcentaje de parecido ni una probabilidad de acierto. Los recuentos cuentan entradas, no diseños únicos.' : 'Percentiles describe position relative to catalog pairs, not a similarity percentage or probability of correctness. Counts refer to entries, not unique designs.'}</p>
-        {visibleTwins.length < result.twins.length && <p className="score-note">{lang === 'es' ? 'Hemos agrupado capturas idénticas para evitar mostrar el mismo diseño varias veces.' : 'Identical captures are grouped to avoid showing the same design repeatedly.'}</p>}
+        {visibleTwins.length < result.twins.length && <p className="score-note">{lang === 'es' ? 'Mostramos hasta tres candidatos que superan el filtro actual, sin capturas duplicadas ni en cuarentena. No son parecidos fuertes confirmados.' : 'Up to three candidates pass the current filter, excluding duplicate and quarantined captures. These are not confirmed strong matches.'}</p>}
+        {!visibleTwins.length && <p className="score-note">{lang === "es" ? "No hay candidatos aptos para mostrar con este filtro. Esto no demuestra originalidad." : "No eligible candidates to show with this filter. This does not establish originality."}</p>}
         <div className="twins-layout">
           {closest && (
             <div className="twins-main">
@@ -520,9 +523,9 @@ export function ResultView({
             ))}
           </div>
         )}
-        <button type="button" className="text-link as-button see-all" onClick={() => setAllTwins((value) => !value)} aria-expanded={allTwins}>
+        {visibleTwins.length > 0 && <button type="button" className="text-link as-button see-all" onClick={() => setAllTwins((value) => !value)} aria-expanded={allTwins}>
           {allTwins ? t.hideTwins : t.seeAllTwins(visibleTwins.length)}
-        </button>
+        </button>}
       </section>
 
       <section className="step diagnosis" id="step-why" aria-labelledby="step-why-title">
