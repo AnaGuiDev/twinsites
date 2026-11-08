@@ -36,3 +36,24 @@ test('every audited duplicate group still contains byte-identical captures',asyn
   for(const image of images.slice(1))assert.ok(images[0].equals(image),group.join(', '));
  }
 });
+
+
+test('quarantined provider pages cannot appear in distinct upload or visible results',async()=>{
+ const {nearestDistinct}=await import('../src/lib/match.ts');
+ const slugs=['aria-8-polsia','dockethearth-ln7cw3-polsia','play-locale','pricelet-polsia','yarrow-5-polsia','valid'];
+ const items=slugs.map(slug=>({site:{slug}}));
+ assert.deepEqual(distinctCaptures(items).map(x=>x.site.slug),['valid']);
+ const dataset={dim:1,embeddings:new Float32Array([1,1,1,1,1,.5]),catalog:{sites:items.map(x=>x.site)}} as any;
+ assert.deepEqual(nearestDistinct(new Float32Array([1]),dataset,12).map(x=>x.site.slug),['valid']);
+ assert.deepEqual(distinctCaptures(items.slice(0,5)),[]);
+});
+
+test('quarantine is bound to reviewed image bytes and requires review after recapture',async()=>{
+ const {readFile}=await import('node:fs/promises');const {createHash}=await import('node:crypto');
+ const review=JSON.parse(await readFile('quality/capture-review.json','utf8'));
+ const catalog=JSON.parse(await readFile('public/data/catalog.json','utf8'));
+ for(const entry of review.entries){
+  assert.equal(catalog.sites.find((s:any)=>s.slug===entry.slug)?.thumb,entry.thumb);
+  assert.equal(createHash('sha256').update(await readFile('public/data/'+entry.thumb)).digest('hex'),entry.sha256);
+ }
+});
