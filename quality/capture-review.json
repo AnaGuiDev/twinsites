@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "reviewMethod": "AI visual inspection of stored screenshots; not human validation or live URL verification",
+  "evidence": "All five captures show the same Polsia provider landing page, despite different catalog project identities. Provenance remains unresolved.",
+  "entries": [
+    {
+      "slug": "aria-8-polsia",
+      "thumb": "thumbs/0130.webp",
+      "sha256": "0e927ca86efca6e2f8ec4a50d29121dd407ad4cc9adb960da8cb2790c1f7610a",
+      "reason": "shared-provider-landing",
+      "status": "quarantined-pending-recapture"
+    },
+    {
+      "slug": "dockethearth-ln7cw3-polsia",
+      "thumb": "thumbs/0468.webp",
+      "sha256": "0e927ca86efca6e2f8ec4a50d29121dd407ad4cc9adb960da8cb2790c1f7610a",
+      "reason": "shared-provider-landing",
+      "status": "quarantined-pending-recapture"
+    },
+    {
+      "slug": "play-locale",
+      "thumb": "thumbs/1282.webp",
+      "sha256": "0e927ca86efca6e2f8ec4a50d29121dd407ad4cc9adb960da8cb2790c1f7610a",
+      "reason": "shared-provider-landing",
+      "status": "quarantined-pending-recapture"
+    },
+    {
+      "slug": "pricelet-polsia",
+      "thumb": "thumbs/1334.webp",
+      "sha256": "0e927ca86efca6e2f8ec4a50d29121dd407ad4cc9adb960da8cb2790c1f7610a",
+      "reason": "shared-provider-landing",
+      "status": "quarantined-pending-recapture"
+    },
+    {
+      "slug": "yarrow-5-polsia",
+      "thumb": "thumbs/1980.webp",
+      "sha256": "0e927ca86efca6e2f8ec4a50d29121dd407ad4cc9adb960da8cb2790c1f7610a",
+      "reason": "shared-provider-landing",
+      "status": "quarantined-pending-recapture"
+    }
+  ]
+}
