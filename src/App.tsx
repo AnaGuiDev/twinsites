@@ -22,7 +22,7 @@ import { analyzeImageSource } from "./lib/analyze";
 import { judgeKin, percentileOf } from "./lib/calibrate";
 import { cropHero } from "./lib/crop";
 import { loadExample, siteResult, type ResultData } from "./lib/explore";
-import { countBands, nearest, placeUser } from "./lib/match";
+import { countBands, nearestDistinct, placeUser } from "./lib/match";
 import { zoneSlug } from "./lib/zones";
 import { loadCheck, saveCheck, smallPreview } from "./lib/history";
 
@@ -184,7 +184,7 @@ export function App() {
         const [vector, dataset] = await Promise.all([modelMod.embedBlob(frame.blob), dataMod.loadDataset()]);
         if (!current()) { URL.revokeObjectURL(preview); return; }
         advance("match");
-        const twins = nearest(vector, dataset, 12);
+        const twins = nearestDistinct(vector, dataset, 12);
         const bandCounts = countBands(vector, dataset);
         const verdict = judgeKin(bandCounts);
         const bands = Object.fromEntries(bandCounts) as Record<number, number>;
