@@ -1,10 +1,33 @@
-# Twinsites launch: free diagnosis and a paid human service
+# Twinsites Studio launch
 
 This replaces the v1 proposal in #17. It is a concrete implementation for a commercial launch, not a promise that live payments have been activated. No production deploy, live charge, email or social post has been executed by this change.
 
-## Product and offer
+## Scope of the first public launch
 
-The homepage uses real catalog screenshots and the existing monochrome/yellow identity. The paid product is a human review, independent of the vision model: public URLs and a brief are enough to book. Default proposed price is **€89 inclusive of applicable tax for one page, €29 per additional page, up to three pages**. There is no subscription or demand pricing. Review this proposal as the seller before opening checkout; these amounts are not copied from the competitor.
+Twinsites will launch as one product. A visitor can compare a screenshot, pick an improvement from the action plan, explore references for that particular section, and take the chosen direction into a coding assistant. The same library is searchable directly from the website or through a Twinsites MCP connection. A customer can also book the existing human audit independently.
+
+The comparator, editable plan and human-service candidate are described below. The section library, paid digital access, subscription lifecycle and MCP are launch requirements awaiting implementation and verification.
+
+### Proposed launch offer
+
+| Offer | Proposed customer price | Delivery |
+| --- | --- | --- |
+| Free comparison | €0 | Existing on-device check, up to three qualifying visual relatives, editable plan and a sample section reference. |
+| Twinsites Pro | €15 per month, billed monthly | Self-service web and MCP access to the same curated sections, visual evidence, variations, implementation prompts and reusable Twinsites examples. |
+| Human audit | €89 for one page, €29 per extra page, up to three pages total | One-off purchase with a recorded review, three priorities and follow-up. |
+
+The Pro price is a hypothesis for launch. Measure paid conversions, renewals, cancellations and the variable cost per paying account before changing prices or promising unlimited usage. Offer prices need seller approval before activation.
+
+### Launch acceptance
+
+- From the free result or an audit finding explicitly selected by the customer, retrieve relevant sections with a source and evidence. Launch with coverage of homepage introductions, services and navigation. Show a helpful empty result when the library lacks a fit. Document motion with a clip or working example.
+- In the web app and a real MCP client, find the same references, inspect a selected one, and adapt an original or licensed implementation to a sample project. Show the result on mobile and desktop. Keep uploaded comparison screenshots local unless the user explicitly shares them.
+- In provider test mode, buy Pro, unlock both channels, renew, recover from a failed payment and cancel at period end. Reconcile repeated events without double billing or granting duplicate access. Keep the audit booking and its capacity independent of Pro.
+- Complete the existing comparator validation, seller setup and human-audit checks in the [release candidate](release-candidate.md) and [validation handoff](validation-handoff.md) before opening sales.
+
+## Existing human audit offer
+
+The homepage uses real catalog screenshots and the existing monochrome/yellow identity. The paid audit is a human review, independent of the vision model: public URLs and a brief are enough to book. Default proposed price is **€89 inclusive of applicable tax for one page, €29 per additional page, up to three pages**. Each audit is booked at a one-off price. Review this proposal as the seller before opening checkout; these amounts are not copied from the competitor.
 
 Scope: recorded walkthrough, prioritized report, three main changes with implementation prompts, and a human follow-up 30 days after delivery. Implementation and Figma are not included. Redesign is separately scoped and quoted; a matching non-refunded audit can be credited once. Default capacity is two audit bookings per UTC calendar week. No invented clients, testimonials, videos, conversion uplift or fake scarcity are shown. The old 14→0 marketing claim is removed from the home; the fictional before/after is presented as a visual example rather than a calibrated performance promise.
 
